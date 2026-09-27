@@ -80,6 +80,7 @@ export function LoginScreen({
         {pending && configured && (
           <p className="mt-6 rounded-2xl bg-lilac-100 px-4 py-3 text-sm font-semibold text-wine-800" role="status">
             Il tuo account esiste ma non è ancora abilitato. Chiedi ad {adamName} di attivarlo ♡
+            <span className="mt-1 block text-xs font-normal">Per {adamName}: assegna il ruolo con lo SQL del passo 9 di SETUP.md.</span>
           </p>
         )}
 

@@ -153,12 +153,19 @@ Lo script crea l'account, conferma l'email e assegna il ruolo. Puoi rilanciarlo 
 (Solo se hai usato il Metodo A.) Supabase → **SQL Editor** → New query, cambia le email e premi Run:
 
 ```sql
-update public.profiles set role = 'admin'
-where id = (select id from auth.users where email = 'tua@email.it');
+insert into public.profiles (id, role, display_name)
+select id, 'admin', 'Adam' from auth.users where email = lower('tua@email.it')
+on conflict (id) do update set role = excluded.role;
 
-update public.profiles set role = 'user'
-where id = (select id from auth.users where email = 'viola@email.it');
+insert into public.profiles (id, role, display_name)
+select id, 'user', 'Viola' from auth.users where email = lower('viola@email.it')
+on conflict (id) do update set role = excluded.role;
+
+-- controllo: devono comparire due righe, con i ruoli giusti
+select u.email, p.role from auth.users u left join public.profiles p on p.id = u.id;
 ```
+
+Funziona anche se hai creato gli utenti **prima** di eseguire `setup.sql`.
 
 Ruoli: `admin` = Adam (dashboard `/admin`), `user` = Viola (area `/viola`), `pending` = nessun accesso.
 

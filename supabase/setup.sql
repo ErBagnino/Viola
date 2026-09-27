@@ -593,8 +593,16 @@ revoke execute on all functions in schema public from anon, public;
 alter default privileges in schema public revoke all on tables from anon;
 alter default privileges in schema public revoke execute on functions from anon, public;
 
-grant usage on schema public to authenticated;
+grant usage on schema public to authenticated, service_role;
 grant select, insert, update, delete on all tables in schema public to authenticated;
+
+-- The server-side service role (notifications, settings, cron) must work even
+-- on projects where new tables are not auto-exposed to the Data API.
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant execute on all functions in schema public to service_role;
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant execute on functions to service_role;
 
 -- Tables the client must never write to directly (server / RPC only)
 revoke insert, update, delete on public.notification_events from authenticated;

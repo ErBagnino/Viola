@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod-it";
 import { APP_ACTION_KEYS } from "@/features/actions/registry";
 import { BREATHING_VISUALS } from "@/features/breathing/types";
 import {
@@ -61,6 +61,8 @@ export type FieldDef = {
   step?: number;
   placeholder?: string;
   half?: boolean;
+  /** select only: the field may stay empty, shown with this label (e.g. "Tutti") */
+  emptyLabel?: string;
   /** extra list suggestions (tags / category) */
   suggestions?: string[];
 };
@@ -376,7 +378,7 @@ export const RESOURCES = {
     fields: [
       { name: "media_id", label: "Foto", type: "image", required: true },
       { name: "text", label: "Frase", type: "text", placeholder: "Respira con me." },
-      { name: "preset_id", label: "Solo per il preset (vuoto = tutti)", type: "select", options: [] },
+      { name: "preset_id", label: "Solo per il preset", type: "select", options: [], emptyLabel: "Tutti i preset" },
       { name: "is_active", label: "Attiva", type: "boolean" },
     ],
     schema: z.object({
@@ -632,7 +634,7 @@ export const RESOURCES = {
       { name: "title", label: "Titolo", type: "text", required: true },
       { name: "subtitle", label: "Descrizione", type: "text" },
       { name: "action", label: "Azione (per le card)", type: "action" },
-      { name: "widget", label: "Widget", type: "select", options: opts(HOME_WIDGETS) },
+      { name: "widget", label: "Widget", type: "select", options: opts(HOME_WIDGETS), emptyLabel: "Nessun widget" },
       { name: "url", label: "Link personalizzato", type: "text", hint: "Solo con azione \"Link personalizzato\"" },
       { name: "icon", label: "Icona", type: "icon", half: true },
       { name: "color", label: "Colore", type: "color", half: true },

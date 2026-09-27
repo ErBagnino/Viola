@@ -6,6 +6,7 @@ import { assertAdmin } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { safeAction, UserError } from "@/server/action-result";
 import { isSettingsKey, PUBLIC_SETTINGS, settingsSchemas } from "./schema";
+import { SETTINGS_FORMS } from "./fields";
 import type { Json } from "@/db/database.types";
 
 export async function saveSettingsAction(key: string, value: Record<string, unknown>) {
@@ -15,7 +16,9 @@ export async function saveSettingsAction(key: string, value: Record<string, unkn
     const parsed = settingsSchemas[key].safeParse(value);
     if (!parsed.success) {
       const i = parsed.error.issues[0];
-      throw new UserError(`${String(i?.path[0] ?? "")}: ${i?.message ?? "valore non valido"}`);
+      const name = String(i?.path[0] ?? "");
+      const label = SETTINGS_FORMS[key]?.fields.find((f) => f.name === name)?.label ?? name;
+      throw new UserError(`«${label}»: ${i?.message ?? "valore non valido"}`);
     }
     const supabase = await createClient();
     const { data: before } = await supabase.from("app_settings").select("value").eq("key", key).maybeSingle();

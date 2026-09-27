@@ -89,7 +89,7 @@ export const SETTINGS_FORMS: Partial<Record<SettingsKey, { title: string; descri
       { name: "toLng", label: "Città 2 — longitudine", type: "number", step: 0.0001, half: true },
       { name: "fromLabel", label: "Etichetta città 1 (es. Adam)", type: "text", half: true },
       { name: "toLabel", label: "Etichetta città 2 (es. Viola)", type: "text", half: true },
-      { name: "countdownId", label: "Countdown del prossimo incontro", type: "select", options: [] },
+      { name: "countdownId", label: "Countdown del prossimo incontro", type: "select", options: [], emptyLabel: "Automatico" },
       { name: "note", label: "Frase", type: "text" },
     ],
   },

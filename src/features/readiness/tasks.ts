@@ -11,7 +11,7 @@ export type ReadinessFacts = {
   settings: SettingsMap;
   /** app_settings keys Adam has saved at least once */
   savedSettings: Set<string>;
-  env: { ai: boolean; telegramToken: boolean; telegramChat: boolean; vapid: boolean; siteUrl: boolean; cronSecret: boolean; serviceRole: boolean };
+  env: { ai: boolean; telegramToken: boolean; telegramChat: boolean; vapid: boolean; siteUrl: boolean; cronSecret: boolean; serviceRole: "ok" | "missing" | "invalid" };
   /** supabase/update.sql applied (newest tables exist) */
   databaseUpdated: boolean;
   contact: { whatsapp: boolean };
@@ -70,6 +70,19 @@ export const TASKS: TaskDef[] = [
     check: (f) => ({ done: f.databaseUpdated, detail: f.databaseUpdated ? "aggiornato" : "mancano le ultime novità (cuori, lista \"Completa\")" }),
   },
   {
+    id: "service-key",
+    title: "La chiave segreta di Supabase",
+    description: "SUPABASE_SERVICE_ROLE_KEY su Vercel: serve per le notifiche a Viola, le impostazioni e il \"tieni sveglio\". Deve essere la Secret key (sb_secret_…) dello stesso progetto.",
+    category: "App",
+    priority: "essential",
+    href: "/admin/completa#chiave-segreta",
+    cta: "Come si fa",
+    check: (f) => ({
+      done: f.env.serviceRole === "ok",
+      detail: f.env.serviceRole === "ok" ? "funziona" : f.env.serviceRole === "missing" ? "manca su Vercel" : "c'è, ma non funziona: forse è la chiave sbagliata",
+    }),
+  },
+  {
     id: "viola-account",
     title: "L'account di Viola",
     description: "Crea il suo accesso in Supabase (Authentication → Users) e dagli il ruolo \"user\": è lei che userà l'app.",
@@ -79,7 +92,7 @@ export const TASKS: TaskDef[] = [
     cta: "Come si fa",
     check: (f) =>
       f.viola.accounts === null
-        ? { done: false, detail: "non posso verificarlo: manca SUPABASE_SERVICE_ROLE_KEY" }
+        ? { done: false, detail: "non riesco a leggere i profili" }
         : { done: f.viola.accounts > 0, detail: f.viola.accounts > 0 ? "creato" : "nessun account con ruolo user" },
   },
   // --- Contatti -------------------------------------------------------------
@@ -145,7 +158,7 @@ export const TASKS: TaskDef[] = [
       !f.env.vapid
         ? { done: false, detail: "prima servono le chiavi VAPID" }
         : f.viola.pushDevices === null
-          ? { done: false, detail: "non posso verificarlo senza service role" }
+          ? { done: false, detail: "non posso verificarlo finché la chiave segreta di Supabase non funziona" }
           : { done: f.viola.pushDevices > 0, detail: f.viola.pushDevices > 0 ? `${f.viola.pushDevices} dispositivo/i` : "non ancora attivate" },
   },
   // --- Coppia ---------------------------------------------------------------

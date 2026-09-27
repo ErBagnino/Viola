@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, serviceRoleStatus } from "@/lib/supabase/admin";
 import { publicEnv } from "@/lib/env";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
@@ -22,7 +22,8 @@ import { occurrenceOf } from "@/utils/dates";
 export async function getReadinessFacts(adminId: string, settings?: SettingsMap): Promise<ReadinessFacts> {
   const s = settings ?? (await getSettings());
   const supabase = await createClient();
-  const service = createAdminClient();
+  const serviceStatus = await serviceRoleStatus();
+  const service = serviceStatus === "ok" ? createAdminClient() : null;
   const [media, memories, dedications, openWhen, countdowns, audio, aiMemory, quiz, phrases, breathingMedia, settingRows, testEvents, conversations, manual, hearts, profiles, subs] =
     await Promise.all([
       supabase.from("media").select("id, kind, visibility, contexts, include_in_random, breathing_enabled, ai_avatar_enabled, category, title").limit(5000),
@@ -80,7 +81,7 @@ export async function getReadinessFacts(adminId: string, settings?: SettingsMap)
       vapid: Boolean(publicEnv.vapidPublicKey && serverEnv.vapidPrivateKey),
       siteUrl: Boolean(serverEnv.siteUrl),
       cronSecret: Boolean(serverEnv.cronSecret),
-      serviceRole: Boolean(service),
+      serviceRole: serviceStatus,
     },
     // the newest tables exist only after supabase/update.sql
     databaseUpdated: !manual.error && !hearts.error,

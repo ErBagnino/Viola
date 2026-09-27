@@ -87,7 +87,15 @@ function FieldControl({ field: f, values, onChange, options, error }: { field: F
           case "select":
             return (
               <Select id={id} value={(v as string) ?? ""} onChange={(e) => set(e.target.value || null)}>
-                <option value="">—</option>
+                {f.emptyLabel ? (
+                  <option value="">{f.emptyLabel}</option>
+                ) : (
+                  !(options ?? []).some((o) => o.value === v) && (
+                    <option value="" disabled>
+                      Scegli…
+                    </option>
+                  )
+                )}
                 {(options ?? []).map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}

@@ -112,6 +112,20 @@ export default async function CompletaPage() {
         <h2 id="guide" className="font-display text-lg font-semibold text-vio-900">
           Come si fa
         </h2>
+        <Guide id="chiave-segreta" title="Sistemare la chiave segreta di Supabase">
+          <p>
+            1. Apri <b>supabase.com</b> → il tuo progetto → <b>Project Settings</b> → <b>API Keys</b>.
+          </p>
+          <p>
+            2. In <b>Secret keys</b> premi <b>Reveal</b> e copia la chiave che inizia con <code>sb_secret_</code> (non la <code>sb_publishable_</code>). Se il progetto usa le chiavi vecchie: la <b>service_role</b>, non la anon.
+          </p>
+          <p>
+            3. Vercel → progetto → <b>Settings</b> → <b>Environment Variables</b> → <code>SUPABASE_SERVICE_ROLE_KEY</code> → <b>Edit</b>, incolla, salva (tipo <b>Secret</b>, ambiente <b>Production</b>).
+          </p>
+          <p>
+            4. <b>Deployments</b> → sull&apos;ultimo deploy <b>⋯</b> → <b>Redeploy</b>. Poi torna qui: l&apos;avviso rosso sparisce.
+          </p>
+        </Guide>
         <Guide id="come-aggiornare" title="Aggiornare il database">
           <p>
             1. Apri il progetto su <b>supabase.com</b> → <b>SQL Editor</b> → <b>New query</b>.

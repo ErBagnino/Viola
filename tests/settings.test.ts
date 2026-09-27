@@ -29,3 +29,16 @@ describe("settings", () => {
     expect(settingsSchemas.ai.safeParse({ dailyMessageLimit: -1 }).success).toBe(false);
   });
 });
+
+describe("validation messages", () => {
+  it("are in plain Italian", async () => {
+    const { settingsSchemas } = await import("@/features/settings/schema");
+    const r = settingsSchemas.general.safeParse({ shortName: "Un nome davvero troppo lungo" });
+    expect(r.success).toBe(false);
+    expect(r.error!.issues[0].message).toBe("massimo 14 caratteri");
+    const a = settingsSchemas.ai.safeParse({ defaultMode: "" });
+    expect(a.error!.issues[0].message).toBe("scegli una delle opzioni");
+    const n = settingsSchemas.notifications.safeParse({ telegramChatId: "abc" });
+    expect(n.error!.issues[0].message).toBe("Il chat ID è un numero");
+  });
+});

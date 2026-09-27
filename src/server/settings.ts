@@ -17,10 +17,21 @@ import {
  * them unreadable from the client.
  */
 export const getSettings = cache(async (): Promise<SettingsMap> => {
+  const admin = createAdminClient();
+  if (admin) {
+    try {
+      const { data, error } = await admin.from("app_settings").select("key, value");
+      // A working secret key always sees the rows; an empty answer may just
+      // be a wrong key (RLS gives 0 rows), so double-check with the session.
+      if (!error && data?.length) return buildSettings(new Map(data.map((r) => [r.key, r.value])));
+      if (error) console.error("[settings] service-role read failed, using the session instead:", error.code ?? error.message);
+    } catch (e) {
+      console.error("[settings] service-role read failed, using the session instead:", e instanceof Error ? e.message : e);
+    }
+  }
   const rows = new Map<string, unknown>();
   try {
-    const client = createAdminClient() ?? (await createClient());
-    const { data } = await client.from("app_settings").select("key, value");
+    const { data } = await (await createClient()).from("app_settings").select("key, value");
     for (const r of data ?? []) rows.set(r.key, r.value);
   } catch {
     // Unconfigured / offline database: defaults only.
@@ -34,7 +45,8 @@ export async function getSystemSettings(): Promise<SettingsMap> {
   const admin = createAdminClient();
   if (admin) {
     try {
-      const { data } = await admin.from("app_settings").select("key, value");
+      const { data, error } = await admin.from("app_settings").select("key, value");
+      if (error) console.error("[settings] service-role read failed:", error.code ?? error.message);
       for (const r of data ?? []) rows.set(r.key, r.value);
     } catch {
       /* defaults */

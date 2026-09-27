@@ -39,7 +39,10 @@ export async function runCheckupFor(adminId: string): Promise<CheckupItem[]> {
   // --- Database & keys ------------------------------------------------------
   if (facts.databaseUpdated) add("ok", "Database aggiornato");
   else add("error", "Il database non è aggiornato", "Esegui supabase/update.sql nel SQL Editor di Supabase.", "/admin/completa#come-aggiornare");
-  if (!facts.env.serviceRole) add("error", "Manca SUPABASE_SERVICE_ROLE_KEY", "Senza, le notifiche a Viola e il \"tieni sveglio\" giornaliero non funzionano.");
+  if (facts.env.serviceRole === "missing") add("error", "Manca SUPABASE_SERVICE_ROLE_KEY", "Senza, le notifiche a Viola e il \"tieni sveglio\" giornaliero non funzionano.", "/admin/completa#chiave-segreta");
+  else if (facts.env.serviceRole === "invalid")
+    add("error", "SUPABASE_SERVICE_ROLE_KEY non funziona", "Su Vercel c'è, ma non è la Secret key di questo progetto (forse la publishable?). Le impostazioni potrebbero sembrare non salvate e le notifiche a Viola non partono.", "/admin/completa#chiave-segreta");
+  else add("ok", "Chiave segreta di Supabase funzionante");
   if (Boolean(publicEnv.vapidPublicKey) !== Boolean(serverEnv.vapidPrivateKey)) add("error", "Chiavi VAPID incomplete", "Servono sia NEXT_PUBLIC_VAPID_PUBLIC_KEY sia VAPID_PRIVATE_KEY.", "/admin/notifiche");
 
   // --- Telegram (real call, no message sent) --------------------------------

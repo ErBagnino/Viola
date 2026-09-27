@@ -13,7 +13,7 @@ function emptyFacts(): ReadinessFacts {
   return {
     settings: settings(),
     savedSettings: new Set(),
-    env: { ai: false, telegramToken: false, telegramChat: false, vapid: false, siteUrl: false, cronSecret: false, serviceRole: true },
+    env: { ai: false, telegramToken: false, telegramChat: false, vapid: false, siteUrl: false, cronSecret: false, serviceRole: "ok" },
     databaseUpdated: true,
     contact: { whatsapp: false },
     viola: { accounts: 0, pushDevices: 0 },
@@ -41,7 +41,7 @@ function fullFacts(): ReadinessFacts {
     ...emptyFacts(),
     settings: settings({ general: { togetherSince: "2025-02-14" } }),
     savedSettings: new Set(["ai", "ai_profile"]),
-    env: { ai: true, telegramToken: true, telegramChat: true, vapid: true, siteUrl: true, cronSecret: true, serviceRole: true },
+    env: { ai: true, telegramToken: true, telegramChat: true, vapid: true, siteUrl: true, cronSecret: true, serviceRole: "ok" },
     contact: { whatsapp: true },
     viola: { accounts: 1, pushDevices: 1 },
     adamPushDevices: 1,
@@ -73,7 +73,7 @@ describe("Completa Vio ♡ — task definitions", () => {
   });
 
   it("never lets the safety-critical essentials be skipped", () => {
-    for (const id of ["db-update", "viola-account", "whatsapp", "alerts", "next-meeting", "gallery", "first-memory"]) {
+    for (const id of ["db-update", "service-key", "viola-account", "whatsapp", "alerts", "next-meeting", "gallery", "first-memory"]) {
       const t = TASKS.find((x) => x.id === id)!;
       expect(t.priority).toBe("essential");
       expect(t.skippable ?? false).toBe(false);
@@ -151,6 +151,16 @@ describe("Completa Vio ♡ — evaluation", () => {
     expect(t.done).toBe(false);
     expect(t.detail).toBe("mancano: quando sei triste, quando hai paura, quando mi manchi");
     expect(t.progress).toEqual({ value: 1, target: 4 });
+  });
+
+  it("a secret key that is set but does not work is an essential problem", () => {
+    const f = fullFacts();
+    f.env.serviceRole = "invalid";
+    const s = evaluateTasks(f);
+    const t = s.tasks.find((x) => x.id === "service-key")!;
+    expect(t).toMatchObject({ done: false, priority: "essential", skippable: false });
+    expect(t.detail).toMatch(/non funziona/);
+    expect(s.level).toBe("todo");
   });
 
   it("an older database is detected and asked to update", () => {

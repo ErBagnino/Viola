@@ -397,6 +397,7 @@ Su **Android** (Chrome): menu ⋮ → **Installa app** / "Aggiungi a schermata H
 | Accesso: "Non riesco a collegarmi a Supabase" | `NEXT_PUBLIC_SUPABASE_URL` deve essere `https://xxxx.supabase.co`; controlla anche che il progetto non sia in pausa. Poi Redeploy. |
 | Accesso: "Il database non è pronto" | Esegui `supabase/setup.sql` (passo 4). |
 | "Cuore a distanza", l'interruttore privacy o le spunte di "Completa Vio ♡" danno errore | Esegui `supabase/update.sql` (passo 5). |
+| Le impostazioni dicono "salvate" ma dopo aver ricaricato sembrano sparite, oppure nel pannello c'è l'avviso rosso "La chiave segreta di Supabase non funziona" | Su Vercel `SUPABASE_SERVICE_ROLE_KEY` non è la **Secret key** (`sb_secret_…`) di questo progetto (spesso è stata incollata la publishable). Correggila (passo 22) e fai **Redeploy**. Le versioni nuove dell'app leggono comunque le impostazioni con la tua sessione, ma senza la chiave giusta le notifiche a Viola non partono. |
 | Adam AI dice che si prende una pausa | Tutti i modelli gratuiti hanno finito la quota di oggi (si riparte verso le 9:00) oppure hai raggiunto i limiti dell'app (Admin → Adam AI). Non si paga mai. |
 | Dopo un aggiornamento l'app installata sembra vecchia | Chiudila del tutto e riaprila: ogni deploy installa un nuovo service worker e svuota le cache vecchie. |
 

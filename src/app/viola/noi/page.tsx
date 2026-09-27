@@ -4,6 +4,10 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ActionCard } from "@/features/home/action-card";
 import { Sparkle } from "@/components/decor/stars";
 import { getSettings } from "@/server/settings";
+import { requireMember } from "@/server/auth";
+import { getHeartState } from "@/server/hearts";
+import { HeartExchange } from "@/features/hearts/heart-exchange";
+import { todayKey } from "@/utils/dates";
 
 export const metadata = { title: "Noi" };
 
@@ -19,7 +23,12 @@ const ITEMS = [
 ];
 
 export default async function NoiPage() {
-  const { distance, general } = await getSettings();
+  const [{ distance, general }, viewer] = await Promise.all([getSettings(), requireMember()]);
+  const hearts = await getHeartState(viewer.id);
+  // Whole days since the date Adam set (in Rome time), e.g. "Insieme da 412 giorni ♡".
+  const together = general.togetherSince
+    ? Math.floor((Date.parse(todayKey(general.timezone)) - Date.parse(general.togetherSince)) / 86_400_000)
+    : null;
   const items = ITEMS.map((it) =>
     it.href === "/viola/noi/distanza"
       ? { ...it, subtitle: `${distance.fromName} ↔ ${distance.toName}` }
@@ -29,7 +38,10 @@ export default async function NoiPage() {
   );
   return (
     <div>
-      <PageHeader title="Noi" subtitle="Tutto quello che è nostro." />
+      <PageHeader title="Noi" subtitle={together !== null && together >= 0 ? `Insieme da ${together.toLocaleString("it-IT")} ${together === 1 ? "giorno" : "giorni"} ♡` : "Tutto quello che è nostro."} />
+      <div className="mb-4">
+        <HeartExchange state={hearts} otherName={general.adamName} compact />
+      </div>
       <Link
         href="/viola/noi/foto/random"
         className="press btn-3d relative mb-4 flex items-center gap-4 overflow-hidden rounded-4xl bg-gradient-to-br from-rouge-400 to-wine-700 p-5 text-white"

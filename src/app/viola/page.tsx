@@ -3,8 +3,14 @@ import { Fragment } from "react";
 import { ArrowRight, HeartHandshake, Moon, Sparkles, Sunrise } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/server/settings";
+import { requireMember } from "@/server/auth";
+import { getHeartState } from "@/server/hearts";
+import { HeartExchange } from "@/features/hearts/heart-exchange";
 import { getContact } from "@/server/contact";
-import { getDailySurprise, getNextCountdown, randomPhrase } from "@/server/viola-data";
+import { getDailySurprise, getNextCountdown, getTodayMoments, randomPhrase } from "@/server/viola-data";
+import { SpecialDay } from "@/features/home/special-day";
+import { TapSecret } from "@/features/secrets/tap-secret";
+import { WishTime } from "@/features/secrets/wish-time";
 import { actionHref } from "@/features/actions/registry";
 import { ActionCard } from "@/features/home/action-card";
 import { DEFAULT_HOME_MODULES } from "@/features/content/fallbacks";
@@ -13,7 +19,7 @@ import { MoodPicker } from "@/features/mood/mood-picker";
 import { LiveCountdown } from "@/features/home/live-countdown";
 import { Sparkle, Star5 } from "@/components/decor/stars";
 import { Icon } from "@/components/ui/icon";
-import { haversineKm, hourIn } from "@/utils/dates";
+import { haversineKm, hourIn, todayKey } from "@/utils/dates";
 import type { Tables } from "@/db/database.types";
 
 export const metadata = { title: "Home" };
@@ -21,7 +27,7 @@ export const metadata = { title: "Home" };
 type Module = Tables<"home_modules">;
 
 export default async function ViolaHome() {
-  const settings = await getSettings();
+  const [settings, viewer] = await Promise.all([getSettings(), requireMember()]);
   const { general, distance } = settings;
   const supabase = await createClient();
   const contact = getContact(settings);
@@ -41,10 +47,14 @@ export default async function ViolaHome() {
     list.splice(at + 1, 0, fallback);
   }
   const widgets = new Set(list.filter((m) => m.type === "widget").map((m) => m.widget));
-  const [surprise, countdown] = await Promise.all([
+  const [surprise, countdown, hearts, moments] = await Promise.all([
     widgets.has("daily_surprise") ? getDailySurprise(general.timezone) : null,
     widgets.has("countdown") ? getNextCountdown(general.timezone) : null,
+    getHeartState(viewer.id),
+    getTodayMoments(general.timezone),
   ]);
+  // A heart from Adam is shown even if the "heart" widget is not on the home.
+  const heartOnTop = hearts.unseen > 0 && !widgets.has("heart");
   const hour = hourIn(general.timezone);
 
   // Group consecutive action cards into one grid.
@@ -80,6 +90,8 @@ export default async function ViolaHome() {
         );
       case "mood":
         return <MoodPicker title={m.title || "Come ti senti?"} />;
+      case "heart":
+        return <HeartExchange state={hearts} otherName={general.adamName} title={m.title || undefined} />;
       case "need_adam":
         return (
           <Link href="/viola/adam" className="press btn-3d block rounded-4xl bg-gradient-to-b from-rouge-400 to-rouge-600 p-5 text-center text-xl font-extrabold text-white">
@@ -141,7 +153,9 @@ export default async function ViolaHome() {
     <div className="space-y-5">
       <header className="flex items-start gap-3 pt-2">
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-[2.4rem] leading-none font-semibold text-vio-900">{general.homeGreeting}</h1>
+          <h1 className="font-display text-[2.4rem] leading-none font-semibold text-vio-900">
+            <TapSecret message={settings.texts.secretMessage}>{general.homeGreeting}</TapSecret>
+          </h1>
           <p className="mt-2 text-lg text-ink-soft">{general.homeQuestion}</p>
         </div>
         <Link href="/viola/adam" className="press paper grid size-12 shrink-0 place-items-center rounded-2xl text-rouge-500" aria-label="Ho bisogno di Adam" title="Ho bisogno di Adam">
@@ -156,6 +170,14 @@ export default async function ViolaHome() {
         <blockquote className="font-display text-xl leading-snug text-vio-800 italic">{phrase}</blockquote>
         {general.showDaAdam && <figcaption className="mt-1 text-right font-hand text-xl text-vio-500">{general.signature}</figcaption>}
       </figure>
+
+      <WishTime tz={general.timezone} />
+
+      {moments.map((m) => (
+        <SpecialDay key={m.id} id={m.id} title={m.title} text={m.description || settings.texts.countdownToday} icon={m.icon} day={todayKey(general.timezone)} />
+      ))}
+
+      {heartOnTop && <HeartExchange state={hearts} otherName={general.adamName} />}
 
       {(hour >= 5 && hour < 12) || hour >= 21 || hour < 5 ? (
         <div className="flex gap-2">

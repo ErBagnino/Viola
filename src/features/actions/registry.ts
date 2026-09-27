@@ -46,6 +46,7 @@ export const APP_ACTIONS = {
   game_slider: { label: "Termometro dell'amore", href: "/viola/giochi/termometro", icon: "flame", group: "Giochi" },
   game_questions: { label: "Domande casuali", href: "/viola/giochi/domande", icon: "dice", group: "Giochi" },
   game_roulette: { label: "Roulette romantica", href: "/viola/giochi/roulette", icon: "orbit", group: "Giochi" },
+  game_guess: { label: "Indovina il ricordo", href: "/viola/giochi/indovina", icon: "eye", group: "Giochi" },
   hug: { label: "Voglio un abbraccio", href: "/viola/abbraccio", icon: "heart-handshake", group: "Svago" },
   good_morning: { label: "Buongiorno", href: "/viola/buongiorno", icon: "sunrise", group: "Svago" },
   good_night: { label: "Buonanotte", href: "/viola/buonanotte", icon: "moon-star", group: "Svago" },

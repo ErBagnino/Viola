@@ -55,7 +55,7 @@ export function EmergencyContact({ tone = "light", className }: { tone?: "light"
       )}
       {c.whatsappUrl && (
         <a href={c.whatsappUrl} target="_blank" rel="noopener noreferrer" className={cn(base, tone === "dark" ? "bg-white/10 text-white" : "paper text-vio-800")}>
-          <MessageCircleHeart className="size-5" /> Scrivi a {c.adamName}
+          <MessageCircleHeart className="size-5" /> Scrivi {/^[aeiou]/i.test(c.adamName) ? "ad" : "a"} {c.adamName}
         </a>
       )}
     </div>

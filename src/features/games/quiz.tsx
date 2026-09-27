@@ -10,7 +10,7 @@ import { cn } from "@/utils/cn";
 
 export type QuizQuestion = { id: string; question: string; options: string[]; correct: number; explanation: string | null };
 
-export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamName: string }) {
+export function Quiz({ questions, texts }: { questions: QuizQuestion[]; texts: { perfect: string; good: string; low: string } }) {
   const [i, setI] = useState(0);
   const [answer, setAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -38,7 +38,7 @@ export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamN
           {score} su {questions.length}
         </p>
         <p className="mt-2 text-ink-soft">
-          {pct === 1 ? `Mi conosci meglio di chiunque. ${adamName} è colpito ♡` : pct >= 0.6 ? "Mi conosci proprio bene ♡" : "Abbiamo ancora tante cose da raccontarci ♡"}
+          {pct === 1 ? texts.perfect : pct >= 0.6 ? texts.good : texts.low}
         </p>
         <Button
           variant="soft"

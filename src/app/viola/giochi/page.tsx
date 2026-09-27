@@ -14,6 +14,7 @@ const GAMES = [
   { key: "game_slider", subtitle: "Quanto mi vuoi bene?", color: "blush" },
   { key: "game_questions", subtitle: "Domande per conoscerci", color: "cream" },
   { key: "game_roulette", subtitle: "Gira e scopri", color: "lilac" },
+  { key: "game_guess", subtitle: "Ti ricordi dov'eravamo?", color: "night" },
 ] as const;
 
 export default async function GiochiPage() {

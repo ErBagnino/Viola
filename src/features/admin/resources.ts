@@ -577,7 +577,7 @@ export const RESOURCES = {
     label: "Home builder",
     singular: "Modulo della home",
     icon: "home",
-    description: "Cosa vede Viola in home, in che ordine, con che titolo, icona e colore.",
+    description: "Cosa vede Viola in home, in che ordine, con che titolo, icona e colore. \"Ho bisogno di Adam\" resta sempre in home anche se lo disattivi qui; se non c'è nessun modulo, Viola vede una home di partenza.",
     titleField: "title",
     subtitleField: "subtitle",
     badgeField: "type",

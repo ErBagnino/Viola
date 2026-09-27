@@ -67,6 +67,7 @@ export const DEFAULT_HOME_MODULES: HomeModule[] = [
   mod(10, { type: "widget", widget: "help_now", title: "Aiutami adesso", subtitle: "Ti propongo una cosa da fare, subito." }),
   mod(15, { type: "widget", widget: "need_adam", title: "Ho bisogno di Adam ♡" }),
   mod(20, { type: "widget", widget: "mood", title: "Come ti senti?" }),
+  mod(25, { type: "widget", widget: "heart", title: "Cuore a distanza" }),
   mod(30, { type: "action", action: "calm", title: "Ho bisogno di calmarmi", subtitle: "Un posto morbido dove rallentare", icon: "flower" }),
   mod(40, { type: "action", action: "breathe", title: "Ho bisogno di respirare", subtitle: "Respira con me", icon: "wind" }),
   mod(50, { type: "action", action: "fear", title: "Ho paura", subtitle: "Facciamo una cosa alla volta", icon: "shield-heart" }),

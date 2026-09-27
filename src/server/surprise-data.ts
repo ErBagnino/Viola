@@ -9,7 +9,7 @@ import { pickOne, shuffle } from "@/utils/random";
 import { countdownParts, occurrenceOf } from "@/utils/dates";
 import { getSettings } from "@/server/settings";
 
-const GAMES = ["game_heart", "game_memory", "game_puzzle", "game_reaction", "game_slider", "game_roulette", "game_questions"] as const;
+const GAMES = ["game_heart", "game_memory", "game_puzzle", "game_reaction", "game_slider", "game_roulette", "game_questions", "game_guess"] as const;
 
 /** A shuffled bag of surprises of different kinds. */
 export async function getSurprises(): Promise<SurpriseItem[]> {

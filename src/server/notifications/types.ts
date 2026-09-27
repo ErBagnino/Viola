@@ -1,7 +1,7 @@
 export type Channel = "telegram" | "webpush" | "whatsapp";
 export type ChannelStatus = "sent" | "failed" | "skipped" | "not_configured";
 
-export type NotificationKind = "need_adam" | "message" | "journal" | "mood" | "test" | "reply";
+export type NotificationKind = "need_adam" | "message" | "journal" | "mood" | "test" | "reply" | "heart";
 
 export type NotificationPayload = {
   kind: NotificationKind;

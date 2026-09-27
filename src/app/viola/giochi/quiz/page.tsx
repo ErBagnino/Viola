@@ -15,7 +15,7 @@ export default async function Page() {
   return (
     <div>
       <PageHeader title="Quanto mi conosci?" back="/viola/giochi" />
-      {qs.length ? <Quiz questions={qs} adamName={settings.general.adamName} /> : <EmptyState title="Le domande stanno arrivando" text={`${settings.general.adamName} sta preparando il quiz ♡`} />}
+      {qs.length ? <Quiz questions={qs} texts={{ perfect: settings.texts.quizPerfect, good: settings.texts.quizGood, low: settings.texts.quizLow }} /> : <EmptyState title="Le domande stanno arrivando" text={`${settings.general.adamName} sta preparando il quiz ♡`} />}
     </div>
   );
 }

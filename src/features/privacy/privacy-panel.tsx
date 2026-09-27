@@ -14,6 +14,7 @@ const OPTIONS = [
   { key: "messages", label: "I messaggi che ho scritto" },
   { key: "aiChats", label: "Le chat con Adam AI" },
   { key: "activity", label: "Statistiche d'uso (es. respiri fatti)" },
+  { key: "hearts", label: "I cuori che ho mandato" },
 ] as const;
 
 export function PrivacyPanel() {
@@ -52,6 +53,7 @@ export function PrivacyPanel() {
                 messages: Boolean(sel.messages),
                 activity: Boolean(sel.activity),
                 aiChats: Boolean(sel.aiChats),
+                hearts: Boolean(sel.hearts),
               }));
               if (res.ok) {
                 toast.show("Fatto. Cancellato ♡");

@@ -49,8 +49,24 @@ function Burst({ kind }: { kind: string }) {
 
 export function OpenWhenGrid({ cards, signature }: { cards: OpenWhenCard[]; signature: string }) {
   const [open, setOpen] = useState<OpenWhenCard | null>(null);
+  const openCard = (c: OpenWhenCard) => {
+    setOpen(c);
+    haptic("heart");
+    void callQuietly(() => markOpenWhenOpened(c.id));
+  };
+  // "Scegli tu per me": one of the envelopes opened the fewest times (never-opened first).
+  const chooseForMe = () => {
+    const least = Math.min(...cards.map((c) => c.openedCount));
+    const pool = cards.filter((c) => c.openedCount === least);
+    openCard(pool[Math.floor(Math.random() * pool.length)]);
+  };
   return (
     <>
+      {cards.length > 1 && (
+        <button type="button" onClick={chooseForMe} className="press paper mb-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 font-bold text-vio-800">
+          <Icon name="shuffle" className="size-4 text-base" /> Scegli tu per me
+        </button>
+      )}
       <div className="grid grid-cols-2 gap-3">
         {cards.map((c, i) => {
           const dark = isDarkTone(c.color);
@@ -62,11 +78,7 @@ export function OpenWhenGrid({ cards, signature }: { cards: OpenWhenCard[]; sign
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               whileTap={{ scale: 0.95, rotate: -1 }}
-              onClick={() => {
-                setOpen(c);
-                haptic("heart");
-                void callQuietly(() => markOpenWhenOpened(c.id));
-              }}
+              onClick={() => openCard(c)}
               className={cn("relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-gradient-to-br p-4 text-left shadow-soft", toneClass(c.color))}
             >
               <span className="absolute inset-x-0 top-0 h-1/2 bg-white/25 [clip-path:polygon(0_0,100%_0,50%_75%)]" aria-hidden />

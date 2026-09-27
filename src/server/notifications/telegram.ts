@@ -38,19 +38,32 @@ export function createTelegramProvider(getChatId: () => string): NotificationPro
       if (url.startsWith("https://")) {
         body.reply_markup = { inline_keyboard: [[{ text: "Apri app", url }]] };
       }
-      try {
-        const res = await fetch(`${API}/bot${token}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          signal: AbortSignal.timeout(8000),
-        });
-        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; description?: string };
-        if (res.ok && json.ok) return { channel: "telegram", status: "sent" };
-        return { channel: "telegram", status: "failed", detail: scrub(json.description ?? `HTTP ${res.status}`) };
-      } catch (e) {
-        return { channel: "telegram", status: "failed", detail: scrub(e instanceof Error ? e.message : "errore di rete") };
+      // Urgent alerts ("Ho bisogno di Adam") get ONE more try on a temporary
+      // failure (network, rate limit, Telegram hiccup): a rare duplicate is
+      // better than a missed call for help. Never more than two attempts.
+      const attempts = p.urgent ? 2 : 1;
+      let last: ChannelResult = { channel: "telegram", status: "failed", detail: "errore" };
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        let retryAfterMs = 700;
+        try {
+          const res = await fetch(`${API}/bot${token}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(8000),
+          });
+          const json = (await res.json().catch(() => ({}))) as { ok?: boolean; description?: string; parameters?: { retry_after?: number } };
+          if (res.ok && json.ok) return { channel: "telegram", status: "sent" };
+          last = { channel: "telegram", status: "failed", detail: scrub(json.description ?? `HTTP ${res.status}`) };
+          const transient = res.status === 429 || res.status >= 500;
+          if (!transient) return last; // wrong token / chat id: retrying cannot help
+          retryAfterMs = Math.min(3000, (json.parameters?.retry_after ?? 0) * 1000 || 700);
+        } catch (e) {
+          last = { channel: "telegram", status: "failed", detail: scrub(e instanceof Error ? e.message : "errore di rete") };
+        }
+        if (attempt < attempts) await new Promise((r) => setTimeout(r, retryAfterMs));
       }
+      return last;
     },
   };
 }

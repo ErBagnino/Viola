@@ -60,6 +60,14 @@ export async function getNextCountdown(tz: string): Promise<(Tables<"countdowns"
   return first ? { ...first.c, isToday: first.occ.isToday } : null;
 }
 
+/** Countdowns happening today (birthdays, anniversaries, meetings…) — "Momenti speciali". */
+export async function getTodayMoments(tz: string): Promise<Tables<"countdowns">[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("countdowns").select("*");
+  const now = new Date();
+  return (data ?? []).filter((c) => occurrenceOf(c.target_at, c.recurring_yearly, now, tz).isToday);
+}
+
 /** Media the app may use for a given purpose (random photos, breathing, …). */
 export async function mediaPool(opts: { context?: string; breathing?: boolean; random?: boolean; category?: string; limit?: number } = {}) {
   const supabase = await createClient();

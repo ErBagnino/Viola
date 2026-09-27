@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/server/auth";
 import { getSettings } from "@/server/settings";
 import { getNotificationStatus } from "@/server/notifications/status";
+import { getHeartState } from "@/server/hearts";
+import { HeartExchange } from "@/features/hearts/heart-exchange";
 import { MOODS } from "@/features/content/constants";
 import { formatDateTime, relativeTime, todayKey } from "@/utils/dates";
 import { cn } from "@/utils/cn";
@@ -34,6 +36,7 @@ export default async function AdminDashboard() {
     supabase.from("activity_events").select("*").order("created_at", { ascending: false }).limit(6),
     getNotificationStatus(settings, admin.id),
   ]);
+  const hearts = await getHeartState(admin.id);
 
   const urgent = reqNew.data ?? [];
   const aiReq = (usage.data ?? []).filter((u) => u.scope === "viola").reduce((s, u) => s + u.requests, 0);
@@ -52,7 +55,7 @@ export default async function AdminDashboard() {
             {urgent.length === 1 ? "1 richiesta nuova" : `${urgent.length} richieste nuove`} · l&apos;ultima {relativeTime(urgent[0].created_at)}
             {urgent[0].message ? ` — "${urgent[0].message}"` : ""}
           </p>
-          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 font-extrabold text-rouge-600">
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-extrabold text-rouge-600">
             Apri <ArrowRight className="size-4" />
           </span>
         </Link>
@@ -62,6 +65,8 @@ export default async function AdminDashboard() {
           <p className="text-sm text-ink-soft">Nessuna richiesta aperta. Quando {viola} premerà &quot;Ho bisogno di Adam&quot; la vedrai qui (e riceverai una notifica).</p>
         </div>
       )}
+
+      <HeartExchange state={hearts} otherName={viola} />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[

@@ -9,11 +9,13 @@ import "./globals.css";
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
-  axes: ["SOFT", "WONK", "opsz"],
+  // SOFT gives the rounded, gentle headings; WONK is never used, so it is not downloaded.
+  axes: ["SOFT", "opsz"],
   display: "swap",
 });
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap" });
-const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat", display: "swap" });
+// Handwriting is decorative and appears below the fold: no preload.
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat", display: "swap", preload: false });
 
 export async function generateMetadata(): Promise<Metadata> {
   const { general } = await getSystemSettings();

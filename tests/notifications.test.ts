@@ -86,6 +86,26 @@ describe("telegram provider", () => {
     expect(failed.detail).not.toContain("SECRET");
   });
 
+  it("retries an urgent alert once on a temporary failure, never on a wrong chat id", async () => {
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "123:SECRET");
+    const tg = createTelegramProvider(() => "42");
+    let calls = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => (++calls === 1 ? new Response("{}", { status: 502 }) : new Response(JSON.stringify({ ok: true }), { status: 200 }))));
+    expect(await tg.send({ ...payload, urgent: true }, { userIds: [] })).toEqual({ channel: "telegram", status: "sent" });
+    expect(calls).toBe(2);
+
+    calls = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => (++calls, new Response(JSON.stringify({ ok: false, description: "Bad Request: chat not found" }), { status: 400 }))));
+    const r = await tg.send({ ...payload, urgent: true }, { userIds: [] });
+    expect(r.status).toBe("failed");
+    expect(calls).toBe(1);
+
+    calls = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => (++calls, new Response("{}", { status: 503 }))));
+    await tg.send({ ...payload, urgent: false }, { userIds: [] });
+    expect(calls).toBe(1); // non-urgent: single attempt
+  });
+
   it("reports not_configured without a token or chat id", () => {
     vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
     expect(createTelegramProvider(() => "42").isConfigured()).toBe(false);

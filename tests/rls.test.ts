@@ -281,3 +281,28 @@ describe("attack paths (defence in depth)", () => {
     expect(await as(VIOLA, async () => (await rows("select count(*)::int n from public.ai_tool_logs"))[0].n)).toBe(0);
   });
 });
+
+describe("cuore a distanza", () => {
+  it("members exchange hearts; nobody can forge or pre-read them", async () => {
+    await as(VIOLA, () => q("insert into public.hearts default values"));
+    expect(await as(VIOLA, () => fails(`insert into public.hearts (from_user) values ('${ADAM}')`))).toBe(true);
+    expect(await as(STRANGER, () => fails("insert into public.hearts default values"))).toBe(true);
+    expect(await as(null, () => fails("select * from public.hearts"))).toBe(true);
+    // Viola cannot mark her own heart as seen; Adam can mark the one he received
+    await as(VIOLA, () => q("update public.hearts set seen_at = now()"));
+    expect((await rows("select seen_at from public.hearts"))[0].seen_at).toBeNull();
+    await as(ADAM, () => q("update public.hearts set seen_at = now()"));
+    expect((await rows("select seen_at from public.hearts"))[0].seen_at).not.toBeNull();
+    // Adam cannot delete Viola's heart; she can
+    await as(ADAM, () => q("delete from public.hearts"));
+    expect((await rows("select count(*)::int n from public.hearts"))[0].n).toBe(1);
+    await as(VIOLA, () => q("delete from public.hearts"));
+    expect((await rows("select count(*)::int n from public.hearts"))[0].n).toBe(0);
+  });
+
+  it("Viola can switch off activity sharing but still not touch her role", async () => {
+    await as(VIOLA, () => q("update public.profiles set share_activity = false where id = $1", [VIOLA]));
+    expect((await rows("select share_activity, role from public.profiles where id = $1", [VIOLA]))[0]).toEqual({ share_activity: false, role: "user" });
+    expect(await as(VIOLA, () => fails("update public.profiles set role = 'admin' where id = $1", [VIOLA]))).toBe(true);
+  });
+});

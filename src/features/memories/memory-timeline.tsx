@@ -22,7 +22,9 @@ export type MemoryItem = {
 };
 
 
-export function MemoryTimeline({ items, initialOpenId }: { items: MemoryItem[]; initialOpenId?: string | null }) {
+export type TimelineNow = { nextTitle: string | null; nextLabel: string | null };
+
+export function MemoryTimeline({ items, initialOpenId, now }: { items: MemoryItem[]; initialOpenId?: string | null; now?: TimelineNow }) {
   const [open, setOpen] = useState<MemoryItem | null>(() => items.find((m) => m.id === initialOpenId) ?? null);
 
   return (
@@ -31,6 +33,24 @@ export function MemoryTimeline({ items, initialOpenId }: { items: MemoryItem[]; 
         <Shuffle className="size-4" /> Un ricordo a caso
       </Button>
       <ol className="relative ml-3 space-y-5 border-l-2 border-dashed border-tint-200 pl-6">
+        {now?.nextTitle && (
+          <li className="relative">
+            <span className="absolute top-2 -left-[2.35rem] grid size-8 place-items-center rounded-full bg-surface text-base shadow-soft" aria-hidden>
+              ⏳
+            </span>
+            <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">Prossimo</p>
+            <p className="font-display text-lg font-semibold text-vio-900">{now.nextTitle}</p>
+            {now.nextLabel && <p className="text-sm text-ink-soft">{now.nextLabel}</p>}
+          </li>
+        )}
+        {now && (
+          <li className="relative">
+            <span className="absolute top-1/2 -left-[2.45rem] grid size-9 -translate-y-1/2 place-items-center rounded-full bg-gradient-to-b from-rouge-400 to-rouge-600 text-white shadow-glow" aria-hidden>
+              ♥
+            </span>
+            <p className="inline-flex rounded-full bg-night-900 px-4 py-1.5 text-sm font-bold text-moon">Sei qui ♡ · oggi</p>
+          </li>
+        )}
         {items.map((m, i) => {
           const k = MEMORY_KINDS[m.kind] ?? MEMORY_KINDS.other;
           return (

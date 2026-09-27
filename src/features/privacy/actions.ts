@@ -11,6 +11,7 @@ const schema = z.object({
   messages: z.boolean(),
   activity: z.boolean(),
   aiChats: z.boolean(),
+  hearts: z.boolean().default(false),
 });
 
 /** Lets Viola erase her own data (RLS restricts each delete to her rows). */
@@ -25,6 +26,7 @@ export async function deleteMyData(input: z.input<typeof schema>) {
     if (opts.messages) jobs.push(supabase.from("messages").delete().eq("sender_id", viewer.id));
     if (opts.activity) jobs.push(supabase.from("activity_events").delete().eq("user_id", viewer.id));
     if (opts.aiChats) jobs.push(supabase.from("ai_conversations").delete().eq("user_id", viewer.id).eq("scope", "viola"));
+    if (opts.hearts) jobs.push(supabase.from("hearts").delete().eq("from_user", viewer.id));
     await Promise.all(jobs);
     return {};
   });

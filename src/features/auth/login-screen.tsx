@@ -8,6 +8,7 @@ import { Field, Input } from "@/components/ui/fields";
 import { HeartFlower, Sparkle, Star5 } from "@/components/decor/stars";
 import { FloatingHearts } from "@/components/decor/floating-hearts";
 import { signIn, type SignInState } from "./actions";
+import { TapSecret } from "@/features/secrets/tap-secret";
 
 type Persona = "viola" | "adam";
 
@@ -50,7 +51,9 @@ export function LoginScreen({
           transition={{ type: "spring", damping: 14, stiffness: 120 }}
           className="relative mx-auto mb-7 grid size-32 place-items-center rounded-[2.2rem] bg-black shadow-float"
         >
-          <HeartFlower className="size-24" color="#da0e14" />
+          <TapSecret taps={5} message="Ti stavo aspettando ♡">
+            <HeartFlower className="size-24" color="#da0e14" />
+          </TapSecret>
           <Star5 className="absolute -top-2 -right-2 size-9 rotate-12" />
           <Sparkle outline className="absolute -bottom-1 -left-2 size-6 text-white" />
         </motion.div>

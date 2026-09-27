@@ -133,6 +133,7 @@ export const HOME_WIDGETS: Record<string, string> = {
   daily_surprise: "Una cosa per te (sorpresa del giorno)",
   countdown: "Countdown",
   distance: "Distanza",
+  heart: "Cuore a distanza (manda un pensiero ad Adam)",
 };
 
 export const MESSAGE_CATEGORIES = {

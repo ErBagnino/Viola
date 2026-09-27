@@ -316,6 +316,19 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"hearts": {
+                  Row: {
+                    "created_at": string,"from_user": string,"id": string,"seen_at": string | null
+                  }
+                  Insert: {
+                    "created_at"?: string,"from_user"?: string,"id"?: string,"seen_at"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"from_user"?: string,"id"?: string,"seen_at"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"home_modules": {
                   Row: {
                     "action": string | null,"color": string | null,"created_at": string,"icon": string | null,"id": string,"is_enabled": boolean,"position": number,"size": string,"subtitle": string | null,"title": string,"type": string,"updated_at": string,"url": string | null,"widget": string | null

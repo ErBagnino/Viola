@@ -23,6 +23,11 @@ export const generalSchema = z.object({
   homeQuestion: text(120, "Come stai oggi?"),
   needsTitle: text(80, "Di cosa hai bisogno?"),
   showDaAdam: z.boolean().default(true),
+  /** "Insieme da N giorni ♡" in Noi — empty = hidden */
+  togetherSince: z
+    .union([z.iso.date(), z.literal(""), z.null()])
+    .default("")
+    .transform((v) => v || ""),
 });
 
 export const onboardingSchema = z.object({
@@ -69,6 +74,10 @@ export const textsSchema = z.object({
   needAdamSent: text(200, "Adam è stato avvisato. ♡ Arriva appena può."),
   needAdamFallback: text(200, "Ho salvato la tua richiesta. Ora scrivigli direttamente. ♡"),
   hugTitle: text(80, "Voglio un abbraccio"),
+  quizPerfect: text(160, "Mi conosci meglio di chiunque ♡"),
+  quizGood: text(160, "Mi conosci proprio bene ♡"),
+  quizLow: text(160, "Ok, questa me la devi spiegare 😂"),
+  secretMessage: text(300, "Hai trovato un segreto. Ti penso anche adesso, proprio adesso ♡"),
   countdownToday: text(80, "È oggi. ♡"),
   countdownDone: text(80, "È già successo ♡"),
   countdownMeetingLead: text(60, "per rivederti"),
@@ -110,6 +119,7 @@ export const notificationsSchema = z.object({
   notifyOnMessage: z.boolean().default(true),
   notifyOnSharedJournal: z.boolean().default(true),
   notifyOnLowMood: z.boolean().default(false),
+  notifyOnHeart: z.boolean().default(true),
   telegramChatId: z
     .string()
     .trim()

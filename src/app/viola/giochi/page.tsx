@@ -9,7 +9,7 @@ const GAMES = [
   { key: "game_memory", subtitle: "Trova le coppie delle nostre foto", color: "blush" },
   { key: "game_heart", subtitle: "Dove si nasconde?", color: "lilac" },
   { key: "game_puzzle", subtitle: "Rimetti insieme la foto", color: "peach" },
-  { key: "game_quiz", subtitle: "Quanto mi conosci?", color: "wine" },
+  { key: "game_quiz", subtitle: "Un piccolo quiz su di me", color: "wine" },
   { key: "game_reaction", subtitle: "30 secondi di riflessi", color: "red" },
   { key: "game_slider", subtitle: "Quanto mi vuoi bene?", color: "blush" },
   { key: "game_questions", subtitle: "Domande per conoscerci", color: "cream" },

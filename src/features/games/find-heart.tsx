@@ -51,7 +51,10 @@ export function FindHeart({ seed }: { seed: string }) {
               type="button"
               whileTap={{ scale: 0.9 }}
               onClick={() => pick(i)}
-              className={cn("grid aspect-square place-items-center rounded-2xl text-2xl shadow-soft", open ? "bg-surface" : "bg-gradient-to-br from-lilac-200 to-blush-200")}
+              className={cn(
+                "grid aspect-square place-items-center rounded-2xl text-2xl shadow-soft",
+                open ? "bg-surface ring-1 ring-line" : "bg-gradient-to-br from-wine-500 to-wine-700 font-display text-white/85",
+              )}
               aria-label={open ? (i === target ? "Cuore trovato" : "Vuoto") : `Casella ${i + 1}`}
             >
               {open ? (i === target ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1.3 }}>💗</motion.span> : DECOYS[i % DECOYS.length]) : "?"}

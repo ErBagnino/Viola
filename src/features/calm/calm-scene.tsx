@@ -29,24 +29,27 @@ export function CalmScene({ mode }: { mode: CalmMode }) {
         </motion.svg>
       );
     case "flower":
+      // Geometry and animation are kept apart so the flower is centred by
+      // construction: each petal is placed with a plain SVG rotate() around the
+      // flower centre (0,0); the breathing (open/close + gentle turn) is applied
+      // to ONE group whose untransformed bounding box is symmetric around (0,0),
+      // so its 50%/50% transform origin is exactly the centre. (Animating each
+      // petal with originX/originY "0px" used the petal's own box corner — SVG
+      // transforms here are fill-box based — and pushed the petals off-centre.)
       return (
-        <svg viewBox="-110 -110 220 220" className="size-[75vmin] max-w-sm" aria-hidden>
-          {Array.from({ length: 8 }, (_, i) => (
-            <motion.ellipse
-              key={i}
-              cx={0}
-              cy={-45}
-              rx={22}
-              ry={48}
-              fill={i % 2 ? "#f4c2c6" : "#fbe1e1"}
-              stroke="#fff"
-              strokeWidth={2}
-              style={{ originX: "0px", originY: "0px" }}
-              initial={{ rotate: i * 45, scale: 0.6 }}
-              animate={reduce ? { rotate: i * 45, scale: 0.9 } : { rotate: [i * 45, i * 45 + 20, i * 45], scale: [0.6, 1, 0.6] }}
-              transition={slow}
-            />
-          ))}
+        <svg viewBox="-110 -110 220 220" className="size-[75vmin] max-w-sm overflow-visible" aria-hidden>
+          <motion.g
+            style={{ originX: 0.5, originY: 0.5 }}
+            initial={{ rotate: 0, scale: reduce ? 0.9 : 0.6 }}
+            animate={reduce ? { rotate: 0, scale: 0.9 } : { rotate: [0, 20, 0], scale: [0.6, 1, 0.6] }}
+            transition={slow}
+          >
+            {Array.from({ length: 8 }, (_, i) => (
+              <g key={i} transform={`rotate(${i * 45})`}>
+                <ellipse cx={0} cy={-45} rx={22} ry={48} fill={i % 2 ? "#f4c2c6" : "#fbe1e1"} stroke="#fff" strokeWidth={2} />
+              </g>
+            ))}
+          </motion.g>
           <circle r={20} fill="#e3262b" />
         </svg>
       );

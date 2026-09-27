@@ -25,7 +25,8 @@ export function ReactionGame() {
     const tick = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
     const spawn = setInterval(() => {
       id.current += 1;
-      const h = { id: id.current, x: 8 + Math.random() * 78, y: 6 + Math.random() * 80, s: 0.8 + Math.random() * 0.7 };
+      // x/y are the heart's CENTRE (it is translated -50%/-50%), kept inside the field
+      const h = { id: id.current, x: 14 + Math.random() * 72, y: 14 + Math.random() * 72, s: 0.8 + Math.random() * 0.6 };
       setHearts((hs) => [...hs.slice(-6), h]);
       setTimeout(() => setHearts((hs) => hs.filter((x) => x.id !== h.id)), 1300);
     }, 650);
@@ -76,12 +77,13 @@ export function ReactionGame() {
             <motion.button
               key={h.id}
               type="button"
-              className="absolute text-5xl"
-              style={{ left: `${h.x}%`, top: `${h.y}%` }}
+              className="absolute grid size-16 place-items-center text-5xl"
+              style={{ left: `${h.x}%`, top: `${h.y}%`, x: "-50%", y: "-50%" }}
               initial={{ scale: 0 }}
               animate={{ scale: h.s }}
               exit={{ scale: 0, opacity: 0 }}
               onPointerDown={() => hit(h.id)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && hit(h.id)}
               aria-label="Cuore"
             >
               💗

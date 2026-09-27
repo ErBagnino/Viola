@@ -144,3 +144,6 @@ export const MESSAGE_CATEGORIES = {
   happy: "Sono felice",
   other: "Altro",
 } as const;
+
+/** Pairs in the memory game (photos first, emoji for the rest). */
+export const MEMORY_PAIRS = 6;

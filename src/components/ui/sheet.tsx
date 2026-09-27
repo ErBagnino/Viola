@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -10,6 +10,11 @@ import { useIsClient } from "@/hooks/use-is-client";
 /**
  * Bottom sheet on phones, centred dialog on larger screens.
  * Escape / backdrop close, focus moves into the sheet and back on close.
+ *
+ * The open/close effect depends on `open` ONLY: parents pass a new
+ * `onClose` arrow on every render (e.g. at every keystroke in a form), and
+ * re-running the effect would move the focus away from the field being
+ * typed in (back to the page, then onto the X button).
  */
 export function Sheet({
   open,
@@ -32,11 +37,15 @@ export function Sheet({
   const titleId = useId();
   const isClient = useIsClient();
 
+  const onEscape = useEffectEvent(() => {
+    if (dismissible) onClose();
+  });
+
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && dismissible) onClose();
+      if (e.key === "Escape") onEscape();
       if (e.key === "Tab" && ref.current) {
         const f = ref.current.querySelectorAll<HTMLElement>(
           'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])',
@@ -56,17 +65,25 @@ export function Sheet({
     document.addEventListener("keydown", onKey);
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Initial focus, once: an explicit [data-autofocus], else (with a mouse)
+    // the first field, else the dialog itself — never the close button, and
+    // never away from a field the user already tapped.
     const t = setTimeout(() => {
-      const target = ref.current?.querySelector<HTMLElement>("[data-autofocus],input,textarea,select,button");
-      (target ?? ref.current)?.focus();
+      const root = ref.current;
+      if (!root || root.contains(document.activeElement)) return;
+      const explicit = root.querySelector<HTMLElement>("[data-autofocus]");
+      const field = window.matchMedia("(pointer: fine)").matches
+        ? root.querySelector<HTMLElement>('input:not([type="hidden"]):not([disabled]),textarea:not([disabled]),select:not([disabled])')
+        : null;
+      (explicit ?? field ?? root).focus({ preventScroll: true });
     }, 60);
     return () => {
       clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = overflow;
-      previous?.focus?.();
+      previous?.focus?.({ preventScroll: true });
     };
-  }, [open, onClose, dismissible]);
+  }, [open]);
 
   if (!isClient) return null;
 

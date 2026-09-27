@@ -11,13 +11,12 @@ import { HeartExchange } from "@/features/hearts/heart-exchange";
 import { NextSteps, ReadinessHero } from "@/features/readiness/readiness-hero";
 import { getReadiness } from "@/server/readiness";
 import { describeAudit } from "@/features/admin/audit-labels";
-import { MOODS, REQUEST_STATUS } from "@/features/content/constants";
+import { activityLabel, CHANNEL_STATE, MOODS, REQUEST_STATUS } from "@/features/content/constants";
 import { formatDateTime, relativeTime, todayKey } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 
 export const metadata = { title: "Dashboard" };
 
-const STATE_CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-vio-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" } as const;
 
 export default async function AdminDashboard() {
   const admin = await requireAdmin();
@@ -95,8 +94,8 @@ export default async function AdminDashboard() {
           <div className="mt-2 space-y-1">
             {(["telegram", "webpush", "whatsapp"] as const).map((c) => (
               <p key={c} className="flex items-center justify-between gap-2 text-xs font-bold">
-                <span className="capitalize text-vio-900">{c === "webpush" ? "Web Push" : c}</span>
-                <span className={cn("rounded-full px-2 py-0.5 text-[10px]", STATE_CLS[status[c].state])}>{status[c].state}</span>
+                <span className="text-vio-900">{c === "webpush" ? "Push" : c === "telegram" ? "Telegram" : "WhatsApp"}</span>
+                <span className={cn("rounded-full px-2 py-0.5 text-[10px]", CHANNEL_STATE[status[c].state].cls)}>{CHANNEL_STATE[status[c].state].label}</span>
               </p>
             ))}
           </div>
@@ -132,7 +131,7 @@ export default async function AdminDashboard() {
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
         <section className="paper rounded-4xl p-5">
           <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Richieste recenti</h2>
           {(reqRecent.data ?? []).length === 0 ? (
@@ -211,14 +210,14 @@ export default async function AdminDashboard() {
           </Link>
         </section>
         <section className="paper rounded-4xl p-5">
-          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Attività recente</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Cosa ha usato {viola}</h2>
           {(activity.data ?? []).length === 0 ? (
             <p className="text-sm text-ink-muted">Ancora nessuna attività.</p>
           ) : (
             <ul className="space-y-1.5 text-sm">
               {activity.data!.map((a) => (
                 <li key={a.id} className="flex justify-between gap-2">
-                  <span className="font-bold text-vio-900">{a.type.replace(/_/g, " ")}</span>
+                  <span className="font-bold text-vio-900">{activityLabel(a.type, a.payload)}</span>
                   <span className="text-ink-muted">{relativeTime(a.created_at)}</span>
                 </li>
               ))}

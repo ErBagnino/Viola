@@ -106,7 +106,7 @@ I file in `supabase/migrations/` sono la "storia" del database. `supabase/setup.
 
 ### Hai già eseguito `setup.sql` in passato? Aggiorna il database
 
-Se il database l'hai creato con una versione precedente dell'app (prima del 28 settembre 2026), esegui **una volta** anche **`supabase/update.sql`**:
+Se il database l'hai creato con una versione precedente dell'app, esegui **una volta** anche **`supabase/update.sql`** (in caso di dubbio: la pagina **Completa Vio ♡** del pannello te lo dice come primo passaggio, "Aggiorna il database"):
 
 1. Supabase → **SQL Editor** → **New query**.
 2. Copia tutto `supabase/update.sql` (da GitHub: pulsante "Raw"), incollalo e premi **Run**.
@@ -396,7 +396,8 @@ Su **Android** (Chrome): menu ⋮ → **Installa app** / "Aggiungi a schermata H
 | Accesso: "La chiave di Supabase non è valida" | In `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` va la chiave **publishable** (o anon), non la secret. Poi Redeploy. |
 | Accesso: "Non riesco a collegarmi a Supabase" | `NEXT_PUBLIC_SUPABASE_URL` deve essere `https://xxxx.supabase.co`; controlla anche che il progetto non sia in pausa. Poi Redeploy. |
 | Accesso: "Il database non è pronto" | Esegui `supabase/setup.sql` (passo 4). |
-| "Cuore a distanza" o l'interruttore privacy danno errore | Esegui `supabase/update.sql` (passo 5). |
+| "Cuore a distanza", l'interruttore privacy o le spunte di "Completa Vio ♡" danno errore | Esegui `supabase/update.sql` (passo 5). |
+| Adam AI dice che si prende una pausa | Tutti i modelli gratuiti hanno finito la quota di oggi (si riparte verso le 9:00) oppure hai raggiunto i limiti dell'app (Admin → Adam AI). Non si paga mai. |
 | Dopo un aggiornamento l'app installata sembra vecchia | Chiudila del tutto e riaprila: ogni deploy installa un nuovo service worker e svuota le cache vecchie. |
 
 Buon lavoro, e buona casa a voi due. ♡

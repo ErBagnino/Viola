@@ -8,19 +8,19 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { href: "/admin/umore", label: "Umore", icon: "smile", group: "Principale" },
   { href: "/admin/copilot", label: "AI Copilot", icon: "wand", group: "Principale" },
 
-  { href: "/admin/home", label: "Home", icon: "home", group: "Contenuti" },
+  { href: "/admin/home", label: "La sua home", icon: "home", group: "Contenuti" },
   { href: "/admin/dediche", label: "Dediche", icon: "mail-heart", group: "Contenuti" },
   { href: "/admin/foto", label: "Foto e audio", icon: "images", group: "Contenuti" },
   { href: "/admin/ricordi", label: "Ricordi", icon: "book-heart", group: "Contenuti" },
-  { href: "/admin/aprimi", label: "Open When", icon: "gift", group: "Contenuti" },
+  { href: "/admin/aprimi", label: "Aprimi quando…", icon: "gift", group: "Contenuti" },
   { href: "/admin/countdown", label: "Countdown", icon: "hourglass", group: "Contenuti" },
-  { href: "/admin/capsule", label: "Time capsule", icon: "alarm", group: "Contenuti" },
+  { href: "/admin/capsule", label: "Capsule del tempo", icon: "alarm", group: "Contenuti" },
   { href: "/admin/sorprese", label: "Sorprese", icon: "sparkles", group: "Contenuti" },
   { href: "/admin/frasi", label: "Frasi", icon: "feather", group: "Contenuti" },
   { href: "/admin/quiz", label: "Quiz", icon: "trophy", group: "Contenuti" },
   { href: "/admin/audio", label: "Audio", icon: "headphones", group: "Contenuti" },
 
-  { href: "/admin/comfort", label: "Comfort", icon: "sparkles", group: "Calma" },
+  { href: "/admin/comfort", label: "Aiutami adesso", icon: "sparkles", group: "Calma" },
   { href: "/admin/respirazione", label: "Respirazione", icon: "wind", group: "Calma" },
   { href: "/admin/grounding", label: "Grounding", icon: "footprints", group: "Calma" },
 
@@ -28,8 +28,8 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { href: "/admin/ai-memoria", label: "Memoria AI", icon: "lightbulb", group: "Sistema" },
   { href: "/admin/notifiche", label: "Notifiche", icon: "bell", group: "Sistema" },
   { href: "/admin/impostazioni", label: "Impostazioni", icon: "palette", group: "Sistema" },
-  { href: "/admin/costi", label: "Cost control", icon: "target", group: "Sistema" },
-  { href: "/admin/backup", label: "Import / Export", icon: "shuffle", group: "Sistema" },
+  { href: "/admin/costi", label: "Costi e limiti", icon: "target", group: "Sistema" },
+  { href: "/admin/backup", label: "Backup", icon: "shuffle", group: "Sistema" },
   { href: "/admin/registro", label: "Registro", icon: "book", group: "Sistema" },
 ];
 

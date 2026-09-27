@@ -70,7 +70,7 @@ export function AdminShell({ children, appName, pendingRequests }: { children: R
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-5xl px-4 pt-[max(env(safe-area-inset-top),1.25rem)] pb-32 sm:px-6 lg:pb-12">{children}</main>
+      <main className="mx-auto w-full min-w-0 max-w-5xl px-4 pt-[max(env(safe-area-inset-top),1.25rem)] pb-32 sm:px-6 lg:pb-12">{children}</main>
 
       <nav aria-label="Navigazione admin" className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(env(safe-area-inset-bottom),0.6rem)] lg:hidden">
         <div className="paper mx-auto flex max-w-md items-stretch rounded-[1.75rem] p-1.5">

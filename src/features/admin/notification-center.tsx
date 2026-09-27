@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/utils/cn";
 import { findTelegramChats, sendTestNotification, selectTelegramChat } from "./notification-actions";
+import { CHANNEL_STATE } from "@/features/content/constants";
 import { callAction } from "@/utils/call-action";
 
 type Status = { state: "CONNECTED" | "DISCONNECTED" | "NOT CONFIGURED"; detail: string };
-const CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-vio-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" };
 
 export function ChannelCards({ status }: { status: { telegram: Status; webpush: Status; whatsapp: Status } }) {
   const [pending, start] = useTransition();
@@ -40,12 +40,12 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
           <div key={c.key} className="paper rounded-4xl p-5">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-display text-lg font-semibold text-vio-900">{c.name}</h3>
-              <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-extrabold", CLS[c.s.state])}>{c.s.state}</span>
+              <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-extrabold", CHANNEL_STATE[c.s.state].cls)}>{CHANNEL_STATE[c.s.state].label}</span>
             </div>
             <p className="mt-1 min-h-10 text-sm text-ink-soft">{c.s.detail}</p>
             {c.test ? (
               <Button size="sm" variant="soft" className="mt-2" loading={pending} disabled={c.s.state === "NOT CONFIGURED"} onClick={() => test(c.key as "telegram" | "webpush")}>
-                <Send className="size-4" /> Test Notification
+                <Send className="size-4" /> Invia notifica di prova
               </Button>
             ) : (
               <p className="mt-2 text-xs text-ink-muted">Non automatico: Viola tocca il pulsante e scrive lei. Sempre disponibile come ultima strada.</p>
@@ -54,7 +54,7 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => test("chain")} loading={pending}>
+        <Button onClick={() => test("chain")} loading={pending} className="h-auto! min-h-11 py-2 text-balance whitespace-normal!">
           <Send className="size-4" /> Prova la catena completa (come &quot;Ho bisogno di Adam&quot;)
         </Button>
         {last && <p className="text-sm font-bold text-vio-800">{last}</p>}

@@ -6,7 +6,7 @@ import { getSettings } from "@/server/settings";
 import { isoDaysAgo, todayKey } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 
-export const metadata = { title: "Cost control" };
+export const metadata = { title: "Costi e limiti" };
 
 function Meter({ label, used, limit, unit, warn, note }: { label: string; used: number; limit: number; unit: string; warn: number; note?: string }) {
   const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
@@ -48,7 +48,7 @@ export default async function CostiPage() {
 
   return (
     <div className="space-y-5">
-      <AdminHeader title="Cost Control" description="Tutto è pensato per restare a €0/mese. Qui vedi quanto sei lontano dai limiti gratuiti." icon="target" />
+      <AdminHeader title="Costi e limiti" description="Tutto è pensato per restare a €0/mese. Qui vedi quanto manca ai limiti gratuiti." icon="target" />
       <div className="grid gap-3 md:grid-cols-2">
         <Meter label="Adam AI oggi (Viola)" used={req("viola")} limit={ai.dailyMessageLimit} unit="richieste" warn={cost.warnPercent} note="Limite impostato da te. Il free tier di Gemini ha anche limiti propri: se li raggiungi Adam AI si mette in pausa, non paghi nulla." />
         <Meter label="AI Copilot oggi" used={req("copilot")} limit={ai.copilotDailyLimit} unit="richieste" warn={cost.warnPercent} />

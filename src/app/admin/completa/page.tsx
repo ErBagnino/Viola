@@ -81,7 +81,7 @@ export default async function CompletaPage() {
               {PRIORITY_META[p].dot} {PRIORITY_META[p].label}
               <span className="rounded-full bg-tint-100 px-2 text-xs font-extrabold text-ink-soft">{tasks.length}</span>
             </h2>
-            <ul className="grid gap-2.5 lg:grid-cols-2">
+            <ul className="grid gap-2.5 lg:grid-cols-2 [&>*]:min-w-0">
               {tasks.map((t) => (
                 <TaskRow key={t.id} task={t} />
               ))}
@@ -103,7 +103,7 @@ export default async function CompletaPage() {
 
       <Checkup />
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2 [&>*]:min-w-0">
         <UsageList id="foto" title="Dove si usano le foto" text="Ogni posto dell'app che mostra le vostre foto, e se ne ha abbastanza." rows={photoUsage(facts)} />
         <UsageList id="giochi" title="I giochi" text="Si possono giocare con le vostre cose?" rows={gameReadiness(facts)} />
       </div>

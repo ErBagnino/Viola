@@ -21,7 +21,7 @@ export default async function NotifichePage() {
   const form = SETTINGS_FORMS.notifications!;
   return (
     <div className="space-y-6">
-      <AdminHeader title="Notification Center" description="Priorità: Telegram → Web Push → WhatsApp. Tutto gratuito." icon="bell" />
+      <AdminHeader title="Notifiche" description="Come ti avvisa l'app quando ha bisogno di te: prima Telegram, poi le notifiche push, poi WhatsApp. Tutto gratuito." icon="bell" />
       <ChannelCards status={status} />
       <section className="paper rounded-4xl p-5">
         <h2 className="font-display text-lg font-semibold text-vio-900">Web Push su questo dispositivo</h2>

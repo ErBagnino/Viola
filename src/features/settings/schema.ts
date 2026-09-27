@@ -19,7 +19,7 @@ export const generalSchema = z.object({
   timezone: text(60, "Europe/Rome"),
   loginTitle: text(120, "Benvenuta nella nostra piccola casa."),
   loginSubtitle: text(200, "Un piccolo mondo fatto da Adam, solo per te."),
-  homeGreeting: text(80, "ciao Vio ♡"),
+  homeGreeting: text(80, "Ciao Vio ♡"),
   homeQuestion: text(120, "Come stai oggi?"),
   needsTitle: text(80, "Di cosa hai bisogno?"),
   showDaAdam: z.boolean().default(true),

@@ -62,7 +62,7 @@ const mod = (position: number, m: Pick<HomeModule, "type" | "title"> & Partial<H
   ...m,
 });
 
-/** The home used until Adam builds his own in "Home builder". */
+/** The home used until Adam builds one in "La home di Viola". */
 export const DEFAULT_HOME_MODULES: HomeModule[] = [
   mod(10, { type: "widget", widget: "help_now", title: "Aiutami adesso", subtitle: "Ti propongo una cosa da fare, subito." }),
   mod(15, { type: "widget", widget: "need_adam", title: "Ho bisogno di Adam ♡" }),

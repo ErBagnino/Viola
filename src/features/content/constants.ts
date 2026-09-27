@@ -155,3 +155,41 @@ export const REQUEST_STATUS: Record<string, { label: string; cls: string }> = {
   responded: { label: "Hai risposto", cls: "bg-green-100 text-green-800" },
   closed: { label: "Chiusa", cls: "bg-cream-200 text-ink-soft" },
 };
+
+/** Notification channel states, as Adam reads them. */
+export const CHANNEL_STATE: Record<string, { label: string; cls: string }> = {
+  CONNECTED: { label: "Collegato", cls: "bg-green-100 text-green-800" },
+  DISCONNECTED: { label: "Non collegato", cls: "bg-peach-100 text-vio-800" },
+  "NOT CONFIGURED": { label: "Da configurare", cls: "bg-cream-200 text-ink-soft" },
+};
+
+/** What Viola did (only if she shares it), in words. */
+export const ACTIVITY_LABELS: Record<string, string> = {
+  game_played: "Ha giocato",
+  surprise_opened: "Ha aperto una sorpresa",
+  hug: "Ha ricevuto l'abbraccio",
+  grounding_completed: "Ha fatto un grounding",
+  fear_flow_completed: "Ha finito \"Ho paura\"",
+  dedication_opened: "Ha letto una dedica",
+  comfort_done: "Ha provato \"Aiutami adesso\"",
+  calm_completed: "Ha finito \"Calmati\"",
+  breathing_completed: "Ha respirato con l'app",
+};
+
+export const GAME_LABELS: Record<string, string> = {
+  memory: "Memory",
+  puzzle: "Puzzle",
+  find_heart: "Trova il cuore",
+  reaction: "Acchiappa i cuori",
+  roulette: "Roulette",
+  quiz: "Quanto mi conosci?",
+  slider: "Termometro",
+  questions: "Domande",
+  guess_memory: "Indovina il ricordo",
+};
+
+export function activityLabel(type: string, payload?: unknown) {
+  const base = ACTIVITY_LABELS[type] ?? type.replace(/_/g, " ");
+  const game = payload && typeof payload === "object" && "game" in payload ? String((payload as { game: unknown }).game) : null;
+  return type === "game_played" && game ? `${base} a ${GAME_LABELS[game] ?? game}` : base;
+}

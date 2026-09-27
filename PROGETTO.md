@@ -110,23 +110,27 @@ Protetta lato server (layout + ogni azione/API verifica il ruolo `admin`). Sezio
 
 | Area | Cosa fa |
 |---|---|
-| **Dashboard** | panoramica: "♡ Viola ha bisogno di te", **Cuore a distanza**, richieste aperte, ultimi messaggi, umore, attività |
-| **Ho bisogno di Adam** | lista richieste, "visto", rispondi, chiudi; esito di ogni canale di notifica |
+| **Dashboard** | panoramica: "♡ Viola ha bisogno di te", **"Vio ♡ è pronta al N%"** con le prossime cose da fare (**Per te, Adam ♡**), **Cuore a distanza**, azioni rapide (+ Dedica, + Ricordo, + Foto, + Countdown, + Sorpresa, + Audio), richieste, messaggi, umore, **Ultime cose che hai sistemato**, cosa ha usato Viola |
+| **Completa Vio ♡** | la checklist per rendere l'app pronta: ogni passaggio (id stabile, priorità 🔴 Importante / 🟡 Per renderla più bella / 🟢 Extra, categoria, stato, link diretto "Completa →") è **calcolato dai dati reali** (foto, ricordi, dediche, countdown, contatti, avvisi, Adam AI, giochi…). Solo le cose non misurabili si spuntano a mano ("Fatto") o si tolgono ("Non mi serve", mai per quelle importanti). Contiene anche "Dove si usano le foto", "I giochi" (si possono giocare con le vostre cose?), il **Controllo Vio ♡** (prova davvero Telegram, Gemini e lo storage e cerca errori nei contenuti, senza inviare né cambiare nulla) e le guide "Come si fa" |
+| **Ho bisogno di Adam** | lista richieste, "vista", **risposte rapide con un tocco** ("Arrivo ♡", "Ti chiamo tra 5 minuti ♡"… modificabili in Impostazioni → Testi), rispondi, chiudi; esito di ogni canale di notifica |
 | **Messaggi** | inbox dei messaggi di Viola + pagine di diario **condivise** |
 | **Umore** | storico dell'umore condiviso |
 | **AI Copilot** | chat con cui Adam crea/modifica contenuti a parole (§7) |
-| **Home** | home builder: moduli, ordine, testi, icone, colori |
-| **Contenuti** | Dediche, Ricordi, Open When, Countdown, Time capsule, Sorprese, Frasi, Quiz, Audio, Comfort, Respirazione (+ foto del respiro), Grounding |
-| **Foto e audio** | upload multiplo drag & drop, con compressione e rimozione dei dati GPS |
+| **La sua home** | moduli della home di Viola, ordine, testi, icone, colori |
+| **Contenuti** | Dediche, Ricordi, Aprimi quando…, Countdown, Capsule del tempo, Sorprese, Frasi, Quiz, Audio, Aiutami adesso, Respirazione (+ foto del respiro), Grounding |
+| **Foto e audio** | upload multiplo drag & drop, con compressione e rimozione dei dati GPS; per ogni file **"Dove la vede Viola"** (usata in…), filtri **Non usate** e **Private** |
 | **Adam AI** | profilo, **foto avatar**, personalità, tono, modello, limiti, verifica modelli disponibili |
 | **Memoria AI** | fatti che l'AI può sapere (soprannomi, preferenze…), visibili a Viola in "Cosa sa Adam AI di voi" |
-| **Notifiche** | stato dei canali (CONNECTED / DISCONNECTED / NOT CONFIGURED), test, **ricerca guidata del chat ID Telegram**, attivazione Web Push sul telefono di Adam |
+| **Notifiche** | stato dei canali (Collegato / Non collegato / Da configurare), notifica di prova, **ricerca guidata del chat ID Telegram**, attivazione Web Push sul telefono di Adam |
 | **Impostazioni** | tutti i testi e le opzioni (generale, onboarding, testi, contatti, notifiche, AI, distanza, calma, costi) |
-| **Cost control** | uso AI, database, storage, notifiche, con avvisi vicino ai limiti gratuiti |
-| **Import / Export** | backup JSON dei contenuti (**senza segreti**) e ripristino validato |
-| **Registro** | audit log delle azioni admin, log degli strumenti AI, attività |
+| **Costi e limiti** | uso AI, database, storage, notifiche, con avvisi vicino ai limiti gratuiti |
+| **Backup** | backup JSON dei contenuti (**senza segreti**) e ripristino validato |
+| **Registro** | le azioni di Adam scritte in italiano ("Hai aggiunto dedica: …"), log degli strumenti AI, attività |
 
-Ogni contenuto ha: crea, modifica, duplica, elimina (con conferma), attiva/disattiva, ordina, cerca, filtra. I form usano componenti dedicati: scelta foto, icone, colori, azioni dell'app, editor di testo, liste, passi, opzioni del quiz, peso casuale, programmazione.
+Ogni contenuto ha: crea, modifica, duplica, elimina (con conferma), attiva/disattiva, ordina, cerca, filtra, link "Come lo vede lei". I form usano componenti dedicati: scelta foto, icone, colori, azioni dell'app, editor di testo, liste, passi, opzioni del quiz, peso casuale, programmazione. Dediche, ricordi, buste, sorprese, countdown, capsule, frasi e quiz hanno la scheda **"Come la vede Viola"**: l'anteprima disegnata con gli stessi componenti che vede lei (con avvisi se è una bozza, se la foto è privata o se comparirà più avanti). Le azioni rapide aprono direttamente il modulo giusto (`/admin/countdown?nuovo=meeting` precompila "Ci rivediamo ♡"; `/admin/dediche?nuovo=sad` sceglie la categoria).
+
+### Vedi come Viola
+Adam può aprire `/viola` e vedere l'app **esattamente come la vede lei**: le letture delle tabelle di contenuto applicano le stesse regole della RLS di Viola (solo pubblicati, attivi, foto condivise, date già arrivate, solo le proprie righe personali) tramite `createViolaClient()` (`src/server/viola-view.ts`). In anteprima **niente viene salvato o inviato**: "Ho bisogno di Adam" mostra la schermata di Viola senza creare richieste né notifiche; messaggi, umore, diario e privacy lo spiegano con un messaggio gentile. La barra in alto offre **"Fai il giro"** (Home → Ho bisogno di Adam → Calma → Noi → Giochi → Adam AI → Altro), che alla fine spunta il passaggio in "Completa Vio ♡".
 
 ---
 
@@ -149,7 +153,7 @@ Ogni contenuto ha: crea, modifica, duplica, elimina (con conferma), attiva/disat
 - Può ricevere allegati (foto) dall'admin.
 
 ### Modelli e limiti
-- Modello di default `gemini-flash-latest`, fallback gratuito `gemini-flash-lite-latest`: si passa al successivo se il modello non esiste, ha finito la sua quota gratuita o è sovraccarico — solo prima che arrivi testo (niente risposte doppie) e ogni modello al massimo una volta. Timeout di 50 secondi. Modificabili dall'admin, con un verificatore dei modelli disponibili.
+- Modello di default `gemini-flash-latest`, poi i modelli di riserva scelti da Adam e — con "usa da solo gli altri modelli gratuiti" (attivo di default) — **tutta la catena gratuita**: `gemini-flash-lite-latest`, `gemini-3-flash-preview`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`, `gemini-2.0-flash-lite` e, **solo per Adam AI**, come ultima spiaggia i modelli **Gemma** (`gemma-3-27b-it`, `gemma-3-12b-it`: quota gratuita molto più alta, ma solo testo — il prompt di sistema viene messo nel primo messaggio e gli strumenti non si usano; i pulsanti di conforto sotto la chat restano sempre). Ogni modello ha la **sua** quota gratuita, quindi quando uno finisce si passa al successivo. Si cambia modello se non esiste, ha finito la quota o è sovraccarico — solo prima che arrivi testo (niente risposte doppie) e ogni modello al massimo una volta per risposta. Un modello esaurito "si riposa" (in memoria del server): fino alla mezzanotte della California (≈ 9:00 in Italia) se è finita la quota giornaliera, qualche secondo se era il limite al minuto, 24 ore se il nome non esiste. Mai modelli "pro" o a pagamento. Timeout di 50 secondi. Il Copilot non usa Gemma (deve usare gli strumenti). Codice: `src/server/ai/models.ts`.
 - Limiti propri dell'app (più bassi di quelli di Google, modificabili): 60 messaggi/giorno per Viola, 6 al minuto, 1024 token di risposta, 80 richieste/giorno per il Copilot. Superati i limiti, l'AI "si prende una pausa": **non si paga mai**.
 - ⚠️ Sul piano gratuito Google può usare le conversazioni per migliorare i suoi servizi.
 
@@ -233,6 +237,7 @@ tests/            unit + integrazione RLS
 | Notifiche | `notification_subscriptions`, `notification_events` |
 | AI | `ai_conversations`, `ai_messages`, `ai_memory`, `ai_tool_logs`, `ai_usage_daily` |
 | Audit | `admin_audit_logs` |
+| Completa Vio ♡ | `readiness_checks` (solo le spunte manuali e i "Non mi serve"; tutto il resto è calcolato dai dati) — solo admin |
 
 ### Regole di accesso (RLS) — nessun "allow all"
 - `anon` (non loggato): **nessun accesso**. Utente `pending`: nessun accesso.
@@ -338,7 +343,8 @@ Durante lo sviluppo e l'audit sono stati eseguiti anche: la suite end-to-end (10
 - Deploy su **Vercel** in corso di configurazione da parte di Adam (variabili d'ambiente inserite, primo deploy creato a mano dal branch sopra).
 - Verificato in sviluppo: tutto il flusso con Supabase locale, foto, AI con Gemini simulato, Copilot, notifiche simulate, offline.
 - **Da verificare sul campo**: Gemini reale, notifiche Telegram reali, Web Push su iPhone installato, login sul Supabase di produzione. Il login ora mostra messaggi d'errore specifici (password errata, account non confermato, chiave o URL Supabase sbagliati, database non inizializzato) per facilitare la diagnosi.
-- **Da fare una volta sul database di produzione**: eseguire `supabase/update.sql` (vedi SETUP.md, passo 5). Fino ad allora l'app funziona, ma "Cuore a distanza" e l'interruttore privacy rispondono con un errore gentile.
+- **Da fare una volta sul database di produzione**: eseguire `supabase/update.sql` (vedi SETUP.md, passo 5). Fino ad allora l'app funziona, ma "Cuore a distanza", l'interruttore privacy e le spunte di "Completa Vio ♡" rispondono con un errore gentile; "Completa Vio ♡" lo segnala come primo passaggio.
+- **Quanto manca**: la percentuale reale di produzione la calcola "Completa Vio ♡" in `/admin/completa` (sul database locale di prova era 32%).
 - Contenuti da personalizzare: ricordi e countdown iniziali sono bozze; foto, audio, avatar di Adam e memoria AI vanno caricati dall'admin.
 
 ---
@@ -357,6 +363,8 @@ Durante lo sviluppo e l'audit sono stati eseguiti anche: la suite end-to-end (10
 - **Colori**: usare i token di `globals.css`. `wine-*`, `rouge-*`, `night-*`, `moon` sono fissi (per superfici piene); `canvas`, `surface`, `line`, `ink*`, `vio-*` (testo), `tint-*`, `blush/peach/lilac/cream` cambiano col tema scuro. Testo su superfici chiare → `text-vio-*`/`text-ink*`; testo su superfici piene → `text-white`/`text-wine-100…300`. Le foto "stampate" usano la utility `polaroid`.
 - **Chiamare una server action dal browser** sempre con `callAction(() => azione(...))` (`src/utils/call-action.ts`): una rete che cade diventa un messaggio gentile invece della schermata d'errore.
 - "Riduci movimento": usare `useReducedMotion` da `src/hooks/use-reduced-motion.ts` (non quello di `motion/react`, che rompe l'idratazione).
+- **Pagine e loader di Viola** usano `createViolaClient()` (non `createClient()`): così "Vedi come Viola" mostra solo ciò che vede lei. Le **azioni** che scrivono dati di Viola chiamano `assertNotPreview(viewer)` (o simulano, come "Ho bisogno di Adam"). Le regole di lettura in `viola-view.ts` sono verificate contro la migration RLS da `tests/viola-view.test.ts`.
+- **"Completa Vio ♡"**: i passaggi sono definiti in `src/features/readiness/tasks.ts` (id stabile — non rinominare —, priorità, categoria, link, `check(facts)`); i dati li raccoglie `src/server/readiness.ts`. Un nuovo passaggio automatico = una voce in `TASKS` + eventuale campo in `ReadinessFacts`.
 - Nuove migration: devono essere **rieseguibili** (`if not exists`, `drop policy if exists`…); poi `npm run db:bundle` aggiorna `setup.sql` e `update.sql`. Il codice deve continuare a funzionare anche prima che la migration sia applicata in produzione (es. `select("*")` invece di nominare una colonna nuova).
 
 ### Aggiungere un nuovo tipo di contenuto

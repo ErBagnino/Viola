@@ -156,7 +156,7 @@ export const SETTINGS_FORMS: Partial<Record<SettingsKey, { title: string; descri
         options: [
           { value: "general", label: "General" },
           { value: "personal", label: "Personal" },
-          { value: "comfort", label: "Comfort" },
+          { value: "comfort", label: "Conforto" },
         ],
       },
       {

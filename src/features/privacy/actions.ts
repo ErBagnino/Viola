@@ -1,0 +1,31 @@
+"use server";
+
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { assertMember } from "@/server/auth";
+import { safeAction } from "@/server/action-result";
+
+const schema = z.object({
+  moods: z.boolean(),
+  journal: z.boolean(),
+  messages: z.boolean(),
+  activity: z.boolean(),
+  aiChats: z.boolean(),
+});
+
+/** Lets Viola erase her own data (RLS restricts each delete to her rows). */
+export async function deleteMyData(input: z.input<typeof schema>) {
+  return safeAction(async () => {
+    const viewer = await assertMember();
+    const opts = schema.parse(input);
+    const supabase = await createClient();
+    const jobs: PromiseLike<unknown>[] = [];
+    if (opts.moods) jobs.push(supabase.from("mood_entries").delete().eq("user_id", viewer.id));
+    if (opts.journal) jobs.push(supabase.from("journal_entries").delete().eq("user_id", viewer.id));
+    if (opts.messages) jobs.push(supabase.from("messages").delete().eq("sender_id", viewer.id));
+    if (opts.activity) jobs.push(supabase.from("activity_events").delete().eq("user_id", viewer.id));
+    if (opts.aiChats) jobs.push(supabase.from("ai_conversations").delete().eq("user_id", viewer.id).eq("scope", "viola"));
+    await Promise.all(jobs);
+    return {};
+  });
+}

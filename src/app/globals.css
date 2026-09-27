@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Vio ♡ — design tokens
+   Romantic, soft, a little game-like. Red is an accent, never a wall.
+   ===================================================================== */
+@theme {
+  --color-wine-50: #fbf1f3;
+  --color-wine-100: #f5dde2;
+  --color-wine-200: #eab6c1;
+  --color-wine-300: #d9899b;
+  --color-wine-400: #bd5a72;
+  --color-wine-500: #9c3350;
+  --color-wine-600: #82203d;
+  --color-wine-700: #6b1831;
+  --color-wine-800: #521226;
+  --color-wine-900: #3a0c1a;
+
+  /* the "icon red": used sparingly for love accents */
+  --color-rouge-400: #ec3a40;
+  --color-rouge-500: #da0e14;
+  --color-rouge-600: #b30b12;
+
+  --color-blush-50: #fff6f5;
+  --color-blush-100: #fde9e7;
+  --color-blush-200: #f8d3d0;
+  --color-blush-300: #f1b6b2;
+  --color-blush-400: #e8948f;
+
+  --color-cream-50: #fffcf7;
+  --color-cream-100: #fdf6ec;
+  --color-cream-200: #f8ecdb;
+  --color-cream-300: #efdcc2;
+
+  --color-peach-100: #fdeadd;
+  --color-peach-200: #fbd5bb;
+  --color-peach-300: #f7bb93;
+  --color-peach-400: #f09c6c;
+
+  --color-lilac-100: #f1ebf9;
+  --color-lilac-200: #e2d6f3;
+  --color-lilac-300: #cbb8e8;
+  --color-lilac-400: #a98fd6;
+  --color-lilac-600: #6f55a8;
+
+  --color-ink: #3b1822;
+  --color-ink-soft: #6f4e57;
+  --color-ink-muted: #9a7c84;
+
+  --color-night-900: #120d24;
+  --color-night-800: #1b1433;
+  --color-night-700: #2a2050;
+  --color-moon: #f6e7c1;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-nunito), ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: var(--font-caveat), "Bradley Hand", cursive;
+
+  --radius-4xl: 2rem;
+  --radius-5xl: 2.5rem;
+
+  --shadow-soft: 0 10px 30px -14px rgb(82 18 38 / 0.28), 0 2px 6px -2px rgb(82 18 38 / 0.08);
+  --shadow-float: 0 22px 50px -20px rgb(82 18 38 / 0.35);
+  --shadow-glow: 0 0 0 6px rgb(218 14 20 / 0.12), 0 12px 40px -8px rgb(218 14 20 / 0.45);
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-twinkle: twinkle 2.4s ease-in-out infinite;
+  --animate-heartbeat: heartbeat 1.6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.35; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.12); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.08); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-cream-100);
+  }
+  body {
+    min-height: 100dvh;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    background-color: var(--color-cream-100);
+    background-image:
+      radial-gradient(60rem 40rem at 110% -10%, rgb(248 211 208 / 0.55), transparent 60%),
+      radial-gradient(50rem 36rem at -20% 30%, rgb(226 214 243 / 0.5), transparent 60%),
+      radial-gradient(40rem 30rem at 50% 115%, rgb(251 213 187 / 0.45), transparent 60%);
+    background-attachment: fixed;
+    overscroll-behavior-y: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 100, "WONK" 0;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: var(--color-blush-300);
+    color: var(--color-wine-900);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-wine-400);
+    outline-offset: 3px;
+    border-radius: 12px;
+  }
+  button, [role="button"] {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  input, textarea, select {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Reusable surfaces
+   --------------------------------------------------------------------- */
+@utility paper {
+  background: rgb(255 252 247 / 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgb(255 255 255 / 0.7);
+  box-shadow: var(--shadow-soft);
+}
+
+@utility press {
+  transition: transform 160ms var(--ease-spring), box-shadow 160ms ease, filter 160ms ease;
+  &:active {
+    transform: translateY(2px) scale(0.985);
+  }
+}
+
+@utility btn-3d {
+  box-shadow: 0 5px 0 0 rgb(0 0 0 / 0.18), 0 12px 24px -10px rgb(82 18 38 / 0.45);
+  transition: transform 140ms var(--ease-spring), box-shadow 140ms ease;
+  &:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 0 rgb(0 0 0 / 0.18), 0 6px 14px -8px rgb(82 18 38 / 0.4);
+  }
+}
+
+@utility safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+@utility safe-top {
+  padding-top: max(env(safe-area-inset-top), 0.75rem);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+/* Markdown content written by Adam */
+@utility prose-vio {
+  line-height: 1.7;
+  & p { margin: 0.6em 0; }
+  & h1, & h2, & h3 { margin: 1em 0 0.4em; font-weight: 600; line-height: 1.25; }
+  & h1 { font-size: 1.5em; }
+  & h2 { font-size: 1.3em; }
+  & h3 { font-size: 1.12em; }
+  & ul { list-style: none; padding-left: 0.2em; margin: 0.6em 0; }
+  & ul > li { position: relative; padding-left: 1.3em; margin: 0.25em 0; }
+  & ul > li::before { content: "♡"; position: absolute; left: 0; color: var(--color-wine-400); font-size: 0.9em; }
+  & ol { list-style: decimal; padding-left: 1.4em; margin: 0.6em 0; }
+  & blockquote { border-left: 3px solid var(--color-blush-300); padding-left: 0.9em; color: var(--color-ink-soft); font-style: italic; }
+  & a { color: var(--color-wine-600); text-decoration: underline; text-underline-offset: 3px; }
+  & strong { color: var(--color-wine-800); }
+  & code { background: var(--color-cream-200); padding: 0.1em 0.35em; border-radius: 6px; font-size: 0.9em; }
+  & pre { background: var(--color-night-800); color: #f8eef0; padding: 0.9em 1em; border-radius: 14px; overflow-x: auto; font-size: 0.85em; margin: 0.8em 0; }
+  & pre code { background: transparent; padding: 0; }
+  & table { width: 100%; border-collapse: collapse; margin: 0.8em 0; font-size: 0.92em; }
+  & th, & td { border-bottom: 1px solid var(--color-blush-200); padding: 0.4em 0.5em; text-align: left; }
+  & hr { border: 0; border-top: 1px dashed var(--color-blush-300); margin: 1.2em 0; }
+}
+
+/* Respect reduced motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

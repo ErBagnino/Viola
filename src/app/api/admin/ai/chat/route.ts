@@ -5,6 +5,7 @@ import { getViewer } from "@/server/auth";
 import { getSettings } from "@/server/settings";
 import { serverEnv } from "@/server/env";
 import { isAiConfigured } from "@/server/ai/gemini";
+import { modelChain } from "@/server/ai/models";
 import { buildCopilotPrompt } from "@/server/ai/prompt";
 import { checkAiLimits, recordAiUsage } from "@/server/ai/limits";
 import { loadHistory } from "@/server/ai/history";
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     let text = "";
     try {
       const out = await runChatLoop({
-        models: [serverEnv.geminiModel || settings.ai.model, ...settings.ai.fallbackModels],
+        models: modelChain(settings, serverEnv.geminiModel, { textOnly: false }),
         system: buildCopilotPrompt(settings),
         contents,
         tools: copilotDeclarations(),

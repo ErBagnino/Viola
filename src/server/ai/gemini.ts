@@ -1,6 +1,7 @@
 import "server-only";
 import { ApiError, GoogleGenAI, type Content, type FunctionDeclaration, type Part } from "@google/genai";
 import { serverEnv } from "@/server/env";
+import { coolDown, failureKind, isCooling, isTextOnlyModel, textOnlyContents } from "./models";
 
 export class AiError extends Error {
   constructor(
@@ -44,28 +45,20 @@ function classify(e: unknown): AiError {
   return new AiError("error", msg.slice(0, 200));
 }
 
-const isModelMissing = (e: unknown) => {
-  const status = e instanceof ApiError ? e.status : (e as { status?: number })?.status;
-  const msg = e instanceof Error ? e.message : "";
-  return status === 404 || /not found|is not supported|unknown model/i.test(msg);
-};
-/** Worth trying the next free model: it is missing, over its own quota, or overloaded. */
-const isRetryableOnOtherModel = (e: unknown) => {
-  if (isModelMissing(e)) return true;
-  const status = e instanceof ApiError ? e.status : (e as { status?: number })?.status;
-  const msg = e instanceof Error ? e.message : "";
-  return status === 429 || status === 503 || /RESOURCE_EXHAUSTED|UNAVAILABLE|overloaded/i.test(msg);
-};
+const statusOf = (e: unknown) => (e instanceof ApiError ? e.status : (e as { status?: number })?.status);
+const messageOf = (e: unknown) => (e instanceof Error ? e.message : "");
 const isThinkingRejected = (e: unknown) => {
   const status = e instanceof ApiError ? e.status : (e as { status?: number })?.status;
   return status === 400 && /thinking/i.test(e instanceof Error ? e.message : "");
 };
 
 /**
- * One streamed model turn. Tries the configured model, then the free
- * fallbacks when a model is missing, over quota or overloaded — but only
- * before any text reached the user (no duplicated answers). Each model is
- * tried at most once, so a failure can never turn into a retry loop.
+ * One streamed model turn. Tries the models in order (see models.ts) and
+ * moves to the next free one when a model is missing, over its free quota or
+ * overloaded — but only before any text reached the user (no duplicated
+ * answers). A model that failed that way "cools down" (e.g. until its daily
+ * quota resets) so the next messages skip it straight away. Each model is
+ * tried at most once per round, so a failure can never become a retry loop.
  * Never falls back to paid APIs.
  */
 export async function streamRound(opts: {
@@ -81,19 +74,23 @@ export async function streamRound(opts: {
   const ai = getClient();
   let lastError: unknown = null;
   let current: StreamRound | null = null;
-  for (const model of [...new Set(opts.models.filter(Boolean))]) {
-    for (const withThinking of [true, false]) {
+  const models = [...new Set(opts.models.filter(Boolean))];
+  const ready = models.filter((m) => !isCooling(m));
+  if (models.length && !ready.length) throw new AiError("limit", "quota esaurita su tutti i modelli gratuiti");
+  for (const model of ready) {
+    const textOnly = isTextOnlyModel(model);
+    for (const withThinking of textOnly ? [false] : [true, false]) {
       try {
         const stream = await ai.models.generateContentStream({
           model,
-          contents: opts.contents,
+          contents: textOnly ? textOnlyContents(opts.system, opts.contents) : opts.contents,
           config: {
-            systemInstruction: opts.system,
+            ...(textOnly ? {} : { systemInstruction: opts.system }),
             maxOutputTokens: opts.maxOutputTokens + (withThinking ? 512 : 0),
             temperature: opts.temperature,
             abortSignal: opts.signal,
             ...(withThinking ? { thinkingConfig: { thinkingBudget: 512 } } : {}),
-            ...(opts.tools?.length ? { tools: [{ functionDeclarations: opts.tools }] } : {}),
+            ...(opts.tools?.length && !textOnly ? { tools: [{ functionDeclarations: opts.tools }] } : {}),
           },
         });
         const round: StreamRound = { parts: [], text: "", calls: [], usage: { input: 0, output: 0 } };
@@ -122,7 +119,11 @@ export async function streamRound(opts: {
         current = null;
         if (started) throw classify(e); // text already streamed: never restart the answer
         if (withThinking && isThinkingRejected(e)) continue; // retry the same model without thinking config
-        if (isRetryableOnOtherModel(e)) break; // try the next free model
+        const failure = failureKind(statusOf(e), messageOf(e));
+        if (failure) {
+          coolDown(model, failure, messageOf(e));
+          break; // try the next free model
+        }
         throw classify(e);
       }
     }
@@ -137,7 +138,7 @@ export async function listAvailableModels(): Promise<string[]> {
   const pager = await ai.models.list({ config: { pageSize: 100 } });
   for await (const m of pager) {
     const name = (m.name ?? "").replace(/^models\//, "");
-    if (name.includes("gemini") && (m.supportedActions ?? []).includes("generateContent")) out.push(name);
+    if (/^(gemini|gemma)-/.test(name) && (m.supportedActions ?? []).includes("generateContent")) out.push(name);
   }
   return out.sort();
 }

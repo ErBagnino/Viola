@@ -5,6 +5,7 @@ import { getViewer } from "@/server/auth";
 import { getSettings } from "@/server/settings";
 import { serverEnv } from "@/server/env";
 import { isAiConfigured } from "@/server/ai/gemini";
+import { modelChain } from "@/server/ai/models";
 import { buildVioPrompt } from "@/server/ai/prompt";
 import { checkAiLimits, recordAiUsage } from "@/server/ai/limits";
 import { loadAiMemory } from "@/server/ai/memory";
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const [memory, contents] = await Promise.all([loadAiMemory(supabase), loadHistory(supabase, conversationId)]);
     const system = buildVioPrompt(settings, mode, memory);
-    const models = [serverEnv.geminiModel || settings.ai.model, ...settings.ai.fallbackModels];
+    const models = modelChain(settings, serverEnv.geminiModel, { textOnly: true });
 
     // 4-7. Gemini → tool calls → validation → execution → response
     let text = "";

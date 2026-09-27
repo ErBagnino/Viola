@@ -135,6 +135,8 @@ export const aiSchema = z.object({
   enabled: z.boolean().default(true),
   model: z.string().trim().max(80).default("gemini-flash-latest"),
   fallbackModels: list(80, ["gemini-flash-lite-latest"]),
+  /** when a model's free quota runs out, try every other free model (never paid ones) */
+  autoFreeModels: z.boolean().default(true),
   dailyMessageLimit: z.number().int().min(0).max(5000).default(60),
   dailyTokenBudget: z.number().int().min(0).max(10_000_000).default(300_000),
   perMinuteLimit: z.number().int().min(1).max(60).default(6),

@@ -178,6 +178,12 @@ export const SETTINGS_FORMS: Partial<Record<SettingsKey, { title: string; descri
       { name: "restrictions", label: "Cose da NON fare / dire", type: "textarea" },
       { name: "model", label: "Modello Gemini", type: "text", half: true, hint: "Default: gemini-flash-latest" },
       { name: "fallbackModels", label: "Modelli di riserva (solo gratuiti)", type: "list" },
+      {
+        name: "autoFreeModels",
+        label: "Quando un modello finisce la quota gratuita, usa da solo gli altri modelli gratuiti",
+        type: "boolean",
+        hint: "Flash, Flash-Lite e, per Adam AI, i modelli Gemma (solo testo). Mai modelli a pagamento.",
+      },
       { name: "dailyMessageLimit", label: "Messaggi al giorno (Viola)", type: "number", min: 0, max: 5000, half: true },
       { name: "perMinuteLimit", label: "Messaggi al minuto", type: "number", min: 1, max: 60, half: true },
       { name: "dailyTokenBudget", label: "Budget token al giorno", type: "number", min: 0, half: true },

@@ -35,7 +35,7 @@ export function ModelChecker() {
           ))}
         </div>
       )}
-      <p className="mt-2 text-xs text-ink-muted">Con una chiave gratuita di Google AI Studio i modelli &quot;flash&quot; e &quot;flash-lite&quot; sono gratuiti entro i limiti giornalieri. L&apos;app non usa mai servizi a pagamento in automatico.</p>
+      <p className="mt-2 text-xs text-ink-muted">Con una chiave gratuita di Google AI Studio ogni modello &quot;flash&quot;, &quot;flash-lite&quot; e &quot;gemma&quot; ha la sua quota gratuita giornaliera. Quando uno finisce, Adam AI passa da solo al successivo e lo riprova dopo il reset (verso le 9 del mattino in Italia). L&apos;app non usa mai servizi a pagamento in automatico.</p>
     </div>
   );
 }

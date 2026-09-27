@@ -6,7 +6,7 @@ Web app personale e privata (PWA installabile su iPhone e Android) per due perso
 
 > Non è una terapia e non sostituisce professionisti. In pericolo: **112**.
 
-👉 **Per metterla online segui [SETUP.md](./SETUP.md)** (passo dopo passo, tutto gratuito).
+👉 **Per metterla online segui [SETUP.md](./SETUP.md)** (passo dopo passo, tutto gratuito). Descrizione completa del progetto: [PROGETTO.md](./PROGETTO.md).
 
 ---
 

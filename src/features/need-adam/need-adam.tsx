@@ -58,7 +58,7 @@ export function NeedAdam({
             href={whatsappLink(whatsappNumber, m) ?? "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="press flex items-center gap-3 rounded-2xl bg-white/90 px-4 py-3.5 text-left font-bold text-wine-800 shadow-soft"
+            className="press flex items-center gap-3 rounded-2xl bg-surface/90 px-4 py-3.5 text-left font-bold text-vio-800 shadow-soft"
           >
             <MessageCircleHeart className="size-5 shrink-0 text-[#25a244]" /> {m}
           </a>
@@ -102,7 +102,7 @@ export function NeedAdam({
             </label>
             <Textarea id="need-msg" value={message} onChange={(e) => setMessage(e.target.value)} placeholder={placeholder} rows={3} maxLength={2000} className="w-full" />
             {error && (
-              <p className="mt-3 rounded-xl bg-blush-100 px-3 py-2 text-sm font-bold text-wine-800" role="alert">
+              <p className="mt-3 rounded-xl bg-blush-100 px-3 py-2 text-sm font-bold text-vio-800" role="alert">
                 {error}
               </p>
             )}
@@ -112,7 +112,7 @@ export function NeedAdam({
         ) : (
           <motion.div key="sent" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-center" role="status">
             <div className="mx-auto grid size-24 place-items-center rounded-full bg-gradient-to-b from-rouge-400 to-rouge-600 text-5xl text-white shadow-glow">♥</div>
-            <p className="mt-5 font-display text-[1.7rem] leading-tight font-semibold text-wine-900">
+            <p className="mt-5 font-display text-[1.7rem] leading-tight font-semibold text-vio-900">
               {result.throttled ? `${adamName} ha già ricevuto la tua richiesta pochi minuti fa. ♡` : result.delivered ? sentText : fallbackText}
             </p>
             {result.delivered && (

@@ -478,13 +478,13 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"id": string,"nickname": string | null,"onboarded_at": string | null,"role": string,"updated_at": string
+                    "created_at": string,"display_name": string | null,"id": string,"nickname": string | null,"onboarded_at": string | null,"role": string,"share_activity": boolean,"updated_at": string
                   }
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"id": string,"nickname"?: string | null,"onboarded_at"?: string | null,"role"?: string,"updated_at"?: string
+                    "created_at"?: string,"display_name"?: string | null,"id": string,"nickname"?: string | null,"onboarded_at"?: string | null,"role"?: string,"share_activity"?: boolean,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"id"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"role"?: string,"updated_at"?: string
+                    "created_at"?: string,"display_name"?: string | null,"id"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"role"?: string,"share_activity"?: boolean,"updated_at"?: string
                   }
                   Relationships: [
                     

@@ -9,6 +9,7 @@ import { cn } from "@/utils/cn";
 import { saveMood } from "./actions";
 import { MOODS } from "@/features/content/constants";
 import { callAction } from "@/utils/call-action";
+import { haptic } from "@/utils/haptics";
 
 
 type Suggestion = { text: string; links: { href: string; label: string }[] };
@@ -59,6 +60,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
 
   const pick = (mood: number | null) =>
     start(async () => {
+      haptic("tap");
       const res = await callAction(() => saveMood({ mood, shared }));
       if (res.ok) setSaved(mood);
       else toast.show(res.error, "error");
@@ -70,7 +72,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
 
   return (
     <section className={cn("paper rounded-4xl p-5", compact && "p-4")} aria-labelledby="mood-title">
-      <h2 id="mood-title" className="text-xl font-semibold text-wine-900">
+      <h2 id="mood-title" className="text-xl font-semibold text-vio-900">
         {title}
       </h2>
       <AnimatePresence mode="wait">
@@ -83,7 +85,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
                   {l.label}
                 </Link>
               ))}
-              <button type="button" onClick={() => setSaved(undefined)} className="press rounded-full px-3 py-2 text-sm font-bold text-wine-600">
+              <button type="button" onClick={() => setSaved(undefined)} className="press rounded-full px-3 py-2 text-sm font-bold text-vio-600">
                 Cambia
               </button>
             </div>
@@ -99,7 +101,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
                   whileHover={{ y: -3 }}
                   disabled={pending}
                   onClick={() => pick(m.value)}
-                  className="grid aspect-square max-h-20 w-full place-items-center rounded-2xl bg-white/80 text-[1.9rem] shadow-soft disabled:opacity-50 sm:aspect-auto sm:h-20"
+                  className="grid aspect-square max-h-20 w-full place-items-center rounded-2xl bg-surface/80 text-[1.9rem] shadow-soft disabled:opacity-50 sm:aspect-auto sm:h-20"
                   aria-label={m.label}
                   title={m.label}
                 >
@@ -117,7 +119,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
                 aria-checked={shared}
                 aria-label="Adam può vedere come mi sento"
                 onClick={toggleShared}
-                className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-ink-soft hover:bg-white/70"
+                className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-ink-soft hover:bg-surface/70"
               >
                 {shared ? "♡ Adam può vederlo" : "🔒 Solo per me"}
               </button>

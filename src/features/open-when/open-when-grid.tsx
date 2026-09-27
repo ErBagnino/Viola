@@ -10,6 +10,7 @@ import { LetterView } from "@/features/letters/letter-view";
 import { cn } from "@/utils/cn";
 import { markOpenWhenOpened } from "./actions";
 import { callQuietly } from "@/utils/call-action";
+import { haptic } from "@/utils/haptics";
 
 export type OpenWhenCard = {
   id: string;
@@ -63,16 +64,17 @@ export function OpenWhenGrid({ cards, signature }: { cards: OpenWhenCard[]; sign
               whileTap={{ scale: 0.95, rotate: -1 }}
               onClick={() => {
                 setOpen(c);
+                haptic("heart");
                 void callQuietly(() => markOpenWhenOpened(c.id));
               }}
               className={cn("relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-gradient-to-br p-4 text-left shadow-soft", toneClass(c.color))}
             >
               <span className="absolute inset-x-0 top-0 h-1/2 bg-white/25 [clip-path:polygon(0_0,100%_0,50%_75%)]" aria-hidden />
-              <span className={cn("absolute top-[30%] left-1/2 grid size-10 -translate-x-1/2 place-items-center rounded-full text-lg shadow", dark ? "bg-white text-wine-700" : "bg-wine-600 text-white")} aria-hidden>
+              <span className={cn("absolute top-[30%] left-1/2 grid size-10 -translate-x-1/2 place-items-center rounded-full text-lg shadow", dark ? "bg-surface text-vio-700" : "bg-wine-600 text-white")} aria-hidden>
                 <Icon name={c.icon ?? "heart"} className="size-5" />
               </span>
               <span className="absolute inset-x-4 bottom-4">
-                <span className={cn("block text-[11px] font-extrabold tracking-widest uppercase", dark ? "text-white/70" : "text-wine-500")}>Aprimi quando…</span>
+                <span className={cn("block text-[11px] font-extrabold tracking-widest uppercase", dark ? "text-white/70" : "text-vio-500")}>Aprimi quando…</span>
                 <span className="mt-1 block text-[15px] leading-snug font-extrabold text-balance">{c.title.replace(/^aprimi quando\s*/i, "")}</span>
               </span>
               {c.openedCount === 0 && <span className="absolute top-3 right-3 rounded-full bg-rouge-500 px-2 py-0.5 text-[10px] font-extrabold text-white">NUOVA</span>}

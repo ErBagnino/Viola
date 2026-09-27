@@ -23,7 +23,7 @@ export default async function AdminAiPage() {
       <AdminHeader title="Adam AI" description="Profilo, personalità, memoria e limiti gratuiti dell'assistente che hai creato per Viola." icon="bot-heart" />
       <section className="paper rounded-4xl p-5">
         <div className="flex flex-wrap items-center gap-3">
-          <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${isAiConfigured() ? "bg-green-100 text-green-800" : "bg-peach-100 text-wine-800"}`}>
+          <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${isAiConfigured() ? "bg-green-100 text-green-800" : "bg-peach-100 text-vio-800"}`}>
             {isAiConfigured() ? "GEMINI CONFIGURATO" : "MANCA GEMINI_API_KEY"}
           </span>
           <span className="text-sm text-ink-soft">
@@ -34,7 +34,7 @@ export default async function AdminAiPage() {
           <Link href="/admin/ai-memoria" className="press rounded-full bg-wine-700 px-4 py-2 text-sm font-bold text-white">
             Memoria di Adam AI →
           </Link>
-          <Link href="/viola/ai" className="press rounded-full bg-white px-4 py-2 text-sm font-bold text-wine-700">
+          <Link href="/viola/ai" className="press rounded-full bg-surface px-4 py-2 text-sm font-bold text-vio-700">
             Prova la chat come Viola
           </Link>
         </div>

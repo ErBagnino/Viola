@@ -43,7 +43,7 @@ export function SettingsForm({
 
   return (
     <section className="paper rounded-4xl p-5" aria-labelledby={`s-${settingsKey}`}>
-      <h2 id={`s-${settingsKey}`} className="font-display text-xl font-semibold text-wine-900">
+      <h2 id={`s-${settingsKey}`} className="font-display text-xl font-semibold text-vio-900">
         {title}
       </h2>
       {description && <p className="mb-4 text-sm text-ink-soft">{description}</p>}

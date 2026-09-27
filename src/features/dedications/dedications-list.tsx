@@ -79,13 +79,13 @@ export function DedicationsList({ items, initialOpenId, eyebrow }: { items: Dedi
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.4) }}
             whileTap={{ scale: 0.98 }}
-            className="relative overflow-hidden rounded-[1.75rem] bg-white p-5 text-left shadow-soft"
+            className="relative overflow-hidden rounded-[1.75rem] bg-surface p-5 text-left shadow-soft"
           >
             {/* envelope flap */}
             <span className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-blush-100 to-transparent [clip-path:polygon(0_0,100%_0,50%_100%)]" aria-hidden />
             <span className="relative">
-              <span className="block text-xs font-extrabold tracking-widest text-wine-500 uppercase">{DEDICATION_CATEGORIES[d.category] ?? d.category}</span>
-              <span className="mt-1 block font-display text-xl font-semibold text-wine-900">
+              <span className="block text-xs font-extrabold tracking-widest text-vio-500 uppercase">{DEDICATION_CATEGORIES[d.category] ?? d.category}</span>
+              <span className="mt-1 block font-display text-xl font-semibold text-vio-900">
                 {d.pinned && "♥ "}
                 {d.title}
               </span>

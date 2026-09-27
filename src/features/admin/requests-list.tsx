@@ -53,7 +53,7 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
       {items.map((r) => (
         <li key={r.id} className={cn("paper rounded-4xl p-5", r.status === "new" && "ring-2 ring-rouge-400")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-display text-lg font-semibold text-wine-900">
+            <p className="font-display text-lg font-semibold text-vio-900">
               {formatDateTime(r.createdAt, tz)}{" "}
               <span className="text-sm font-normal text-ink-muted" suppressHydrationWarning>
                 · {relativeTime(r.createdAt)}
@@ -61,16 +61,16 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
             </p>
             <span className={cn("rounded-full px-3 py-1 text-xs font-extrabold", STATUS[r.status]?.cls)}>{STATUS[r.status]?.label ?? r.status}</span>
           </div>
-          <p className="mt-2 text-[17px] text-wine-900">{r.message ? `“${r.message}”` : <span className="text-ink-muted">Nessun messaggio: solo &quot;ho bisogno di te&quot;.</span>}</p>
+          <p className="mt-2 text-[17px] text-vio-900">{r.message ? `“${r.message}”` : <span className="text-ink-muted">Nessun messaggio: solo &quot;ho bisogno di te&quot;.</span>}</p>
           <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
             {r.events.length === 0 && <span className="rounded-full bg-cream-200 px-2.5 py-1 font-bold text-ink-soft">nessuna notifica registrata</span>}
             {r.events.map((e, i) => (
-              <span key={i} className={cn("rounded-full px-2.5 py-1 font-bold", e.status === "sent" ? "bg-green-100 text-green-800" : "bg-blush-100 text-wine-800")} title={e.detail ?? ""}>
+              <span key={i} className={cn("rounded-full px-2.5 py-1 font-bold", e.status === "sent" ? "bg-green-100 text-green-800" : "bg-blush-100 text-vio-800")} title={e.detail ?? ""}>
                 {e.channel}: {e.status === "sent" ? "inviata ✓" : `fallita${e.detail ? ` (${e.detail.slice(0, 40)})` : ""}`}
               </span>
             ))}
           </div>
-          {r.response && <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-sm text-wine-800">La tua risposta: {r.response}</p>}
+          {r.response && <p className="mt-3 rounded-2xl bg-surface/80 px-3 py-2 text-sm text-vio-800">La tua risposta: {r.response}</p>}
           {replying === r.id ? (
             <div className="mt-3 space-y-2">
               <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={`Scrivi a ${violaName}… (riceverà una notifica se l'ha abilitata)`} />

@@ -50,7 +50,7 @@ export function CalmExperience({ timers, endText, initialMode }: { timers: numbe
   return (
     <>
       <section aria-label="Durata" className="paper rounded-4xl p-4">
-        <p className="mb-2 text-xs font-extrabold tracking-widest text-wine-500 uppercase">Quanto tempo?</p>
+        <p className="mb-2 text-xs font-extrabold tracking-widest text-vio-500 uppercase">Quanto tempo?</p>
         <div className="flex flex-wrap gap-2">
           {timers.map((t) => (
             <button
@@ -58,7 +58,7 @@ export function CalmExperience({ timers, endText, initialMode }: { timers: numbe
               type="button"
               onClick={() => setSeconds(t)}
               aria-pressed={seconds === t}
-              className={cn("press rounded-full px-4 py-2 text-sm font-bold", seconds === t ? "bg-wine-700 text-white" : "bg-white text-wine-700")}
+              className={cn("press min-h-11 rounded-full px-4 py-2 text-sm font-bold", seconds === t ? "bg-wine-700 text-white" : "bg-surface text-vio-700")}
             >
               {t === 0 ? "Libero" : `${Math.round(t / 60)} min`}
             </button>
@@ -72,7 +72,7 @@ export function CalmExperience({ timers, endText, initialMode }: { timers: numbe
             <span className="text-3xl" aria-hidden>
               {m.emoji}
             </span>
-            <span className="mt-2 block font-extrabold text-wine-900">{m.label}</span>
+            <span className="mt-2 block font-extrabold text-vio-900">{m.label}</span>
             <span className="block text-xs text-ink-soft">{m.hint}</span>
           </motion.button>
         ))}
@@ -94,14 +94,14 @@ export function CalmExperience({ timers, endText, initialMode }: { timers: numbe
               <button type="button" onClick={close} className="press paper grid size-11 place-items-center rounded-2xl" aria-label="Chiudi">
                 <X className="size-5" />
               </button>
-              <p className="text-sm font-bold text-wine-700">{info?.label}</p>
-              <p className="w-11 text-right text-sm font-extrabold text-wine-600 tabular-nums" aria-live="off">
+              <p className="text-sm font-bold text-vio-700">{info?.label}</p>
+              <p className="w-11 text-right text-sm font-extrabold text-vio-600 tabular-nums" aria-live="off">
                 {startedAt ? fmt(left) : ""}
               </p>
             </div>
             <div className="grid flex-1 place-items-center">
               {done ? (
-                <motion.p initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-w-xs text-center font-display text-3xl font-semibold text-wine-900">
+                <motion.p initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-w-xs text-center font-display text-3xl font-semibold text-vio-900">
                   {endText}
                 </motion.p>
               ) : (

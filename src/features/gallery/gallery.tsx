@@ -64,12 +64,12 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
                 animate={{ opacity: 1, y: 0, rotate: tilt(i) }}
                 whileTap={{ scale: 0.96, rotate: 0 }}
                 transition={{ delay: Math.min(i * 0.03, 0.4) }}
-                className="rounded-md bg-white p-2 pb-3 text-left shadow-soft"
+                className="polaroid rounded-md p-2 pb-3 text-left shadow-soft"
                 aria-label={p.title ?? "Apri foto"}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.thumbUrl} alt={p.title ?? ""} loading="lazy" className="aspect-square w-full rounded-sm object-cover" />
-                <span className="mt-2 block truncate text-center font-hand text-xl text-wine-800">{p.title || formatDate(p.takenOn, { month: "short", year: "numeric" }) || "♡"}</span>
+                <span className="mt-2 block truncate text-center font-hand text-xl text-vio-800">{p.title || formatDate(p.takenOn, { month: "short", year: "numeric" }) || "♡"}</span>
               </motion.button>
             ))}
           </div>
@@ -87,11 +87,11 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
         )}
 
         {layout === "timeline" && (
-          <ol className="relative space-y-6 border-l-2 border-dashed border-wine-200 pl-5">
+          <ol className="relative space-y-6 border-l-2 border-dashed border-tint-200 pl-5">
             {byYear.map(([k, items]) => (
               <li key={k}>
                 <span className="absolute -left-[9px] mt-1.5 size-4 rounded-full border-4 border-cream-100 bg-wine-500" aria-hidden />
-                <h3 className="font-display text-lg font-semibold text-wine-800 capitalize">
+                <h3 className="font-display text-lg font-semibold text-vio-800 capitalize">
                   {k === "senza data" ? k : formatDate(`${k}-15`, { month: "long", year: "numeric" })}
                 </h3>
                 <div className="mt-2 grid grid-cols-3 gap-2">
@@ -117,9 +117,9 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
                 </button>
                 {(p.title || p.caption) && (
                   <figcaption className="p-4">
-                    {p.title && <p className="font-display text-lg font-semibold text-wine-900">{p.title}</p>}
+                    {p.title && <p className="font-display text-lg font-semibold text-vio-900">{p.title}</p>}
                     {p.caption && <p className="text-sm text-ink-soft">{p.caption}</p>}
-                    {p.takenOn && <p className="mt-1 text-xs font-bold text-wine-500">{formatDate(p.takenOn)}</p>}
+                    {p.takenOn && <p className="mt-1 text-xs font-bold text-vio-500">{formatDate(p.takenOn)}</p>}
                   </figcaption>
                 )}
               </figure>

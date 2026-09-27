@@ -64,9 +64,9 @@ export function OfflineKit() {
   return (
     <main className="mx-auto max-w-xl px-4 pt-[max(env(safe-area-inset-top),1.25rem)] pb-10">
       <div className="paper mb-5 flex items-center gap-3 rounded-3xl p-4">
-        <WifiOff className="size-6 shrink-0 text-wine-500" />
+        <WifiOff className="size-6 shrink-0 text-vio-500" />
         <div>
-          <p className="font-bold text-wine-900">{online ? "La connessione è tornata ♡" : "Sei offline, ma io sono qui."}</p>
+          <p className="font-bold text-vio-900">{online ? "La connessione è tornata ♡" : "Sei offline, ma io sono qui."}</p>
           <p className="text-sm text-ink-soft">{online ? "Puoi tornare all'app." : "Queste cose funzionano anche senza internet."}</p>
         </div>
         {online && (
@@ -89,7 +89,7 @@ export function OfflineKit() {
       <div className="mt-5">
         {tab === "respira" && (
           <div className="paper rounded-4xl p-6 text-center">
-            <p className="font-display text-2xl text-wine-900">Respira con me.</p>
+            <p className="font-display text-2xl text-vio-900">Respira con me.</p>
             <p className="mt-1 text-ink-soft">Inspira 4 · trattieni 4 · espira 6</p>
             <Button size="xl" className="mt-5 w-full" onClick={() => setBreathing(true)}>
               <Wind className="size-5" /> Inizia
@@ -100,7 +100,7 @@ export function OfflineKit() {
         {tab === "grounding" && <GroundingFlow exercise={DEFAULT_FEET} onDone={() => setTab("respira")} />}
         {tab === "idee" && (
           <div className="paper rounded-4xl p-6">
-            <p className="font-display text-2xl leading-snug text-wine-900">{idea}</p>
+            <p className="font-display text-2xl leading-snug text-vio-900">{idea}</p>
             <Button variant="soft" className="mt-5 w-full" onClick={() => setIdea(pickOne(COMFORT.filter((c) => c !== idea)) ?? COMFORT[0])}>
               Un&apos;altra idea
             </Button>

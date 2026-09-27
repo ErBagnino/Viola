@@ -44,7 +44,7 @@ export function LiveCountdown({
       {lead && <p className="mb-2 text-[15px] font-bold opacity-85">{sentence}</p>}
       <div className="flex gap-2" role="timer" aria-label={sentence}>
         {units.map((u) => (
-          <div key={u.l} className={`min-w-14 rounded-2xl px-2.5 py-2 text-center ${tone === "dark" ? "bg-white/15" : "bg-white/75"}`}>
+          <div key={u.l} className={`min-w-14 rounded-2xl px-2.5 py-2 text-center ${tone === "dark" ? "bg-white/15" : "bg-surface/75"}`}>
             <div className="font-display text-2xl leading-none font-semibold tabular-nums">{String(u.v).padStart(2, "0")}</div>
             <div className="mt-1 text-[11px] font-bold uppercase opacity-70">{u.l}</div>
           </div>

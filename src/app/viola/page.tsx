@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Fragment } from "react";
-import { ArrowRight, Moon, Sparkles, Sunrise } from "lucide-react";
+import { ArrowRight, HeartHandshake, Moon, Sparkles, Sunrise } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
@@ -66,8 +66,7 @@ export default async function ViolaHome() {
             href="/viola/calma/aiutami"
             className="press btn-3d relative block overflow-hidden rounded-4xl bg-gradient-to-br from-wine-600 via-wine-700 to-wine-900 p-5 text-white"
           >
-            <Sparkle className="absolute top-4 right-5 size-5 animate-twinkle text-blush-200" />
-            <Sparkle className="absolute right-14 bottom-5 size-3 animate-twinkle text-peach-200 [animation-delay:700ms]" />
+            <Sparkle className="absolute top-4 right-5 size-5 animate-twinkle text-white/60" />
             <span className="flex items-center gap-3">
               <span className="grid size-12 place-items-center rounded-2xl bg-white/15">
                 <Sparkles className="size-6" />
@@ -92,9 +91,9 @@ export default async function ViolaHome() {
         return (
           <Link href="/viola/oggi" className="press paper relative block overflow-hidden rounded-4xl p-5">
             <Star5 className="absolute -top-1 -right-1 size-10 rotate-12" />
-            <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{m.title}</p>
-            <p className="mt-2 font-display text-xl font-semibold text-wine-900">{surprise.title}</p>
-            <p className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-wine-600">
+            <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{m.title}</p>
+            <p className="mt-2 font-display text-xl font-semibold text-vio-900">{surprise.title}</p>
+            <p className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-vio-600">
               Aprila <ArrowRight className="size-4" />
             </p>
           </Link>
@@ -102,7 +101,7 @@ export default async function ViolaHome() {
       case "countdown":
         if (!countdown) return null;
         return (
-          <Link href="/viola/noi/countdown" className="press block rounded-4xl bg-gradient-to-br from-lilac-100 to-lilac-200 p-5 text-wine-900 shadow-soft">
+          <Link href="/viola/noi/countdown" className="press block rounded-4xl bg-gradient-to-br from-lilac-100 to-lilac-200 p-5 text-vio-900 shadow-soft">
             <p className="flex items-center gap-2 text-xs font-extrabold tracking-widest text-lilac-600 uppercase">
               <Icon name={countdown.icon ?? "hourglass"} className="size-4 text-base" /> {m.title}
             </p>
@@ -121,10 +120,10 @@ export default async function ViolaHome() {
         const km = Math.round(haversineKm(distance.fromLat, distance.fromLng, distance.toLat, distance.toLng));
         return (
           <Link href="/viola/noi/distanza" className="press paper block rounded-4xl p-5">
-            <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{m.title}</p>
-            <div className="mt-3 flex items-center gap-3 font-display text-lg font-semibold text-wine-900">
+            <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{m.title}</p>
+            <div className="mt-3 flex items-center gap-3 font-display text-lg font-semibold text-vio-900">
               <span>{distance.fromName}</span>
-              <span className="relative h-0.5 flex-1 rounded bg-[repeating-linear-gradient(90deg,var(--color-wine-300)_0_6px,transparent_6px_12px)]">
+              <span className="relative h-0.5 flex-1 rounded bg-[repeating-linear-gradient(90deg,var(--color-tint-300)_0_6px,transparent_6px_12px)]">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 animate-heartbeat text-rouge-500">♥</span>
               </span>
               <span>{distance.toName}</span>
@@ -140,23 +139,28 @@ export default async function ViolaHome() {
 
   return (
     <div className="space-y-5">
-      <header className="pt-2">
-        <h1 className="font-display text-[2.4rem] leading-none font-semibold text-wine-900">{general.homeGreeting}</h1>
-        <p className="mt-2 text-lg text-ink-soft">{general.homeQuestion}</p>
+      <header className="flex items-start gap-3 pt-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-display text-[2.4rem] leading-none font-semibold text-vio-900">{general.homeGreeting}</h1>
+          <p className="mt-2 text-lg text-ink-soft">{general.homeQuestion}</p>
+        </div>
+        <Link href="/viola/adam" className="press paper grid size-12 shrink-0 place-items-center rounded-2xl text-rouge-500" aria-label="Ho bisogno di Adam" title="Ho bisogno di Adam">
+          <HeartHandshake className="size-6" />
+        </Link>
       </header>
 
       <figure className="paper relative rounded-4xl px-5 py-4">
         <span className="absolute -top-3 left-5 font-display text-5xl leading-none text-blush-300" aria-hidden>
           “
         </span>
-        <blockquote className="font-display text-xl leading-snug text-wine-800 italic">{phrase}</blockquote>
-        {general.showDaAdam && <figcaption className="mt-1 text-right font-hand text-xl text-wine-500">{general.signature}</figcaption>}
+        <blockquote className="font-display text-xl leading-snug text-vio-800 italic">{phrase}</blockquote>
+        {general.showDaAdam && <figcaption className="mt-1 text-right font-hand text-xl text-vio-500">{general.signature}</figcaption>}
       </figure>
 
       {(hour >= 5 && hour < 12) || hour >= 21 || hour < 5 ? (
         <div className="flex gap-2">
           {hour >= 5 && hour < 12 ? (
-            <Link href="/viola/buongiorno" className="press inline-flex items-center gap-2 rounded-full bg-peach-100 px-4 py-2 text-sm font-bold text-wine-800">
+            <Link href="/viola/buongiorno" className="press inline-flex items-center gap-2 rounded-full bg-peach-100 px-4 py-2 text-sm font-bold text-vio-800">
               <Sunrise className="size-4" /> Buongiorno ♡
             </Link>
           ) : (
@@ -178,7 +182,7 @@ export default async function ViolaHome() {
           return (
             <section key={`g${i}`} aria-labelledby={showTitle ? "needs-title" : undefined}>
               {showTitle && (
-                <h2 id="needs-title" className="mb-3 px-1 font-sans text-xs font-extrabold tracking-[0.18em] text-wine-500 uppercase">
+                <h2 id="needs-title" className="mb-3 px-1 font-sans text-xs font-extrabold tracking-[0.18em] text-vio-500 uppercase">
                   {general.needsTitle}
                 </h2>
               )}

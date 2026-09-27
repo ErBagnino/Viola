@@ -120,7 +120,7 @@ export function BreathingSession({
     <div
       className={cn(
         "fixed inset-0 z-[60] flex flex-col items-center justify-between overflow-hidden px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.25rem)]",
-        night ? "bg-gradient-to-b from-night-900 via-night-800 to-night-700 text-moon" : "bg-gradient-to-b from-lilac-100 via-blush-50 to-peach-100 text-wine-900",
+        night ? "bg-gradient-to-b from-night-900 via-night-800 to-night-700 text-moon" : "bg-gradient-to-b from-lilac-100 via-blush-50 to-peach-100 text-vio-900",
       )}
     >
       {preset.audioUrl && <audio ref={audio} src={preset.audioUrl} loop preload="none" />}

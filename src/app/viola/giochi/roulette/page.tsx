@@ -11,7 +11,7 @@ export default async function Page() {
   return (
     <div>
       <PageHeader title="Roulette romantica" subtitle="Gira e fai quello che esce ♡" back="/viola/giochi" />
-      {items.length >= 2 ? <Roulette items={items} /> : <EmptyState title="La ruota è vuota" text="Adam deve ancora riempirla ♡" />}
+      {items.length >= 2 ? <Roulette items={items} /> : <EmptyState title="La ruota è vuota" text="Presto qui ci saranno tante piccole sorprese ♡" />}
     </div>
   );
 }

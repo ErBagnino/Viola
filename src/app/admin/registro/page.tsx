@@ -31,9 +31,9 @@ export default async function RegistroPage({ searchParams }: PageProps<"/admin/r
   return (
     <div>
       <AdminHeader title="Registro" description="Chi ha fatto cosa e quando. Le chiavi segrete non vengono mai salvate." icon="book" />
-      <nav className="mb-4 flex gap-1 rounded-2xl bg-wine-50 p-1" aria-label="Registri">
+      <nav className="mb-4 flex gap-1 rounded-2xl bg-tint-50 p-1" aria-label="Registri">
         {tabs.map((t) => (
-          <Link key={t.key} href={`/admin/registro?tab=${t.key}`} aria-current={tab === t.key ? "page" : undefined} className={`flex-1 rounded-xl px-3 py-2 text-center text-sm font-bold ${tab === t.key ? "bg-white text-wine-800 shadow-soft" : "text-wine-600"}`}>
+          <Link key={t.key} href={`/admin/registro?tab=${t.key}`} aria-current={tab === t.key ? "page" : undefined} className={`flex-1 rounded-xl px-3 py-2 text-center text-sm font-bold ${tab === t.key ? "bg-surface text-vio-800 shadow-soft" : "text-vio-600"}`}>
             {t.label}
           </Link>
         ))}
@@ -43,7 +43,7 @@ export default async function RegistroPage({ searchParams }: PageProps<"/admin/r
         {rows.map((r) => (
           <li key={r.id} className="paper rounded-2xl px-4 py-3 text-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <b className={r.ok === false ? "text-rouge-600" : "text-wine-900"}>{r.title}</b>
+              <b className={r.ok === false ? "text-rouge-600" : "text-vio-900"}>{r.title}</b>
               <span className="text-xs text-ink-muted">{formatDateTime(r.when, tz)}</span>
             </div>
             {r.detail && <p className="mt-1 font-mono text-xs break-all text-ink-soft">{r.detail}</p>}

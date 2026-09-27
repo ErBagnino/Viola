@@ -28,7 +28,7 @@ export function PageHeader({
   const showNeedAdam = Boolean(needAdam) && path !== needAdam;
   const backCls = cn(
     "press grid size-11 shrink-0 place-items-center rounded-2xl",
-    tone === "dark" ? "bg-white/10 text-moon hover:bg-white/15" : "paper text-wine-700",
+    tone === "dark" ? "bg-white/10 text-moon hover:bg-white/15" : "paper text-vio-700",
   );
   return (
     <header className={cn("mb-5 flex items-start gap-3", className)}>
@@ -43,7 +43,7 @@ export function PageHeader({
           </Link>
         ))}
       <div className="min-w-0 flex-1 pt-0.5">
-        <h1 className={cn("text-[1.75rem] leading-tight font-semibold text-balance", tone === "dark" ? "text-moon" : "text-wine-900")}>
+        <h1 className={cn("text-[1.75rem] leading-tight font-semibold text-balance", tone === "dark" ? "text-moon" : "text-vio-900")}>
           {title}
         </h1>
         {subtitle && (

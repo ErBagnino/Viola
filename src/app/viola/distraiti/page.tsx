@@ -16,7 +16,7 @@ export default async function DistraitiPage() {
     <div className="space-y-6">
       <PageHeader title="Voglio distrarmi" subtitle="Portiamo la testa da un'altra parte, per un po'." back="/viola" />
       <section>
-        <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">Un gioco</h2>
+        <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">Un gioco</h2>
         <div className="grid grid-cols-2 gap-3">
           {GAMES.map((g, i) => (
             <ActionCard key={g} href={APP_ACTIONS[g].href} title={APP_ACTIONS[g].label} icon={APP_ACTIONS[g].icon} color={COLORS[i]} index={i} />
@@ -26,7 +26,7 @@ export default async function DistraitiPage() {
       </section>
       {items.length > 0 && (
         <section>
-          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">Oppure prova questo</h2>
+          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">Oppure prova questo</h2>
           <HelpNow items={items} initialId={weightedPick(items)?.id} />
         </section>
       )}

@@ -51,7 +51,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
   return (
     <div>
       <div className="flex items-center gap-3">
-        <button type="button" onClick={openPicker} aria-label={preview ? "Cambia file" : "Scegli un file"} className="press grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-wine-200 bg-white/70 text-wine-500">
+        <button type="button" onClick={openPicker} aria-label={preview ? "Cambia file" : "Scegli un file"} className="press grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-tint-200 bg-surface/70 text-vio-500">
           {preview ? (
             kind === "image" ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -67,7 +67,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
         </button>
         <div className="min-w-0 flex-1 space-y-1.5">
           {preview && kind === "audio" && <audio src={preview.url} controls className="h-9 w-full" preload="none" />}
-          {preview?.title && <p className="truncate text-sm font-bold text-wine-800">{preview.title}</p>}
+          {preview?.title && <p className="truncate text-sm font-bold text-vio-800">{preview.title}</p>}
           <div className="flex gap-2">
             <Button size="sm" variant="soft" onClick={openPicker}>
               {value ? "Cambia" : kind === "image" ? "Scegli foto" : "Scegli audio"}
@@ -131,7 +131,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
           ) : (
             <ul className="space-y-2">
               {filtered.map((m) => (
-                <li key={m.id} className={cn("flex items-center gap-3 rounded-2xl bg-white p-3", value === m.id && "ring-2 ring-wine-500")}>
+                <li key={m.id} className={cn("flex items-center gap-3 rounded-2xl bg-surface p-3", value === m.id && "ring-2 ring-wine-500")}>
                   <audio src={m.url} controls preload="none" className="h-9 min-w-0 flex-1" />
                   <Button
                     size="sm"
@@ -161,7 +161,7 @@ export function IconPicker({ value, onChange }: { value: string | null; onChange
   const [open, setOpen] = useState(false);
   return (
     <div className="flex items-center gap-3">
-      <button type="button" onClick={() => setOpen(true)} className="press grid size-12 place-items-center rounded-2xl border border-blush-200 bg-white text-wine-600">
+      <button type="button" onClick={() => setOpen(true)} className="press grid size-12 place-items-center rounded-2xl border border-blush-200 bg-surface text-vio-600">
         {value ? <Icon name={value} className="size-6 text-2xl" /> : <Pencil className="size-5" />}
       </button>
       <Button size="sm" variant="soft" onClick={() => setOpen(true)}>
@@ -182,7 +182,7 @@ export function IconPicker({ value, onChange }: { value: string | null; onChange
                 onChange(n);
                 setOpen(false);
               }}
-              className={cn("press grid aspect-square place-items-center rounded-2xl bg-white text-wine-700", value === n && "ring-2 ring-wine-500")}
+              className={cn("press grid aspect-square place-items-center rounded-2xl bg-surface text-vio-700", value === n && "ring-2 ring-wine-500")}
               aria-label={n}
               title={n}
             >
@@ -277,14 +277,14 @@ export function RichTextEditor({ value, onChange, id }: { value: string; onChang
     { icon: Quote, label: "Citazione", run: () => line("> ") },
   ];
   return (
-    <div className="overflow-hidden rounded-2xl border border-blush-200 bg-white/80">
+    <div className="overflow-hidden rounded-2xl border border-blush-200 bg-surface/80">
       <div className="flex items-center gap-1 border-b border-blush-100 px-2 py-1.5">
         {tools.map((t) => (
-          <button key={t.label} type="button" onClick={t.run} disabled={preview} className="grid size-9 place-items-center rounded-xl text-wine-700 hover:bg-wine-50 disabled:opacity-40" aria-label={t.label} title={t.label}>
+          <button key={t.label} type="button" onClick={t.run} disabled={preview} className="grid size-9 place-items-center rounded-xl text-vio-700 hover:bg-tint-50 disabled:opacity-40" aria-label={t.label} title={t.label}>
             <t.icon className="size-4" />
           </button>
         ))}
-        <button type="button" onClick={() => setPreview((p) => !p)} className={cn("ml-auto flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-bold", preview ? "bg-wine-700 text-white" : "text-wine-700 hover:bg-wine-50")}>
+        <button type="button" onClick={() => setPreview((p) => !p)} className={cn("ml-auto flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-bold", preview ? "bg-wine-700 text-white" : "text-vio-700 hover:bg-tint-50")}>
           <Eye className="size-4" /> Anteprima
         </button>
       </div>
@@ -338,7 +338,7 @@ export function TagsInput({ value, onChange, suggestions = [] }: { value: string
     <div>
       <div className="flex flex-wrap gap-1.5">
         {value.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-full bg-wine-100 px-3 py-1 text-sm font-bold text-wine-800">
+          <span key={t} className="inline-flex items-center gap-1 rounded-full bg-tint-100 px-3 py-1 text-sm font-bold text-vio-800">
             #{t}
             <button type="button" onClick={() => onChange(value.filter((x) => x !== t))} aria-label={`Rimuovi ${t}`}>
               <X className="size-3.5" />
@@ -352,7 +352,7 @@ export function TagsInput({ value, onChange, suggestions = [] }: { value: string
           {suggestions
             .filter((s) => !value.includes(s))
             .map((s) => (
-              <button key={s} type="button" onClick={() => add(s)} className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-wine-600">
+              <button key={s} type="button" onClick={() => add(s)} className="rounded-full bg-surface px-2.5 py-1 text-xs font-bold text-vio-600">
                 + {s}
               </button>
             ))}
@@ -372,9 +372,9 @@ export function StepsEditor({ value, onChange }: { value: Step[]; onChange: (v: 
   return (
     <div className="space-y-3">
       {value.map((s, i) => (
-        <div key={i} className="space-y-2 rounded-2xl bg-white/70 p-3">
+        <div key={i} className="space-y-2 rounded-2xl bg-surface/70 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-extrabold text-wine-500 uppercase">Passo {i + 1}</span>
+            <span className="text-xs font-extrabold text-vio-500 uppercase">Passo {i + 1}</span>
             <Button variant="ghost" size="sm" onClick={() => onChange(value.filter((_, k) => k !== i))}>
               <X className="size-4" /> Rimuovi
             </Button>
@@ -399,7 +399,7 @@ export function OptionsEditor({ options, correct, onChange }: { options: string[
     <div className="space-y-2">
       {options.map((o, i) => (
         <div key={i} className="flex items-center gap-2">
-          <button type="button" onClick={() => onChange(options, i)} className={cn("grid size-10 shrink-0 place-items-center rounded-xl", correct === i ? "bg-green-600 text-white" : "bg-white text-ink-muted")} aria-label={`Segna la risposta ${i + 1} come giusta`} aria-pressed={correct === i}>
+          <button type="button" onClick={() => onChange(options, i)} className={cn("grid size-10 shrink-0 place-items-center rounded-xl", correct === i ? "bg-green-600 text-white" : "bg-surface text-ink-muted")} aria-label={`Segna la risposta ${i + 1} come giusta`} aria-pressed={correct === i}>
             <Check className="size-5" />
           </button>
           <Input value={o} aria-label={`Risposta ${i + 1}`} onChange={(e) => onChange(options.map((x, k) => (k === i ? e.target.value : x)), correct)} placeholder={`Risposta ${i + 1}`} />
@@ -427,7 +427,7 @@ export function RandomWeightInput({ value, onChange, max = 20, id }: { value: nu
   return (
     <div className="flex items-center gap-3">
       <input id={id} type="range" min={0} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="flex-1 accent-wine-600" />
-      <span className="w-12 rounded-xl bg-white py-1.5 text-center font-extrabold text-wine-800">{value}</span>
+      <span className="w-12 rounded-xl bg-surface py-1.5 text-center font-extrabold text-vio-800">{value}</span>
     </div>
   );
 }
@@ -463,9 +463,9 @@ export function PairsEditor({ value, onChange, max = 8 }: { value: Pair[]; onCha
   return (
     <div className="space-y-2">
       {value.map((p, i) => (
-        <div key={i} className="space-y-2 rounded-2xl bg-white/70 p-3">
+        <div key={i} className="space-y-2 rounded-2xl bg-surface/70 p-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold text-wine-500">{i + 1}.</span>
+            <span className="text-xs font-extrabold text-vio-500">{i + 1}.</span>
             <Input value={p.title} aria-label={`Elemento ${i + 1}: titolo`} onChange={(e) => set(i, { title: e.target.value })} placeholder="Titolo" />
             {value.length > 1 && (
               <Button variant="ghost" size="icon" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Rimuovi">
@@ -489,7 +489,7 @@ export function NumbersInput({ value, onChange, suffix }: { value: number[]; onC
   return (
     <div className="flex flex-wrap gap-2">
       {value.map((n, i) => (
-        <div key={i} className="flex items-center gap-1 rounded-2xl bg-white px-2 py-1">
+        <div key={i} className="flex items-center gap-1 rounded-2xl bg-surface px-2 py-1">
           <input type="number" min={0} className="w-20 bg-transparent px-1 py-1 text-center font-bold" value={n} onChange={(e) => onChange(value.map((x, k) => (k === i ? Number(e.target.value) : x)))} aria-label={`Valore ${i + 1}`} />
           {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
           <button type="button" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Rimuovi" className="p-1 text-ink-muted">

@@ -70,7 +70,7 @@ export function BackupPanel() {
       </section>
       {report && (
         <section className="paper rounded-4xl p-5">
-          <h2 className="font-display text-lg font-semibold text-wine-900">Risultato import</h2>
+          <h2 className="font-display text-lg font-semibold text-vio-900">Risultato import</h2>
           <ul className="mt-2 space-y-1 text-sm">
             {Object.entries(report).map(([k, v]) => (
               <li key={k}>

@@ -65,11 +65,11 @@ export function ImageUploader({
         className={cn(
           "flex w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed px-4 text-center transition",
           compact ? "py-5" : "py-10",
-          drag ? "border-wine-500 bg-blush-100" : "border-wine-200 bg-white/60 hover:bg-white",
+          drag ? "border-wine-500 bg-blush-100" : "border-tint-200 bg-surface/60 hover:bg-surface",
         )}
       >
-        <UploadCloud className="size-8 text-wine-500" />
-        <span className="font-bold text-wine-800">Trascina qui le foto o tocca per sceglierle</span>
+        <UploadCloud className="size-8 text-vio-500" />
+        <span className="font-bold text-vio-800">Trascina qui le foto o tocca per sceglierle</span>
         <span className="text-xs text-ink-muted">JPEG, PNG o WEBP · più foto insieme · ottimizzate automaticamente</span>
       </button>
       <input
@@ -86,12 +86,12 @@ export function ImageUploader({
       {jobs.length > 0 && (
         <ul className="mt-3 space-y-1.5">
           {jobs.map((j, i) => (
-            <li key={i} className="rounded-xl bg-white/80 px-3 py-2 text-sm">
+            <li key={i} className="rounded-xl bg-surface/80 px-3 py-2 text-sm">
               <div className="flex justify-between gap-2">
-                <span className="truncate font-bold text-wine-800">{j.name}</span>
+                <span className="truncate font-bold text-vio-800">{j.name}</span>
                 <span className={j.error ? "text-rouge-600" : "text-ink-muted"}>{j.error ? "errore" : j.done ? "✓" : `${Math.round(j.progress * 100)}%`}</span>
               </div>
-              {j.error ? <p className="text-xs text-rouge-600">{j.error}</p> : <div className="mt-1 h-1.5 overflow-hidden rounded bg-wine-100"><div className="h-full bg-wine-500 transition-all" style={{ width: `${j.progress * 100}%` }} /></div>}
+              {j.error ? <p className="text-xs text-rouge-600">{j.error}</p> : <div className="mt-1 h-1.5 overflow-hidden rounded bg-tint-100"><div className="h-full bg-wine-500 transition-all" style={{ width: `${j.progress * 100}%` }} /></div>}
             </li>
           ))}
         </ul>
@@ -138,8 +138,8 @@ export function AudioUploader({ onUploaded }: { onUploaded?: (id: string) => voi
 
   return (
     <div>
-      <button type="button" onClick={() => input.current?.click()} disabled={Boolean(busy)} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-wine-200 bg-white/60 px-4 py-4 font-bold text-wine-800 hover:bg-white disabled:opacity-60">
-        <Music className="size-5 text-wine-500" /> {busy ? `Carico ${busy}…` : "Carica un audio (mp3, m4a, ogg, wav · max 10 MB)"}
+      <button type="button" onClick={() => input.current?.click()} disabled={Boolean(busy)} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-tint-200 bg-surface/60 px-4 py-4 font-bold text-vio-800 hover:bg-surface disabled:opacity-60">
+        <Music className="size-5 text-vio-500" /> {busy ? `Carico ${busy}…` : "Carica un audio (mp3, m4a, ogg, wav · max 10 MB)"}
       </button>
       <input
         ref={input}

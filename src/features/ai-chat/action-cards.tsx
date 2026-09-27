@@ -38,25 +38,25 @@ export function ActionCard({ action, onConfirm }: { action: ChatAction; onConfir
       );
     case "photo":
       return action.url ? (
-        <figure className="w-56 -rotate-1 rounded-md bg-white p-2 pb-3 shadow-soft">
+        <figure className="polaroid w-56 -rotate-1 rounded-md p-2 pb-3 shadow-soft">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={action.url} alt={action.title ?? "Foto"} className="aspect-square w-full rounded-sm object-cover" />
           <figcaption className="mt-1.5 text-center">
-            <span className="block font-hand text-lg text-wine-800">{action.title || "Noi ♡"}</span>
+            <span className="block font-hand text-lg text-vio-800">{action.title || "Noi ♡"}</span>
             {action.date && <span className="text-[11px] text-ink-muted">{formatDate(action.date)}</span>}
           </figcaption>
         </figure>
       ) : null;
     case "memory":
       return (
-        <Link href="/viola/noi/ricordi" className="press block w-full max-w-xs overflow-hidden rounded-2xl bg-white shadow-soft">
+        <Link href="/viola/noi/ricordi" className="press block w-full max-w-xs overflow-hidden rounded-2xl bg-surface shadow-soft">
           {action.url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={action.url} alt="" className="aspect-video w-full object-cover" />
           )}
           <span className="block p-3">
-            <span className="block text-[11px] font-extrabold tracking-widest text-wine-500 uppercase">Ricordo{action.date ? ` · ${formatDate(action.date)}` : ""}</span>
-            <span className="block font-display font-semibold text-wine-900">{action.title}</span>
+            <span className="block text-[11px] font-extrabold tracking-widest text-vio-500 uppercase">Ricordo{action.date ? ` · ${formatDate(action.date)}` : ""}</span>
+            <span className="block font-display font-semibold text-vio-900">{action.title}</span>
             <span className="line-clamp-3 block text-sm text-ink-soft">{action.excerpt}</span>
           </span>
         </Link>
@@ -64,22 +64,22 @@ export function ActionCard({ action, onConfirm }: { action: ChatAction; onConfir
     case "dedication":
       return (
         <Link href="/viola/noi/dediche" className="press block w-full max-w-xs rounded-2xl bg-gradient-to-br from-blush-100 to-cream-50 p-4 shadow-soft">
-          <span className="block text-[11px] font-extrabold tracking-widest text-wine-500 uppercase">Una dedica</span>
-          <span className="block font-display font-semibold text-wine-900">{action.title}</span>
+          <span className="block text-[11px] font-extrabold tracking-widest text-vio-500 uppercase">Una dedica</span>
+          <span className="block font-display font-semibold text-vio-900">{action.title}</span>
           <span className="mt-1 line-clamp-4 block text-sm whitespace-pre-line text-ink-soft">{action.excerpt.replace(/[#*_>`]/g, "")}</span>
-          <span className="mt-2 block text-right font-hand text-lg text-wine-600">{action.signature}</span>
+          <span className="mt-2 block text-right font-hand text-lg text-vio-600">{action.signature}</span>
         </Link>
       );
     case "tool":
       return (
-        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold", action.ok ? "bg-green-100 text-green-800" : "bg-blush-100 text-wine-800")}>
+        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold", action.ok ? "bg-green-100 text-green-800" : "bg-blush-100 text-vio-800")}>
           {action.ok ? <Check className="size-3.5" /> : <X className="size-3.5" />} {action.summary}
         </span>
       );
     case "confirm":
       return (
         <div className="w-full max-w-sm rounded-2xl border-2 border-peach-300 bg-peach-100 p-3">
-          <p className="text-sm font-bold text-wine-900">{action.summary}</p>
+          <p className="text-sm font-bold text-vio-900">{action.summary}</p>
           {action.state === "pending" ? (
             <div className="mt-2 flex gap-2">
               <Button

@@ -99,11 +99,11 @@ export function Sheet({
             exit={{ y: 60, opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
           >
-            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-wine-100 sm:hidden" aria-hidden />
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-tint-100 sm:hidden" aria-hidden />
             {(title || dismissible) && (
               <div className="mb-3 flex items-start justify-between gap-3">
                 {title ? (
-                  <h2 id={titleId} className="text-xl font-semibold text-wine-900">
+                  <h2 id={titleId} className="text-xl font-semibold text-vio-900">
                     {title}
                   </h2>
                 ) : (
@@ -113,7 +113,7 @@ export function Sheet({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="press -mr-1 -mt-1 grid size-10 place-items-center rounded-full text-wine-700 hover:bg-wine-50"
+                    className="press -mr-1 -mt-1 grid size-10 place-items-center rounded-full text-vio-700 hover:bg-tint-50"
                     aria-label="Chiudi"
                   >
                     <X className="size-5" />

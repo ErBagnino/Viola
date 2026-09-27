@@ -62,7 +62,7 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
           <ul className="mt-4 space-y-3">
             {list.length === 0 && <EmptyState title="Nessun messaggio" />}
             {list.map((m) => (
-              <li key={m.id} className={cn("paper rounded-4xl p-5", !m.readAt && "ring-2 ring-wine-300")}>
+              <li key={m.id} className={cn("paper rounded-4xl p-5", !m.readAt && "ring-2 ring-tint-300")}>
                 <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
                   <span className="text-ink-muted">{formatDateTime(m.createdAt, tz)}</span>
                   <span className="rounded-full bg-lilac-100 px-2 py-0.5 text-lilac-600">{CAT[m.category] ?? m.category}</span>
@@ -72,10 +72,10 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
                     </span>
                   )}
                   <span className={cn("rounded-full px-2 py-0.5", m.readAt ? "bg-green-100 text-green-800" : "bg-rouge-500 text-white")}>{m.readAt ? "letto" : "da leggere"}</span>
-                  {m.respondedAt && <span className="rounded-full bg-wine-100 px-2 py-0.5 text-wine-800">risposto</span>}
+                  {m.respondedAt && <span className="rounded-full bg-tint-100 px-2 py-0.5 text-vio-800">risposto</span>}
                 </div>
-                <p className="mt-2 text-[17px] whitespace-pre-line text-wine-900">{m.body}</p>
-                {m.reply && <p className="mt-3 rounded-2xl bg-white/80 px-3 py-2 text-sm text-wine-800">La tua risposta: {m.reply}</p>}
+                <p className="mt-2 text-[17px] whitespace-pre-line text-vio-900">{m.body}</p>
+                {m.reply && <p className="mt-3 rounded-2xl bg-surface/80 px-3 py-2 text-sm text-vio-800">La tua risposta: {m.reply}</p>}
                 {replying === m.id ? (
                   <div className="mt-3 space-y-2">
                     <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="La tua risposta (la vedrà nella pagina Scrivi ad Adam)" />
@@ -124,11 +124,11 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
           {journal.map((j) => (
             <li key={j.id} className="paper rounded-4xl p-5">
               <p className="text-xs font-bold text-ink-muted">{formatDateTime(j.createdAt, tz)}</p>
-              <h3 className="mt-1 font-display text-lg font-semibold text-wine-900">
+              <h3 className="mt-1 font-display text-lg font-semibold text-vio-900">
                 {j.mood ? `${MOODS[j.mood - 1]?.emoji} ` : ""}
                 {j.title || "Senza titolo"}
               </h3>
-              <p className="mt-1 whitespace-pre-line text-wine-900">{j.body}</p>
+              <p className="mt-1 whitespace-pre-line text-vio-900">{j.body}</p>
             </li>
           ))}
         </ul>

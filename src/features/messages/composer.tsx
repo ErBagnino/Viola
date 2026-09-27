@@ -55,7 +55,7 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
           Messaggio
         </label>
         <Textarea id="msg" rows={6} value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} placeholder={`Scrivi ad ${adamName} tutto quello che stai pensando…`} className="mt-2" />
-        <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold text-wine-800">
+        <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold text-vio-800">
           <input type="checkbox" className="size-5 accent-wine-600" checked={isPrivate} onChange={(e) => setPrivate(e.target.checked)} />
           <Lock className="size-4" /> Non mostrare il testo nella notifica
         </label>
@@ -66,7 +66,7 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
 
       {history.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">I tuoi messaggi</h2>
+          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">I tuoi messaggi</h2>
           <ul className="space-y-3">
             {history.map((m) => (
               <li key={m.id} className="space-y-2">
@@ -90,8 +90,8 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
                   </p>
                 </div>
                 {m.reply && (
-                  <div className="max-w-[85%] rounded-3xl rounded-bl-lg bg-white px-4 py-3 text-wine-900 shadow-soft">
-                    <p className="font-hand text-lg text-wine-500">{adamName}</p>
+                  <div className="max-w-[85%] rounded-3xl rounded-bl-lg bg-surface px-4 py-3 text-vio-900 shadow-soft">
+                    <p className="font-hand text-lg text-vio-500">{adamName}</p>
                     <p className="whitespace-pre-line">{m.reply}</p>
                   </div>
                 )}

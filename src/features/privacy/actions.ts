@@ -29,3 +29,14 @@ export async function deleteMyData(input: z.input<typeof schema>) {
     return {};
   });
 }
+
+/** "Adam può vedere quando uso gli esercizi" — her own switch, nothing else. */
+export async function setShareActivity(share: boolean) {
+  return safeAction(async () => {
+    const viewer = await assertMember();
+    const supabase = await createClient();
+    const { error } = await supabase.from("profiles").update({ share_activity: z.boolean().parse(share) }).eq("id", viewer.id);
+    if (error) throw error;
+    return { share };
+  });
+}

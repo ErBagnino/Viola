@@ -54,7 +54,7 @@ export function EmergencyContact({ tone = "light", className }: { tone?: "light"
         </a>
       )}
       {c.whatsappUrl && (
-        <a href={c.whatsappUrl} target="_blank" rel="noopener noreferrer" className={cn(base, tone === "dark" ? "bg-white/10 text-white" : "paper text-wine-800")}>
+        <a href={c.whatsappUrl} target="_blank" rel="noopener noreferrer" className={cn(base, tone === "dark" ? "bg-white/10 text-white" : "paper text-vio-800")}>
           <MessageCircleHeart className="size-5" /> Scrivi a {c.adamName}
         </a>
       )}

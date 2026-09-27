@@ -38,15 +38,15 @@ export default async function OggiPage() {
             <img src={s.media.url} alt="" className="aspect-[4/3] w-full rounded-t-[2rem] object-cover" />
           )}
           <div className="p-6">
-            <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{EYEBROW[s.kind] ?? "Per te"}</p>
-            <h2 className="mt-1 font-display text-[1.8rem] leading-tight font-semibold text-wine-900">{s.title}</h2>
+            <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{EYEBROW[s.kind] ?? "Per te"}</p>
+            <h2 className="mt-1 font-display text-[1.8rem] leading-tight font-semibold text-vio-900">{s.title}</h2>
             {s.body && <Markdown className="mt-3 text-[17px] text-ink-soft">{s.body}</Markdown>}
             {href && isAppAction(s.action) && (
               <Link href={href} className="press btn-3d mt-5 block rounded-[1.25rem] bg-gradient-to-b from-wine-500 to-wine-700 px-6 py-4 text-center font-extrabold text-white">
                 {APP_ACTIONS[s.action].label}
               </Link>
             )}
-            {settings.general.showDaAdam && <p className="mt-5 text-right font-hand text-2xl text-wine-500">{daAdam}</p>}
+            {settings.general.showDaAdam && <p className="mt-5 text-right font-hand text-2xl text-vio-500">{daAdam}</p>}
           </div>
         </article>
       ) : (

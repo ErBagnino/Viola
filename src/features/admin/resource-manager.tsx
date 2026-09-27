@@ -170,16 +170,16 @@ export function ResourceManager({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={thumb} alt="" className="size-16 shrink-0 rounded-2xl object-cover" loading="lazy" />
                 ) : typeof r.icon === "string" && r.icon ? (
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blush-100 text-wine-600">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blush-100 text-vio-600">
                     <Icon name={r.icon} className="size-6 text-xl" />
                   </span>
                 ) : null}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {def.badgeField && r[def.badgeField] ? <span className="rounded-full bg-lilac-100 px-2 py-0.5 text-[11px] font-extrabold text-lilac-600">{badgeLabel(r[def.badgeField])}</span> : null}
-                    {r.pinned || r.is_default || r.featured ? <span className="rounded-full bg-peach-100 px-2 py-0.5 text-[11px] font-extrabold text-wine-700">in evidenza</span> : null}
+                    {r.pinned || r.is_default || r.featured ? <span className="rounded-full bg-peach-100 px-2 py-0.5 text-[11px] font-extrabold text-vio-700">in evidenza</span> : null}
                   </div>
-                  <h3 className="mt-0.5 truncate font-extrabold text-wine-900">{plain(r[def.titleField]) || "(senza titolo)"}</h3>
+                  <h3 className="mt-0.5 truncate font-extrabold text-vio-900">{plain(r[def.titleField]) || "(senza titolo)"}</h3>
                   {def.subtitleField && r[def.subtitleField] ? <p className="line-clamp-2 text-sm text-ink-soft">{describe(r[def.subtitleField])}</p> : null}
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <Button size="sm" variant="soft" onClick={() => openEdit(r)}>
@@ -226,8 +226,8 @@ export function ResourceManager({
                     onClick={() => toggle(r)}
                     className="-mt-1 -mr-1 grid h-11 w-14 shrink-0 place-items-center"
                   >
-                    <span className={cn("relative h-7 w-12 rounded-full transition-colors", isOn(r) ? "bg-wine-600" : "bg-wine-100")}>
-                      <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", isOn(r) ? "left-6" : "left-1")} />
+                    <span className={cn("relative h-7 w-12 rounded-full transition-colors", isOn(r) ? "bg-wine-600" : "bg-tint-100")}>
+                      <span className={cn("absolute top-1 size-5 rounded-full bg-surface shadow transition-all", isOn(r) ? "left-6" : "left-1")} />
                     </span>
                   </button>
                 )}

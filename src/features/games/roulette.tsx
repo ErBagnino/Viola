@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { HeartBurst } from "@/components/decor/burst";
 import { track } from "@/features/activity/track";
 
-const COLORS = ["#f8d3d0", "#e2d6f3", "#fbd5bb", "#fdf6ec", "#f1b6b2", "#cbb8e8", "#f7bb93", "#fde9e7"];
+// a paper wheel: white, rose and red slices (text stays dark on all of them)
+const COLORS = ["#fbe1e1", "#ffffff", "#f4c2c6", "#fdf3f1", "#eeb1b7", "#ffffff", "#f7d4d4", "#fdf3f1"];
 
 export function Roulette({ items }: { items: string[] }) {
   const slices = items.slice(0, 8);
@@ -55,14 +56,14 @@ export function Roulette({ items }: { items: string[] }) {
               </g>
             );
           })}
-          <circle r={26} fill="#82203d" stroke="#fff" strokeWidth={4} />
+          <circle r={26} fill="#7e1730" stroke="#fff" strokeWidth={4} />
           <text textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize="20">
             ♥
           </text>
         </motion.svg>
       </div>
       <div className="mt-6 min-h-24 text-center" aria-live="polite">
-        {result && <p className="font-display text-2xl leading-snug font-semibold text-wine-900">{result}</p>}
+        {result && <p className="font-display text-2xl leading-snug font-semibold text-vio-900">{result}</p>}
       </div>
       <Button size="lg" className="w-full max-w-sm" onClick={spin} loading={spinning}>
         Gira la ruota

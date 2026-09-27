@@ -24,7 +24,7 @@ export function SmileCard({ phrases, initialIndex = 0 }: { phrases: string[]; in
           <p className="text-4xl" aria-hidden>
             😄
           </p>
-          <p className="mt-3 font-display text-2xl leading-snug text-wine-900">{cur.text}</p>
+          <p className="mt-3 font-display text-2xl leading-snug text-vio-900">{cur.text}</p>
         </motion.div>
       </AnimatePresence>
       <Button

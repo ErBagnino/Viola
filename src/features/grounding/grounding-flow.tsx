@@ -9,6 +9,7 @@ import { HeartBurst } from "@/components/decor/burst";
 import { track } from "@/features/activity/track";
 import { cn } from "@/utils/cn";
 import type { GroundingExercise } from "./types";
+import { haptic } from "@/utils/haptics";
 
 /**
  * Step-by-step grounding. Steps with a `count` show that many small inputs
@@ -27,6 +28,7 @@ export function GroundingFlow({ exercise, onDone, doneHref = "/viola/calma" }: {
     if (i + delta >= steps.length) {
       setFinished(true);
       track("grounding_completed", { exercise: exercise.slug });
+      haptic("success");
       return;
     }
     setI((v) => Math.max(0, Math.min(steps.length - 1, v + delta)));
@@ -39,7 +41,7 @@ export function GroundingFlow({ exercise, onDone, doneHref = "/viola/calma" }: {
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-6xl">
           ♡
         </motion.div>
-        <p className="mt-4 max-w-xs font-display text-3xl font-semibold text-wine-900">{exercise.endText}</p>
+        <p className="mt-4 max-w-xs font-display text-3xl font-semibold text-vio-900">{exercise.endText}</p>
         <div className="mt-8 flex w-full max-w-sm flex-col gap-3">
           {onDone ? (
             <Button size="lg" onClick={onDone}>
@@ -73,7 +75,7 @@ export function GroundingFlow({ exercise, onDone, doneHref = "/viola/calma" }: {
     <div className="flex min-h-[70dvh] flex-col">
       <div className="mb-6 flex gap-1.5" role="progressbar" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={i + 1} aria-label="Avanzamento">
         {steps.map((_, k) => (
-          <span key={k} className={cn("h-2 flex-1 rounded-full transition-colors", k <= i ? "bg-wine-500" : "bg-wine-100")} />
+          <span key={k} className={cn("h-2 flex-1 rounded-full transition-colors", k <= i ? "bg-wine-500" : "bg-tint-100")} />
         ))}
       </div>
 
@@ -92,18 +94,18 @@ export function GroundingFlow({ exercise, onDone, doneHref = "/viola/calma" }: {
               {step.emoji}
             </motion.div>
           )}
-          <h2 className="font-display text-3xl leading-tight font-semibold text-wine-900 text-balance">{step.title}</h2>
+          <h2 className="font-display text-3xl leading-tight font-semibold text-vio-900 text-balance">{step.title}</h2>
           {step.text && <p className="mt-2 text-lg text-ink-soft">{step.text}</p>}
 
           {count > 0 && (
             <div className="mt-6 space-y-2.5">
               {Array.from({ length: count }, (_, k) => (
                 <motion.div key={k} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: k * 0.06 }} className="flex items-center gap-3">
-                  <span className={cn("grid size-9 shrink-0 place-items-center rounded-full text-sm font-extrabold", values[k]?.trim() ? "bg-wine-600 text-white" : "bg-white text-wine-500")}>
+                  <span className={cn("grid size-9 shrink-0 place-items-center rounded-full text-sm font-extrabold", values[k]?.trim() ? "bg-wine-600 text-white" : "bg-surface text-vio-500")}>
                     {values[k]?.trim() ? "♥" : k + 1}
                   </span>
                   <input
-                    className="h-12 flex-1 rounded-2xl border border-blush-200 bg-white/80 px-4 focus:border-wine-300 focus:ring-4 focus:ring-blush-200/70 focus:outline-none"
+                    className="h-12 flex-1 rounded-2xl border border-blush-200 bg-surface/80 px-4 focus:border-tint-300 focus:ring-4 focus:ring-blush-200/70 focus:outline-none"
                     placeholder="Scrivila, se vuoi…"
                     aria-label={`${step.title}: ${k + 1}`}
                     value={values[k] ?? ""}

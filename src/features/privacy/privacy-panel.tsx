@@ -32,7 +32,7 @@ export function PrivacyPanel() {
         <p className="text-sm text-ink-soft">Scegli cosa vuoi cancellare per sempre. Non si può annullare.</p>
         <div className="mt-4 space-y-2">
           {OPTIONS.map((o) => (
-            <label key={o.key} className="flex items-center gap-3 rounded-2xl bg-white/80 px-4 py-3 font-bold text-wine-900">
+            <label key={o.key} className="flex items-center gap-3 rounded-2xl bg-surface/80 px-4 py-3 font-bold text-vio-900">
               <input type="checkbox" className="size-5 accent-wine-600" checked={Boolean(sel[o.key])} onChange={(e) => setSel((s) => ({ ...s, [o.key]: e.target.checked }))} />
               {o.label}
             </label>

@@ -27,7 +27,7 @@ export default async function UmoreAdminPage() {
         icon="smile"
       />
       <section className="paper rounded-4xl p-5">
-        <h2 className="font-display text-lg font-semibold text-wine-900">Ultimi 30 giorni</h2>
+        <h2 className="font-display text-lg font-semibold text-vio-900">Ultimi 30 giorni</h2>
         <div className="mt-4 flex h-36 items-end gap-1" role="img" aria-label="Andamento dell'umore negli ultimi 30 giorni">
           {days.map((d) => (
             <div key={d.key} className="flex flex-1 flex-col items-center justify-end" title={`${formatDate(d.key)}${d.avg ? ` · ${d.avg.toFixed(1)}/5` : ""}`}>
@@ -46,9 +46,9 @@ export default async function UmoreAdminPage() {
         <ul className="space-y-2">
           {list.map((m) => (
             <li key={m.id} className="paper flex items-center gap-3 rounded-3xl p-3">
-              <span className="grid size-11 place-items-center rounded-2xl bg-white text-2xl">{m.mood ? MOODS[m.mood - 1]?.emoji : "🤷"}</span>
+              <span className="grid size-11 place-items-center rounded-2xl bg-surface text-2xl">{m.mood ? MOODS[m.mood - 1]?.emoji : "🤷"}</span>
               <span>
-                <span className="block text-sm font-bold text-wine-900">{m.mood ? MOODS[m.mood - 1]?.label : "Non lo so"}</span>
+                <span className="block text-sm font-bold text-vio-900">{m.mood ? MOODS[m.mood - 1]?.label : "Non lo so"}</span>
                 <span className="block text-xs text-ink-muted">{formatDateTime(m.created_at, settings.general.timezone)}</span>
                 {m.note && <span className="block text-sm text-ink-soft">{m.note}</span>}
               </span>

@@ -1,7 +1,8 @@
+import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { ActionCard } from "@/features/home/action-card";
 import { PushToggle } from "@/features/push/push-toggle";
-import { PrivacyPanel } from "@/features/privacy/privacy-panel";
 import { SignOutButton } from "@/features/auth/sign-out-button";
 import { getSettings } from "@/server/settings";
 
@@ -45,7 +46,7 @@ export default async function AltroPage() {
       <PageHeader title="Altro" subtitle="Tutte le piccole stanze della casa." />
       {sections.map((s) => (
         <section key={s.title}>
-          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">{s.title}</h2>
+          <h2 className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">{s.title}</h2>
           <div className="grid grid-cols-2 gap-3">
             {s.items.map((it, i) => (
               <ActionCard key={it.href} {...it} index={i} />
@@ -54,10 +55,12 @@ export default async function AltroPage() {
         </section>
       ))}
       <section className="paper space-y-4 rounded-4xl p-5">
-        <h2 className="font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">Impostazioni</h2>
+        <h2 className="font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">Impostazioni</h2>
         <PushToggle label={`Avvisi quando ${adam} ti risponde`} />
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-blush-100 pt-4">
-          <PrivacyPanel />
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4">
+          <Link href="/viola/privacy" className="press inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold text-vio-700 hover:bg-tint-50">
+            <ShieldCheck className="size-4" /> La tua privacy
+          </Link>
           <SignOutButton />
         </div>
       </section>

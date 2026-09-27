@@ -46,13 +46,13 @@ export function Puzzle({ imageUrl, seed }: { imageUrl: string | null; seed: stri
     setSel(null);
   };
 
-  const bg = imageUrl ? `url(${JSON.stringify(imageUrl)})` : "linear-gradient(135deg,#f8d3d0,#cbb8e8 50%,#f7bb93)";
+  const bg = imageUrl ? `url(${JSON.stringify(imageUrl)})` : "linear-gradient(135deg,#fbe1e1,#e3262b 55%,#621226)";
 
   return (
     <div>
       <HeartBurst show={solved} />
-      <p className="mb-3 text-sm font-bold text-wine-700">Tocca due tessere per scambiarle · Mosse: {moves}</p>
-      <div className="mx-auto grid aspect-square max-w-sm gap-1 overflow-hidden rounded-3xl bg-white p-1 shadow-soft" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
+      <p className="mb-3 text-sm font-bold text-vio-700">Tocca due tessere per scambiarle · Mosse: {moves}</p>
+      <div className="mx-auto grid aspect-square max-w-sm gap-1 overflow-hidden rounded-3xl bg-surface p-1 shadow-soft" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
         {tiles.map((t, i) => {
           const x = (t % n) * 50;
           const y = Math.floor(t / n) * 50;
@@ -70,7 +70,7 @@ export function Puzzle({ imageUrl, seed }: { imageUrl: string | null; seed: stri
           );
         })}
       </div>
-      {solved && <p className="mt-4 text-center font-display text-2xl font-semibold text-wine-900">Completato! ♡</p>}
+      {solved && <p className="mt-4 text-center font-display text-2xl font-semibold text-vio-900">Completato! ♡</p>}
       <Button variant="soft" className="mt-5 w-full" onClick={scramble}>
         <Shuffle className="size-4" /> Mescola di nuovo
       </Button>

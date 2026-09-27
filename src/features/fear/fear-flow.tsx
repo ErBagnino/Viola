@@ -75,7 +75,7 @@ export function FearFlow({
   const isChoiceStep = !isIntro && stepIndex === steps.length - 1;
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-wine-800 via-wine-700 to-lilac-600 px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)] text-white">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-wine-800 via-wine-700 to-night-900 px-5 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)] text-white">
       <div className="mx-auto flex w-full max-w-md items-center justify-between">
         <Link href="/viola" className="press grid size-11 place-items-center rounded-2xl bg-white/10" aria-label="Esci">
           <X className="size-5" />

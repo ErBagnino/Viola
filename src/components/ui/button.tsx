@@ -9,13 +9,13 @@ type Size = "sm" | "md" | "lg" | "xl" | "icon";
 
 const variants: Record<Variant, string> = {
   primary:
-    "btn-3d text-white bg-gradient-to-b from-wine-500 to-wine-700 hover:from-wine-500 hover:to-wine-600 disabled:from-wine-300 disabled:to-wine-400",
+    "btn-3d text-white bg-gradient-to-b from-wine-500 to-wine-700 hover:from-wine-500 hover:to-wine-600 disabled:from-tint-300 disabled:to-wine-400",
   love: "btn-3d text-white bg-gradient-to-b from-rouge-400 to-rouge-600 disabled:opacity-60",
-  soft: "press text-wine-800 bg-blush-100 hover:bg-blush-200 border border-blush-200",
-  ghost: "press text-wine-700 hover:bg-wine-50",
-  outline: "press text-wine-700 border-2 border-wine-200 bg-white/60 hover:bg-white",
+  soft: "press text-vio-800 bg-blush-100 hover:bg-blush-200 border border-blush-200",
+  ghost: "press text-vio-700 hover:bg-tint-50",
+  outline: "press text-vio-700 border-2 border-tint-200 bg-surface/60 hover:bg-surface",
   night: "press text-moon bg-night-700/80 hover:bg-night-700 border border-white/10",
-  white: "btn-3d text-wine-800 bg-white hover:bg-cream-50",
+  white: "btn-3d text-vio-800 bg-surface hover:bg-cream-50",
   danger: "press text-white bg-rouge-600 hover:bg-rouge-500",
 };
 

@@ -13,6 +13,8 @@ export type Viewer = {
   displayName: string | null;
   nickname: string | null;
   onboardedAt: string | null;
+  /** Viola chose to let Adam see which exercises/games she used */
+  shareActivity: boolean;
 };
 
 /** The signed-in user + role, verified server-side (cached per request). */
@@ -25,7 +27,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role, display_name, nickname, onboarded_at")
+    .select("role, display_name, nickname, onboarded_at, share_activity")
     .eq("id", claims.sub)
     .maybeSingle();
   // A failed lookup (database paused or unreachable) is not the same as
@@ -40,6 +42,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     displayName: profile?.display_name ?? null,
     nickname: profile?.nickname ?? null,
     onboardedAt: profile?.onboarded_at ?? null,
+    shareActivity: profile?.share_activity ?? true,
   };
 });
 

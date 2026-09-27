@@ -55,7 +55,7 @@ export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: 
         {[0, 1, 2, 3].map((k) => (
           <motion.span
             key={k}
-            className="absolute size-64 rounded-full border border-blush-200/40"
+            className="absolute size-64 rounded-full border border-wine-200/40"
             animate={{ scale: holding ? [1, 1.25] : [1, 1.8], opacity: [0.6, 0] }}
             transition={{ duration: holding ? 1 : 3, delay: k * 0.7, repeat: Infinity }}
             aria-hidden
@@ -70,7 +70,7 @@ export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: 
           onKeyUp={(e) => e.key === " " && endHold()}
           animate={{ scale: holding ? 1.18 : [1, 1.06, 1] }}
           transition={holding ? { type: "spring", damping: 10 } : { duration: 1.6, repeat: Infinity }}
-          className="relative grid size-56 touch-none place-items-center overflow-hidden rounded-full bg-gradient-to-br from-blush-200 to-rouge-400 shadow-glow select-none"
+          className="relative grid size-56 touch-none place-items-center overflow-hidden rounded-full bg-gradient-to-br from-wine-200 to-rouge-400 shadow-glow select-none"
           aria-label="Tieni premuto per un abbraccio"
         >
           {photoUrl ? (

@@ -21,11 +21,11 @@ export function LoveSlider({ adamName }: { adamName: string }) {
   return (
     <div className="text-center">
       <HeartBurst show={sent} />
-      <h2 className="font-display text-2xl font-semibold text-wine-900">Quanto mi vuoi bene?</h2>
+      <h2 className="font-display text-2xl font-semibold text-vio-900">Quanto mi vuoi bene?</h2>
       <motion.p key={level.emoji} initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="mt-6 text-7xl">
         {level.emoji}
       </motion.p>
-      <p className="mt-3 font-display text-xl text-wine-800">{level.text}</p>
+      <p className="mt-3 font-display text-xl text-vio-800">{level.text}</p>
       <input
         type="range"
         min={0}
@@ -44,8 +44,8 @@ export function LoveSlider({ adamName }: { adamName: string }) {
       <AnimatePresence>
         {sent && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="paper mt-5 rounded-3xl p-5">
-            <p className="font-hand text-3xl text-wine-600">Risultato ufficiale:</p>
-            <p className="mt-1 font-display text-2xl font-semibold text-wine-900">{adamName} ti vuole bene ancora di più. Sempre. ♡</p>
+            <p className="font-hand text-3xl text-vio-600">Risultato ufficiale:</p>
+            <p className="mt-1 font-display text-2xl font-semibold text-vio-900">{adamName} ti vuole bene ancora di più. Sempre. ♡</p>
             <p className="mt-1 text-sm text-ink-muted">(Il termometro è truccato. Lo ammetto.)</p>
           </motion.div>
         )}

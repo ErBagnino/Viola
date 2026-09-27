@@ -63,12 +63,12 @@ export function BreathingExperience({
             aria-pressed={selected.id === p.id}
             className={cn(
               "w-full rounded-3xl border-2 p-4 text-left transition",
-              selected.id === p.id ? "border-wine-500 bg-white shadow-soft" : "border-transparent bg-white/60",
+              selected.id === p.id ? "border-wine-500 bg-surface shadow-soft" : "border-transparent bg-surface/60",
             )}
           >
-            <span className="block font-extrabold text-wine-900">{p.name}</span>
+            <span className="block font-extrabold text-vio-900">{p.name}</span>
             <span className="block text-sm text-ink-soft">{p.description || describe(p)}</span>
-            <span className="mt-1 block text-xs font-bold text-wine-500">
+            <span className="mt-1 block text-xs font-bold text-vio-500">
               {describe(p)}
               {p.rounds ? ` · ${p.rounds} respiri` : " · libero"}
             </span>
@@ -77,7 +77,7 @@ export function BreathingExperience({
       </section>
 
       <section className="mt-5" aria-label="Forma">
-        <p className="mb-2 px-1 text-xs font-extrabold tracking-widest text-wine-500 uppercase">Forma</p>
+        <p className="mb-2 px-1 text-xs font-extrabold tracking-widest text-vio-500 uppercase">Forma</p>
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {BREATHING_VISUALS.map((v) => (
             <button
@@ -86,8 +86,8 @@ export function BreathingExperience({
               onClick={() => setVisual(v.value)}
               aria-pressed={visual === v.value}
               className={cn(
-                "press shrink-0 rounded-full px-4 py-2 text-sm font-bold",
-                visual === v.value ? "bg-wine-700 text-white" : "bg-white/70 text-wine-700",
+                "press min-h-11 shrink-0 rounded-full px-4 py-2 text-sm font-bold",
+                visual === v.value ? "bg-wine-700 text-white" : "bg-surface/70 text-vio-700",
               )}
             >
               {v.label}
@@ -95,7 +95,7 @@ export function BreathingExperience({
           ))}
         </div>
         {photos.length > 0 && selected.showPhotos && (
-          <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 px-1 text-sm font-bold text-wine-800">
+          <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 px-1 text-sm font-bold text-vio-800">
             <input type="checkbox" checked={withPhotos} onChange={(e) => setWithPhotos(e.target.checked)} className="size-5 accent-wine-600" />
             Con le nostre foto
           </label>

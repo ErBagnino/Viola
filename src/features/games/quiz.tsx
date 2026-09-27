@@ -34,7 +34,7 @@ export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamN
       <div className="text-center">
         <HeartBurst show />
         <p className="text-6xl">{pct === 1 ? "🏆" : pct >= 0.6 ? "🥰" : "😘"}</p>
-        <p className="mt-3 font-display text-3xl font-semibold text-wine-900">
+        <p className="mt-3 font-display text-3xl font-semibold text-vio-900">
           {score} su {questions.length}
         </p>
         <p className="mt-2 text-ink-soft">
@@ -57,15 +57,15 @@ export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamN
 
   return (
     <div>
-      <div className="mb-4 h-2 overflow-hidden rounded-full bg-wine-100">
+      <div className="mb-4 h-2 overflow-hidden rounded-full bg-tint-100">
         <motion.div className="h-full bg-wine-500" animate={{ width: `${(i / questions.length) * 100}%` }} />
       </div>
       <AnimatePresence mode="wait">
         <motion.div key={q.id} initial={{ x: 30, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -30, opacity: 0 }}>
-          <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">
+          <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">
             Domanda {i + 1} di {questions.length}
           </p>
-          <h2 className="mt-2 font-display text-2xl leading-snug font-semibold text-wine-900">{q.question}</h2>
+          <h2 className="mt-2 font-display text-2xl leading-snug font-semibold text-vio-900">{q.question}</h2>
           <div className="mt-5 grid gap-2.5">
             {q.options.map((o, k) => {
               const state = answer === null ? "idle" : k === q.correct ? "right" : k === answer ? "wrong" : "idle";
@@ -79,8 +79,8 @@ export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamN
                   className={cn(
                     "rounded-2xl border-2 px-4 py-3.5 text-left font-bold transition",
                     state === "right" && "border-green-500 bg-green-50 text-green-800",
-                    state === "wrong" && "border-rouge-400 bg-blush-100 text-wine-800",
-                    state === "idle" && "border-transparent bg-white text-wine-900 shadow-soft",
+                    state === "wrong" && "border-rouge-400 bg-blush-100 text-vio-800",
+                    state === "idle" && "border-transparent bg-surface text-vio-900 shadow-soft",
                   )}
                 >
                   {o}
@@ -90,7 +90,7 @@ export function Quiz({ questions, adamName }: { questions: QuizQuestion[]; adamN
           </div>
           {answer !== null && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4">
-              <p className="font-bold text-wine-800">{answer === q.correct ? "Giusto! ♡" : "Quasi…"}</p>
+              <p className="font-bold text-vio-800">{answer === q.correct ? "Giusto! ♡" : "Quasi…"}</p>
               {q.explanation && <p className="text-ink-soft">{q.explanation}</p>}
               <Button className="mt-4 w-full" size="lg" onClick={next}>
                 {i + 1 < questions.length ? "Prossima" : "Risultato"}

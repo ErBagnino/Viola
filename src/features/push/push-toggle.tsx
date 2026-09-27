@@ -91,7 +91,7 @@ export function PushToggle({ label = "Notifiche su questo dispositivo" }: { labe
           {state === "needs-install" ? <Smartphone className="size-5" /> : state === "on" ? <Bell className="size-5" /> : <BellOff className="size-5" />}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-wine-900">{label}</p>
+          <p className="text-sm font-bold text-vio-900">{label}</p>
           <p className="text-xs text-ink-muted">{hint[state] ?? (state === "on" ? "Attive ♡" : state === "off" ? "Spente" : "…")}</p>
         </div>
       </div>

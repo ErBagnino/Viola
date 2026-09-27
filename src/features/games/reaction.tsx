@@ -65,7 +65,7 @@ export function ReactionGame() {
 
   return (
     <div>
-      <div className="mb-3 flex justify-between text-sm font-bold text-wine-700">
+      <div className="mb-3 flex justify-between text-sm font-bold text-vio-700">
         <span>Cuori: {score}</span>
         <span>Record: {best}</span>
         <span>{running ? `${left}s` : ""}</span>
@@ -91,7 +91,7 @@ export function ReactionGame() {
         {!running && (
           <div className="absolute inset-0 grid place-items-center p-6 text-center">
             <div>
-              <p className="font-display text-2xl font-semibold text-wine-900">{left <= 0 ? `${score} cuori presi! ♡` : "Acchiappa i cuori"}</p>
+              <p className="font-display text-2xl font-semibold text-vio-900">{left <= 0 ? `${score} cuori presi! ♡` : "Acchiappa i cuori"}</p>
               <p className="mt-1 text-ink-soft">30 secondi. Tocca più cuori che puoi.</p>
               <Button
                 className="mt-4"

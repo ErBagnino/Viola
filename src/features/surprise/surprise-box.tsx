@@ -72,7 +72,7 @@ export function SurpriseBox({ items }: { items: SurpriseItem[] }) {
               <span className="absolute inset-x-0 top-1/2 h-6 -translate-y-1/2 bg-blush-200/90" />
               <Gift className="relative size-16" strokeWidth={1.6} />
             </span>
-            <span className="absolute -bottom-6 font-display text-xl font-semibold text-wine-800">Toccami ♡</span>
+            <span className="absolute -bottom-6 font-display text-xl font-semibold text-vio-800">Toccami ♡</span>
           </motion.button>
         ) : (
           <motion.article
@@ -87,8 +87,8 @@ export function SurpriseBox({ items }: { items: SurpriseItem[] }) {
               <img src={current.imageUrl} alt="" className="aspect-[4/3] w-full object-cover" />
             )}
             <div className="p-6">
-              <p className="font-hand text-2xl text-wine-500">{current.eyebrow}</p>
-              <h2 className="mt-1 font-display text-[1.7rem] leading-tight font-semibold text-wine-900">{current.title}</h2>
+              <p className="font-hand text-2xl text-vio-500">{current.eyebrow}</p>
+              <h2 className="mt-1 font-display text-[1.7rem] leading-tight font-semibold text-vio-900">{current.title}</h2>
               {current.text && <Markdown className="mt-3 text-[16px] text-ink-soft">{current.text}</Markdown>}
               {current.href && (
                 <Link href={current.href} className="press btn-3d mt-5 block rounded-[1.25rem] bg-gradient-to-b from-wine-500 to-wine-700 px-6 py-4 text-center font-extrabold text-white">

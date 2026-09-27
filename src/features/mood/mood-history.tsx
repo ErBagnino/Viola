@@ -19,7 +19,7 @@ export function MoodHistoryDelete({ id }: { id: string }) {
           if (!res.ok) toast.show(res.error, "error");
         })
       }
-      className="press grid size-11 place-items-center rounded-xl text-ink-muted hover:bg-wine-50 disabled:opacity-40"
+      className="press grid size-11 place-items-center rounded-xl text-ink-muted hover:bg-tint-50 disabled:opacity-40"
       aria-label="Elimina"
     >
       <X className="size-4" />

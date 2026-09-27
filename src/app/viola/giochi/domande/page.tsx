@@ -17,7 +17,7 @@ export default async function Page() {
       {qs.length ? (
         <RandomQuestions questions={shuffle(qs.map((q) => q.text))} whatsappNumber={contact.whatsappNumber} adamName={settings.general.adamName} />
       ) : (
-        <EmptyState title="Nessuna domanda ancora" />
+        <EmptyState title="Nessuna domanda ancora" text={`${settings.general.adamName} sta pensando a cosa chiederti ♡`} />
       )}
     </div>
   );

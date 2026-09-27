@@ -31,14 +31,14 @@ export const MEMORY_KINDS: Record<string, { label: string; emoji: string }> = {
 
 export const COMFORT_CATEGORIES: Record<string, { label: string; color: string }> = {
   breathing: { label: "Respiro", color: "bg-lilac-100 text-lilac-600" },
-  grounding: { label: "Grounding", color: "bg-peach-100 text-wine-700" },
-  sensory: { label: "Sensi", color: "bg-blush-100 text-wine-700" },
-  movement: { label: "Movimento", color: "bg-peach-100 text-wine-700" },
+  grounding: { label: "Grounding", color: "bg-peach-100 text-vio-700" },
+  sensory: { label: "Sensi", color: "bg-blush-100 text-vio-700" },
+  movement: { label: "Movimento", color: "bg-peach-100 text-vio-700" },
   distraction: { label: "Distrazione", color: "bg-lilac-100 text-lilac-600" },
-  writing: { label: "Scrivere", color: "bg-cream-200 text-wine-800" },
-  social: { label: "Contatto", color: "bg-blush-100 text-wine-700" },
-  romantic: { label: "Noi", color: "bg-blush-200 text-wine-800" },
-  practical: { label: "Pratico", color: "bg-cream-200 text-wine-800" },
+  writing: { label: "Scrivere", color: "bg-cream-200 text-vio-800" },
+  social: { label: "Contatto", color: "bg-blush-100 text-vio-700" },
+  romantic: { label: "Noi", color: "bg-blush-200 text-vio-800" },
+  practical: { label: "Pratico", color: "bg-cream-200 text-vio-800" },
 };
 
 export const COUNTDOWN_KINDS: Record<string, string> = {

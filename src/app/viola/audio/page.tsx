@@ -22,8 +22,8 @@ export default async function AudioPage() {
         <ul className="space-y-3">
           {items.map((a) => (
             <li key={a.id} className="paper rounded-[1.75rem] p-4">
-              <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{CAT[a.category] ?? "Audio"}</p>
-              <p className="mt-1 font-display text-lg font-semibold text-wine-900">{a.title}</p>
+              <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{CAT[a.category] ?? "Audio"}</p>
+              <p className="mt-1 font-display text-lg font-semibold text-vio-900">{a.title}</p>
               {a.description && <p className="text-sm text-ink-soft">{a.description}</p>}
               <audio src={media.get(a.media_id!)!.url} controls preload="none" className="mt-3 w-full" />
             </li>

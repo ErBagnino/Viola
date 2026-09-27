@@ -38,7 +38,7 @@ export function FindHeart({ seed }: { seed: string }) {
   return (
     <div>
       <HeartBurst show={found} />
-      <div className="mb-3 flex items-center justify-between text-sm font-bold text-wine-700">
+      <div className="mb-3 flex items-center justify-between text-sm font-bold text-vio-700">
         <span>Livello {level}</span>
         <span>Tentativi: {revealed.length}</span>
       </div>
@@ -51,7 +51,7 @@ export function FindHeart({ seed }: { seed: string }) {
               type="button"
               whileTap={{ scale: 0.9 }}
               onClick={() => pick(i)}
-              className={cn("grid aspect-square place-items-center rounded-2xl text-2xl shadow-soft", open ? "bg-white" : "bg-gradient-to-br from-lilac-200 to-blush-200")}
+              className={cn("grid aspect-square place-items-center rounded-2xl text-2xl shadow-soft", open ? "bg-surface" : "bg-gradient-to-br from-lilac-200 to-blush-200")}
               aria-label={open ? (i === target ? "Cuore trovato" : "Vuoto") : `Casella ${i + 1}`}
             >
               {open ? (i === target ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1.3 }}>💗</motion.span> : DECOYS[i % DECOYS.length]) : "?"}
@@ -61,7 +61,7 @@ export function FindHeart({ seed }: { seed: string }) {
       </div>
       {found && (
         <div className="mt-5 text-center">
-          <p className="font-display text-2xl font-semibold text-wine-900">L&apos;hai trovato! Come hai trovato me ♡</p>
+          <p className="font-display text-2xl font-semibold text-vio-900">L&apos;hai trovato! Come hai trovato me ♡</p>
           <Button className="mt-4 w-full" size="lg" onClick={nextLevel}>
             Livello {level + 1}
           </Button>

@@ -31,7 +31,7 @@ function NavList({ path, onNavigate }: { path: string; onNavigate?: () => void }
                     href={n.href}
                     onClick={onNavigate}
                     aria-current={on ? "page" : undefined}
-                    className={cn("flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition", on ? "bg-wine-700 text-white shadow-soft" : "text-wine-800 hover:bg-white/70")}
+                    className={cn("flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition", on ? "bg-wine-700 text-white shadow-soft" : "text-vio-800 hover:bg-surface/70")}
                   >
                     <Icon name={n.icon} className="size-[18px]" /> {n.label}
                   </Link>
@@ -57,13 +57,13 @@ export function AdminShell({ children, appName, pendingRequests }: { children: R
             <HeartFlower className="size-8" color="#da0e14" strokeWidth={46} />
           </span>
           <span>
-            <span className="block font-display text-xl font-semibold text-wine-900">{appName}</span>
-            <span className="block text-xs font-bold text-wine-500">Pannello di Adam</span>
+            <span className="block font-display text-xl font-semibold text-vio-900">{appName}</span>
+            <span className="block text-xs font-bold text-vio-500">Pannello di Adam</span>
           </span>
         </Link>
         <NavList path={path} />
         <div className="mt-6 space-y-2 border-t border-blush-200 pt-4">
-          <Link href="/viola" className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-bold text-wine-700 hover:bg-white/70">
+          <Link href="/viola" className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-bold text-vio-700 hover:bg-surface/70">
             <Eye className="size-4" /> Guarda l&apos;app come Viola
           </Link>
           <SignOutButton className="w-full" />
@@ -78,7 +78,7 @@ export function AdminShell({ children, appName, pendingRequests }: { children: R
             const n = ADMIN_NAV.find((x) => x.href === href)!;
             const on = active(path, href);
             return (
-              <Link key={href} href={href} aria-current={on ? "page" : undefined} className={cn("relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-[10.5px] font-extrabold", on ? "bg-wine-700 text-white" : "text-wine-700")}>
+              <Link key={href} href={href} aria-current={on ? "page" : undefined} className={cn("relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-[10.5px] font-extrabold", on ? "bg-wine-700 text-white" : "text-vio-700")}>
                 <Icon name={n.icon} className="size-[21px]" />
                 <span className="max-w-full truncate px-1">{href === "/admin/richieste" ? "Richieste" : n.label}</span>
                 {href === "/admin/richieste" && pendingRequests > 0 && (
@@ -87,7 +87,7 @@ export function AdminShell({ children, appName, pendingRequests }: { children: R
               </Link>
             );
           })}
-          <button type="button" onClick={() => setMenu(true)} className="flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-[10.5px] font-extrabold text-wine-700" aria-label="Tutte le sezioni">
+          <button type="button" onClick={() => setMenu(true)} className="flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-2 text-[10.5px] font-extrabold text-vio-700" aria-label="Tutte le sezioni">
             <Menu className="size-[21px]" /> Menu
           </button>
         </div>
@@ -96,7 +96,7 @@ export function AdminShell({ children, appName, pendingRequests }: { children: R
       <Sheet open={menu} onClose={() => setMenu(false)} title="Tutte le sezioni">
         <NavList path={path} onNavigate={() => setMenu(false)} />
         <div className="mt-6 flex flex-wrap gap-2 border-t border-blush-200 pt-4">
-          <Link href="/viola" onClick={() => setMenu(false)} className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-bold text-wine-700">
+          <Link href="/viola" onClick={() => setMenu(false)} className="flex items-center gap-2 rounded-2xl bg-surface px-4 py-2.5 text-sm font-bold text-vio-700">
             <Eye className="size-4" /> Guarda come Viola
           </Link>
           <SignOutButton />

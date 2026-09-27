@@ -10,6 +10,7 @@ import { useNow } from "@/hooks/use-now";
 import { countdownParts, formatDate } from "@/utils/dates";
 import { openCapsule } from "./actions";
 import { callAction } from "@/utils/call-action";
+import { haptic } from "@/utils/haptics";
 
 export type CapsuleItem = { id: string; title: string; teaser: string | null; unlockAt: string; unlocked: boolean; openedAt: string | null };
 
@@ -22,8 +23,10 @@ export function CapsuleList({ items, lockedText, readyText, signature }: { items
   const open = (c: CapsuleItem) =>
     start(async () => {
       const res = await callAction(() => openCapsule(c.id));
-      if (res.ok) setLetter(res);
-      else toast.show(res.error, "info");
+      if (res.ok) {
+        haptic("success");
+        setLetter(res);
+      } else toast.show(res.error, "info");
     });
 
   return (
@@ -44,17 +47,17 @@ export function CapsuleList({ items, lockedText, readyText, signature }: { items
               whileTap={{ scale: 0.98 }}
               className={`flex w-full items-center gap-4 rounded-[1.75rem] p-4 text-left shadow-soft ${unlocked ? "bg-gradient-to-br from-blush-100 to-peach-100" : "paper opacity-90"}`}
             >
-              <span className={`grid size-14 shrink-0 place-items-center rounded-2xl ${unlocked ? "bg-wine-600 text-white" : "bg-wine-50 text-wine-400"}`}>
+              <span className={`grid size-14 shrink-0 place-items-center rounded-2xl ${unlocked ? "bg-wine-600 text-white" : "bg-tint-50 text-wine-400"}`}>
                 {unlocked ? <Mail className="size-6" /> : <Lock className="size-6" />}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-display text-lg font-semibold text-wine-900">{c.title}</span>
+                <span className="block font-display text-lg font-semibold text-vio-900">{c.title}</span>
                 {unlocked ? (
-                  <span className="block text-sm font-bold text-wine-600">{c.openedAt ? "Aperta ♡ — rileggila" : readyText}</span>
+                  <span className="block text-sm font-bold text-vio-600">{c.openedAt ? "Aperta ♡ — rileggila" : readyText}</span>
                 ) : (
                   <span className="block text-sm text-ink-soft">
                     {c.teaser || lockedText}
-                    <span className="block text-xs font-bold text-wine-500">
+                    <span className="block text-xs font-bold text-vio-500">
                       Si apre il {formatDate(c.unlockAt, { day: "numeric", month: "long", year: "numeric" })}
                       {left && !left.done && ` · tra ${left.days > 0 ? `${left.days} giorni` : `${left.hours} ore`}`}
                     </span>

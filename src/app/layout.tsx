@@ -36,11 +36,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#fdf6ec",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbf7f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0b0c" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  colorScheme: "light",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

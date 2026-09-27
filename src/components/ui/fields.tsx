@@ -4,11 +4,11 @@ import { forwardRef, useId, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/utils/cn";
 
 const control =
-  "w-full rounded-2xl border border-blush-200 bg-white/80 px-4 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_2px_rgb(82_18_38/0.05)] transition focus:border-wine-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blush-200/70 disabled:opacity-60";
+  "w-full rounded-2xl border border-blush-200 bg-surface/80 px-4 text-ink placeholder:text-ink-muted/70 shadow-[inset_0_1px_2px_rgb(82_18_38/0.05)] transition focus:border-tint-300 focus:bg-surface focus:outline-none focus:ring-4 focus:ring-blush-200/70 disabled:opacity-60";
 
 export function Label({ children, hint, htmlFor, className }: { children: ReactNode; hint?: ReactNode; htmlFor?: string; className?: string }) {
   return (
-    <label htmlFor={htmlFor} className={cn("mb-1.5 flex items-baseline justify-between gap-2 text-sm font-bold text-wine-800", className)}>
+    <label htmlFor={htmlFor} className={cn("mb-1.5 flex items-baseline justify-between gap-2 text-sm font-bold text-vio-800", className)}>
       <span>{children}</span>
       {hint && <span className="text-xs font-medium text-ink-muted">{hint}</span>}
     </label>
@@ -91,7 +91,7 @@ export function Switch({
   return (
     <div className="flex items-center justify-between gap-4 py-1">
       <div className="min-w-0">
-        <label htmlFor={id} className="block text-sm font-bold text-wine-800">
+        <label htmlFor={id} className="block text-sm font-bold text-vio-800">
           {label}
         </label>
         {description && <p className="text-xs text-ink-muted">{description}</p>}
@@ -105,10 +105,10 @@ export function Switch({
         onClick={() => onChange(!checked)}
         className="grid h-11 w-16 shrink-0 place-items-center disabled:opacity-50"
       >
-        <span className={cn("relative h-8 w-14 rounded-full transition-colors", checked ? "bg-wine-600" : "bg-wine-100")}>
+        <span className={cn("relative h-8 w-14 rounded-full transition-colors", checked ? "bg-wine-600" : "bg-tint-100")}>
           <span
             className={cn(
-              "absolute top-1 size-6 rounded-full bg-white shadow transition-all duration-200",
+              "absolute top-1 size-6 rounded-full bg-surface shadow transition-all duration-200",
               checked ? "left-7" : "left-1",
             )}
           />
@@ -132,7 +132,7 @@ export function Segmented<T extends string | number>({
   className?: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn("flex gap-1 rounded-2xl bg-wine-50 p-1", className)}>
+    <div role="radiogroup" aria-label={label} className={cn("flex gap-1 rounded-2xl bg-tint-50 p-1", className)}>
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -141,8 +141,8 @@ export function Segmented<T extends string | number>({
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "press flex-1 rounded-xl px-3 py-2 text-sm font-bold transition",
-            value === o.value ? "bg-white text-wine-800 shadow-soft" : "text-wine-600 hover:bg-white/50",
+            "press min-h-10 flex-1 rounded-xl px-3 py-2 text-sm font-bold transition",
+            value === o.value ? "bg-surface text-vio-800 shadow-soft" : "text-vio-600 hover:bg-surface/50",
           )}
         >
           {o.label}
@@ -164,7 +164,7 @@ export function Chip({
       aria-pressed={active}
       className={cn(
         "press inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-bold whitespace-nowrap transition",
-        active ? "border-wine-600 bg-wine-600 text-white" : "border-blush-200 bg-white/70 text-wine-700 hover:bg-white",
+        active ? "border-wine-600 bg-wine-600 text-white" : "border-blush-200 bg-surface/70 text-vio-700 hover:bg-surface",
         className,
       )}
       {...rest}

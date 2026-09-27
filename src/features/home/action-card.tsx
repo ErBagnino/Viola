@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
 import { isDarkTone, toneClass } from "@/components/ui/card";
-import { Sparkle } from "@/components/decor/stars";
 import { cn } from "@/utils/cn";
 
 export function ActionCard({
@@ -25,11 +24,10 @@ export function ActionCard({
   const external = /^(https?:|tel:)/.test(href);
   const content = (
     <>
-      <Sparkle className={cn("absolute top-3 right-3 size-3 animate-twinkle", dark ? "text-white/50" : "text-white")} />
       <span
         className={cn(
           "mb-3 grid size-11 place-items-center rounded-2xl",
-          dark ? "bg-white/15 text-white" : "bg-white/80 text-wine-600 shadow-sm",
+          dark ? "bg-white/15 text-white" : "bg-surface/80 text-vio-600 shadow-sm",
         )}
       >
         <Icon name={icon ?? "heart"} className="size-[22px] text-[22px]" />
@@ -39,7 +37,7 @@ export function ActionCard({
     </>
   );
   const cls = cn(
-    "press relative block overflow-hidden rounded-[1.75rem] bg-gradient-to-br p-4 text-left shadow-soft transition hover:-translate-y-0.5 hover:shadow-float",
+    "press relative block overflow-hidden rounded-[1.75rem] bg-gradient-to-br p-4 text-left shadow-soft transition duration-300 ease-(--ease-soft) hover:-translate-y-0.5 hover:shadow-float",
     toneClass(color),
     wide && "col-span-2",
   );

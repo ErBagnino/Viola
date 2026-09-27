@@ -8,7 +8,7 @@ import { formatDateTime } from "@/utils/dates";
 export const metadata = { title: "Ho bisogno di Adam" };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  new: { label: "Inviata", cls: "bg-peach-100 text-wine-800" },
+  new: { label: "Inviata", cls: "bg-peach-100 text-vio-800" },
   seen: { label: "Adam l'ha vista ♡", cls: "bg-lilac-100 text-lilac-600" },
   responded: { label: "Adam ha risposto", cls: "bg-wine-600 text-white" },
   closed: { label: "Chiusa", cls: "bg-cream-200 text-ink-soft" },
@@ -36,7 +36,7 @@ export default async function NeedAdamPage() {
       />
       {recent && recent.length > 0 && (
         <section className="mt-10" aria-labelledby="recent-req">
-          <h2 id="recent-req" className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-wine-500 uppercase">
+          <h2 id="recent-req" className="mb-3 px-1 font-sans text-xs font-extrabold tracking-widest text-vio-500 uppercase">
             Le tue ultime richieste
           </h2>
           <ul className="space-y-2">
@@ -48,10 +48,10 @@ export default async function NeedAdamPage() {
                     <span className="text-sm font-bold text-ink-soft">{formatDateTime(r.created_at, general.timezone)}</span>
                     <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${s.cls}`}>{s.label}</span>
                   </div>
-                  {r.message && <p className="mt-2 text-[15px] text-wine-900">“{r.message}”</p>}
+                  {r.message && <p className="mt-2 text-[15px] text-vio-900">“{r.message}”</p>}
                   {r.response && (
-                    <p className="mt-2 rounded-2xl bg-blush-50 px-3 py-2 text-[15px] text-wine-800">
-                      <span className="font-hand text-lg text-wine-500">{general.adamName}: </span>
+                    <p className="mt-2 rounded-2xl bg-blush-50 px-3 py-2 text-[15px] text-vio-800">
+                      <span className="font-hand text-lg text-vio-500">{general.adamName}: </span>
                       {r.response}
                     </p>
                   )}

@@ -23,9 +23,9 @@ export default async function GroundingPage() {
                 <Icon name={g.icon ?? "footprints"} className="size-6 text-2xl" />
               </span>
               <span className="min-w-0">
-                <span className="block font-extrabold text-wine-900">{g.title}</span>
+                <span className="block font-extrabold text-vio-900">{g.title}</span>
                 {g.description && <span className="block text-sm text-ink-soft">{g.description}</span>}
-                <span className="block text-xs font-bold text-wine-500">{g.steps.length} passi</span>
+                <span className="block text-xs font-bold text-vio-500">{g.steps.length} passi</span>
               </span>
             </Link>
           ))}

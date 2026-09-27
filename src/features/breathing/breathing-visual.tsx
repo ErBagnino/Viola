@@ -64,20 +64,20 @@ export function BreathingVisual({
             </>
           ) : visual === "star" ? (
             <>
-              <stop offset="0%" stopColor="#fff3d6" />
-              <stop offset="100%" stopColor="#f09c6c" />
+              <stop offset="0%" stopColor="#fff4f2" />
+              <stop offset="100%" stopColor="#e3262b" />
             </>
           ) : (
             <>
-              <stop offset="0%" stopColor="#f8d3d0" />
-              <stop offset="55%" stopColor="#d9899b" />
-              <stop offset="100%" stopColor="#82203d" />
+              <stop offset="0%" stopColor="#fbe1e1" />
+              <stop offset="55%" stopColor="#e06a72" />
+              <stop offset="100%" stopColor="#7e1730" />
             </>
           )}
         </radialGradient>
         <radialGradient id={glow}>
-          <stop offset="0%" stopColor="#f8d3d0" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#f8d3d0" stopOpacity="0" />
+          <stop offset="0%" stopColor="#f4a7ab" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#f4a7ab" stopOpacity="0" />
         </radialGradient>
         <clipPath id={clip}>{shapeFor(clipShape as Visual)}</clipPath>
         <filter id={blurId} x="-20%" y="-20%" width="140%" height="140%">
@@ -94,7 +94,7 @@ export function BreathingVisual({
             key={i}
             r={40 + i * 22 + expansion * 26}
             fill="none"
-            stroke="#bd5a72"
+            stroke="#c0455f"
             strokeOpacity={0.45 - i * 0.12}
             strokeWidth={3}
           />
@@ -109,8 +109,8 @@ export function BreathingVisual({
               cy={-30 - expansion * 22}
               rx={24 + expansion * 6}
               ry={42 + expansion * 10}
-              fill="#e2d6f3"
-              stroke="#a98fd6"
+              fill="#f9dcdc"
+              stroke="#e3262b"
               strokeWidth={2}
               opacity={0.85}
               transform={`rotate(${i * 60})`}

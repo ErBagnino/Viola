@@ -7,7 +7,7 @@ export function Sparkle({ className, outline }: { className?: string; outline?: 
       <path
         d="M0 -9 C1.8 -1.8 1.8 -1.8 9 0 C1.8 1.8 1.8 1.8 0 9 C-1.8 1.8 -1.8 1.8 -9 0 C-1.8 -1.8 -1.8 -1.8 0 -9 Z"
         fill="currentColor"
-        stroke={outline ? "#3b1822" : "none"}
+        stroke={outline ? "currentColor" : "none"}
         strokeWidth={outline ? 1 : 0}
         strokeLinejoin="round"
       />

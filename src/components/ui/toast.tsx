@@ -36,7 +36,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               className={cn(
                 "pointer-events-auto max-w-sm rounded-2xl px-4 py-3 text-sm font-semibold shadow-float",
                 t.tone === "love" && "bg-wine-700 text-white",
-                t.tone === "info" && "bg-white text-wine-900",
+                t.tone === "info" && "bg-surface text-vio-900",
                 t.tone === "error" && "bg-rouge-600 text-white",
               )}
             >

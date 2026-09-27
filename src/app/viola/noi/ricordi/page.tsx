@@ -14,7 +14,7 @@ export default async function RicordiPage({ searchParams }: PageProps<"/viola/no
       {items.length ? (
         <MemoryTimeline items={items} initialOpenId={caso === "1" ? pickOne(items)?.id : null} />
       ) : (
-        <EmptyState title="La nostra storia sta per essere scritta" text="Adam sta raccogliendo i ricordi più belli ♡" />
+        <EmptyState title="La nostra storia sta per essere scritta" text="Stiamo raccogliendo i ricordi più belli ♡" />
       )}
     </div>
   );

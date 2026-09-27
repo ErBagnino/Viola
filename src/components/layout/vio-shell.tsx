@@ -33,7 +33,7 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
           <span className="grid size-11 place-items-center rounded-2xl bg-black">
             <HeartFlower className="size-8" color="#da0e14" strokeWidth={46} />
           </span>
-          <span className="font-display text-2xl font-semibold text-wine-900">{appName}</span>
+          <span className="font-display text-2xl font-semibold text-vio-900">{appName}</span>
         </Link>
         {NAV.map((n) => {
           const active = isActive(path, n.href, n.exact);
@@ -43,7 +43,7 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
               href={n.href}
               className={cn(
                 "press flex items-center gap-3 rounded-2xl px-4 py-3 font-bold transition",
-                active ? "bg-wine-700 text-white shadow-soft" : "text-wine-800 hover:bg-white/70",
+                active ? "bg-wine-700 text-white shadow-soft" : "text-vio-800 hover:bg-surface/70",
               )}
               aria-current={active ? "page" : undefined}
             >
@@ -56,7 +56,7 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
             ♡ Ho bisogno di Adam
           </Link>
           {isAdmin && (
-            <Link href="/admin" className="press flex items-center justify-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-wine-700 hover:bg-white/70">
+            <Link href="/admin" className="press flex items-center justify-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-vio-700 hover:bg-surface/70">
               <LayoutDashboard className="size-4" /> Torna all&apos;admin
             </Link>
           )}
@@ -97,8 +97,8 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
                       transition={{ type: "spring", damping: 26, stiffness: 340 }}
                     />
                   )}
-                  <n.icon className={cn("relative size-[22px]", active ? "text-white" : "text-wine-700")} strokeWidth={2.2} />
-                  <span className={cn("relative", active ? "text-white" : "text-wine-700")}>{n.label}</span>
+                  <n.icon className={cn("relative size-[22px]", active ? "text-white" : "text-vio-700")} strokeWidth={2.2} />
+                  <span className={cn("relative", active ? "text-white" : "text-vio-700")}>{n.label}</span>
                 </Link>
               );
             })}

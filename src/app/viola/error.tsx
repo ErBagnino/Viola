@@ -15,14 +15,14 @@ export default function ViolaError({ error, reset }: { error: Error & { digest?:
   }, [error]);
   return (
     <div className="flex min-h-[70dvh] flex-col items-center justify-center text-center">
-      <HeartFlower className="size-16 text-wine-500" />
-      <h1 className="mt-5 font-display text-[1.75rem] leading-tight font-semibold text-wine-900">Questa pagina non si è aperta.</h1>
+      <HeartFlower className="size-16 text-vio-500" />
+      <h1 className="mt-5 font-display text-[1.75rem] leading-tight font-semibold text-vio-900">Questa pagina non si è aperta.</h1>
       <p className="mt-2 text-ink-soft">Non è colpa tua. Riproviamo, oppure fai una di queste cose.</p>
       <div className="mt-6 grid w-full max-w-sm gap-2">
         <Button size="lg" onClick={reset}>
           Riprova
         </Button>
-        <Link href="/offline" className="press paper flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-bold text-wine-800">
+        <Link href="/offline" className="press paper flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-bold text-vio-800">
           <Wind className="size-5" /> Respira con me
         </Link>
         <EmergencyContact />

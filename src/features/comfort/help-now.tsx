@@ -105,10 +105,10 @@ export function HelpNow({ items, initialId }: { items: ComfortItem[]; initialId?
               </span>
             ) : null}
           </div>
-          <div className="mt-5 grid size-16 place-items-center rounded-3xl bg-gradient-to-br from-blush-100 to-lilac-100 text-wine-600">
+          <div className="mt-5 grid size-16 place-items-center rounded-3xl bg-gradient-to-br from-blush-100 to-lilac-100 text-vio-600">
             <Icon name={current.icon ?? "sparkles"} className="size-8 text-3xl" />
           </div>
-          <h2 className="mt-4 font-display text-[1.75rem] leading-tight font-semibold text-wine-900 text-balance">{current.title}</h2>
+          <h2 className="mt-4 font-display text-[1.75rem] leading-tight font-semibold text-vio-900 text-balance">{current.title}</h2>
           {current.text && <p className="mt-2 text-[17px] leading-relaxed text-ink-soft">{current.text}</p>}
 
           {current.soundUrl && <audio ref={audio} src={current.soundUrl} controls className="mt-4 w-full" preload="none" />}
@@ -127,7 +127,7 @@ export function HelpNow({ items, initialId }: { items: ComfortItem[]; initialId?
                 </Button>
               ) : (
                 <>
-                  <span className="font-display text-3xl font-semibold text-wine-800 tabular-nums">{timer > 0 ? fmt(timer) : "Fatto!"}</span>
+                  <span className="font-display text-3xl font-semibold text-vio-800 tabular-nums">{timer > 0 ? fmt(timer) : "Fatto!"}</span>
                   {timer > 0 && (
                     <Button variant="soft" size="icon" onClick={() => setRunning((r) => !r)} aria-label={running ? "Pausa" : "Riprendi"}>
                       {running ? <Pause className="size-5" /> : <Play className="size-5" />}

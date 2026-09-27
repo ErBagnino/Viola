@@ -54,7 +54,7 @@ export function MemoryGame({ images, seed }: { images: string[]; seed: string })
   return (
     <div>
       <HeartBurst show={won} />
-      <div className="mb-3 flex items-center justify-between text-sm font-bold text-wine-700">
+      <div className="mb-3 flex items-center justify-between text-sm font-bold text-vio-700">
         <span>Mosse: {moves}</span>
         <span>
           Coppie: {matched.size}/{cards.length / 2 || 6}
@@ -67,7 +67,7 @@ export function MemoryGame({ images, seed }: { images: string[]; seed: string })
             <button key={c.key} type="button" onClick={() => flip(i)} className="aspect-square [perspective:600px]" aria-label={open ? "Carta scoperta" : "Carta coperta"}>
               <motion.span className="relative block h-full w-full [transform-style:preserve-3d]" animate={{ rotateY: open ? 180 : 0 }} transition={{ duration: 0.4 }}>
                 <span className="absolute inset-0 grid place-items-center rounded-2xl bg-gradient-to-br from-wine-500 to-wine-700 text-2xl text-white shadow-soft [backface-visibility:hidden]">♡</span>
-                <span className={cn("absolute inset-0 grid place-items-center overflow-hidden rounded-2xl bg-white text-4xl shadow-soft [backface-visibility:hidden] [transform:rotateY(180deg)]", matched.has(c.face) && "ring-4 ring-blush-300")}>
+                <span className={cn("absolute inset-0 grid place-items-center overflow-hidden rounded-2xl bg-surface text-4xl shadow-soft [backface-visibility:hidden] [transform:rotateY(180deg)]", matched.has(c.face) && "ring-4 ring-blush-300")}>
                   {c.isImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={c.face} alt="" className="h-full w-full object-cover" draggable={false} />
@@ -80,7 +80,7 @@ export function MemoryGame({ images, seed }: { images: string[]; seed: string })
           );
         })}
       </div>
-      {won && <p className="mt-5 text-center font-display text-2xl font-semibold text-wine-900">Brava! In {moves} mosse ♡</p>}
+      {won && <p className="mt-5 text-center font-display text-2xl font-semibold text-vio-900">Brava! In {moves} mosse ♡</p>}
       <Button variant="soft" className="mt-5 w-full" onClick={reset}>
         <RotateCcw className="size-4" /> Nuova partita
       </Button>

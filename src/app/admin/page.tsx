@@ -12,7 +12,7 @@ import { cn } from "@/utils/cn";
 
 export const metadata = { title: "Dashboard" };
 
-const STATE_CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-wine-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" } as const;
+const STATE_CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-vio-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" } as const;
 
 export default async function AdminDashboard() {
   const admin = await requireAdmin();
@@ -52,13 +52,13 @@ export default async function AdminDashboard() {
             {urgent.length === 1 ? "1 richiesta nuova" : `${urgent.length} richieste nuove`} · l&apos;ultima {relativeTime(urgent[0].created_at)}
             {urgent[0].message ? ` — "${urgent[0].message}"` : ""}
           </p>
-          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-extrabold text-rouge-600">
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 font-extrabold text-rouge-600">
             Apri <ArrowRight className="size-4" />
           </span>
         </Link>
       ) : (
         <div className="paper rounded-4xl p-5">
-          <p className="font-display text-xl font-semibold text-wine-900">Tutto tranquillo ♡</p>
+          <p className="font-display text-xl font-semibold text-vio-900">Tutto tranquillo ♡</p>
           <p className="text-sm text-ink-soft">Nessuna richiesta aperta. Quando {viola} premerà &quot;Ho bisogno di Adam&quot; la vedrai qui (e riceverai una notifica).</p>
         </div>
       )}
@@ -72,18 +72,18 @@ export default async function AdminDashboard() {
           { label: "Adam AI oggi", value: `${aiReq}/${settings.ai.dailyMessageLimit}`, href: "/admin/costi", icon: "bot-heart" },
         ].map((t) => (
           <Link key={t.label} href={t.href} className="press paper rounded-3xl p-4">
-            <Icon name={t.icon} className="size-5 text-wine-500" />
-            <p className="mt-2 font-display text-2xl font-semibold text-wine-900">{t.value}</p>
+            <Icon name={t.icon} className="size-5 text-vio-500" />
+            <p className="mt-2 font-display text-2xl font-semibold text-vio-900">{t.value}</p>
             <p className="text-xs font-bold text-ink-muted">{t.label}</p>
             {"sub" in t && t.sub ? <p className="text-[11px] text-ink-muted">{t.sub}</p> : null}
           </Link>
         ))}
         <Link href="/admin/notifiche" className="press paper rounded-3xl p-4">
-          <Bell className="size-5 text-wine-500" />
+          <Bell className="size-5 text-vio-500" />
           <div className="mt-2 space-y-1">
             {(["telegram", "webpush", "whatsapp"] as const).map((c) => (
               <p key={c} className="flex items-center justify-between gap-2 text-xs font-bold">
-                <span className="capitalize text-wine-900">{c === "webpush" ? "Web Push" : c}</span>
+                <span className="capitalize text-vio-900">{c === "webpush" ? "Web Push" : c}</span>
                 <span className={cn("rounded-full px-2 py-0.5 text-[10px]", STATE_CLS[status[c].state])}>{status[c].state}</span>
               </p>
             ))}
@@ -106,13 +106,13 @@ export default async function AdminDashboard() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="paper rounded-4xl p-5">
-          <h2 className="mb-3 font-display text-lg font-semibold text-wine-900">Richieste recenti</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Richieste recenti</h2>
           {(reqRecent.data ?? []).length === 0 ? (
             <p className="text-sm text-ink-muted">Nessuna richiesta.</p>
           ) : (
             <ul className="space-y-2">
               {reqRecent.data!.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-2 rounded-2xl bg-white/70 px-3 py-2 text-sm">
+                <li key={r.id} className="flex items-center justify-between gap-2 rounded-2xl bg-surface/70 px-3 py-2 text-sm">
                   <span className="min-w-0 truncate">
                     <b>{formatDateTime(r.created_at, tz)}</b> {r.message ? `· ${r.message}` : ""}
                   </span>
@@ -123,27 +123,27 @@ export default async function AdminDashboard() {
           )}
         </section>
         <section className="paper rounded-4xl p-5">
-          <h2 className="mb-3 font-display text-lg font-semibold text-wine-900">Ultimi messaggi</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Ultimi messaggi</h2>
           {(msgRecent.data ?? []).length === 0 ? (
             <p className="text-sm text-ink-muted">Nessun messaggio.</p>
           ) : (
             <ul className="space-y-2">
               {msgRecent.data!.map((m) => (
-                <li key={m.id} className="rounded-2xl bg-white/70 px-3 py-2 text-sm">
+                <li key={m.id} className="rounded-2xl bg-surface/70 px-3 py-2 text-sm">
                   <span className="text-xs font-bold text-ink-muted">{formatDateTime(m.created_at, tz)}</span>
                   {!m.read_at && <span className="ml-2 rounded-full bg-rouge-500 px-1.5 text-[10px] font-extrabold text-white">NUOVO</span>}
-                  <p className="line-clamp-2 text-wine-900">{m.body}</p>
+                  <p className="line-clamp-2 text-vio-900">{m.body}</p>
                 </li>
               ))}
             </ul>
           )}
         </section>
         <section className="paper rounded-4xl p-5">
-          <h2 className="mb-3 font-display text-lg font-semibold text-wine-900">Umore (condiviso)</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Umore (condiviso)</h2>
           <div className="flex flex-wrap gap-2">
             {(moods.data ?? []).length === 0 && <p className="text-sm text-ink-muted">Nessun umore condiviso.</p>}
             {(moods.data ?? []).map((m) => (
-              <span key={m.id} className="rounded-2xl bg-white/80 px-3 py-2 text-center" title={formatDateTime(m.created_at, tz)}>
+              <span key={m.id} className="rounded-2xl bg-surface/80 px-3 py-2 text-center" title={formatDateTime(m.created_at, tz)}>
                 <span className="block text-2xl">{m.mood ? MOODS[m.mood - 1]?.emoji : "🤷"}</span>
                 <span className="text-[10px] font-bold text-ink-muted">{relativeTime(m.created_at)}</span>
               </span>
@@ -151,14 +151,14 @@ export default async function AdminDashboard() {
           </div>
         </section>
         <section className="paper rounded-4xl p-5">
-          <h2 className="mb-3 font-display text-lg font-semibold text-wine-900">Attività recente</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Attività recente</h2>
           {(activity.data ?? []).length === 0 ? (
             <p className="text-sm text-ink-muted">Ancora nessuna attività.</p>
           ) : (
             <ul className="space-y-1.5 text-sm">
               {activity.data!.map((a) => (
                 <li key={a.id} className="flex justify-between gap-2">
-                  <span className="font-bold text-wine-900">{a.type.replace(/_/g, " ")}</span>
+                  <span className="font-bold text-vio-900">{a.type.replace(/_/g, " ")}</span>
                   <span className="text-ink-muted">{relativeTime(a.created_at)}</span>
                 </li>
               ))}

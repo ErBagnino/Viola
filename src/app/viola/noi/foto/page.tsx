@@ -18,7 +18,7 @@ export default async function FotoPage() {
         back="/viola/noi"
         right={
           photos.length > 0 ? (
-            <Link href="/viola/noi/foto/random" className="press paper grid size-11 place-items-center rounded-2xl text-wine-700" aria-label="Una foto a caso">
+            <Link href="/viola/noi/foto/random" className="press paper grid size-11 place-items-center rounded-2xl text-vio-700" aria-label="Una foto a caso">
               <Shuffle className="size-5" />
             </Link>
           ) : null
@@ -27,7 +27,7 @@ export default async function FotoPage() {
       {photos.length ? (
         <Gallery photos={photos} categories={categories} />
       ) : (
-        <EmptyState title="Ancora nessuna foto" text="Adam sta scegliendo le più belle. Torna presto ♡" />
+        <EmptyState title="Il nostro album è ancora vuoto." text="Ma qualcosa mi dice che non resterà così per molto. ♡" />
       )}
     </div>
   );

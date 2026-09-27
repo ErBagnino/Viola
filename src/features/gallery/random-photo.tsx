@@ -48,19 +48,19 @@ export function RandomPhoto({ photos, phrases, initialPhrase }: { photos: Galler
             animate={{ rotate: n % 2 ? 2 : -2, y: 0, opacity: 1, scale: 1 }}
             exit={{ rotate: 10, x: 120, opacity: 0 }}
             transition={{ type: "spring", damping: 18, stiffness: 160 }}
-            className="rounded-md bg-white p-3 pb-5 shadow-float"
+            className="polaroid rounded-md p-3 pb-5 shadow-float"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photo.url} alt={photo.title ?? "Noi"} className="aspect-[4/5] w-full rounded-sm object-cover" />
             <figcaption className="mt-3 text-center">
-              <p className="font-hand text-2xl text-wine-800">{photo.title || photo.caption || "Noi ♡"}</p>
+              <p className="font-hand text-2xl text-vio-800">{photo.title || photo.caption || "Noi ♡"}</p>
               {photo.takenOn && <p className="text-xs font-bold text-ink-muted">{formatDate(photo.takenOn)}</p>}
               {photo.caption && photo.title && <p className="mt-1 text-sm text-ink-soft">{photo.caption}</p>}
             </figcaption>
           </motion.figure>
         </AnimatePresence>
       </div>
-      {phrase && <p className="mt-6 max-w-xs text-center font-display text-xl text-wine-800 italic">{phrase}</p>}
+      {phrase && <p className="mt-6 max-w-xs text-center font-display text-xl text-vio-800 italic">{phrase}</p>}
       <Button size="lg" className="mt-6 w-full max-w-sm" onClick={next} disabled={photos.length < 2}>
         <Shuffle className="size-5" /> Un&apos;altra
       </Button>

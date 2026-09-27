@@ -284,7 +284,7 @@ export function Chat({
       <div className="flex items-center gap-3 pb-3">
         <Avatar url={profile.avatarUrl} />
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-xl leading-tight font-semibold text-wine-900">{profile.name}</h1>
+          <h1 className="truncate font-display text-xl leading-tight font-semibold text-vio-900">{profile.name}</h1>
           <p className="truncate text-xs text-ink-soft">{profile.subtitle}</p>
         </div>
         {knownFacts && (
@@ -299,14 +299,14 @@ export function Chat({
           <MessageSquarePlus className="size-5" />
         </Button>
         {needAdam && (
-          <Link href={needAdam} className="press grid size-11 shrink-0 place-items-center rounded-2xl text-rouge-500 hover:bg-wine-50" aria-label="Ho bisogno di Adam" title="Ho bisogno di Adam">
+          <Link href={needAdam} className="press grid size-11 shrink-0 place-items-center rounded-2xl text-rouge-500 hover:bg-tint-50" aria-label="Ho bisogno di Adam" title="Ho bisogno di Adam">
             <HeartHandshake className="size-5" />
           </Link>
         )}
       </div>
 
       {showModes && (
-        <div role="radiogroup" aria-label="Modalità" className="mb-2 flex gap-1 rounded-2xl bg-wine-50 p-1">
+        <div role="radiogroup" aria-label="Modalità" className="mb-2 flex gap-1 rounded-2xl bg-tint-50 p-1">
           {MODES.map((m) => (
             <button
               key={m.value}
@@ -315,7 +315,7 @@ export function Chat({
               aria-checked={mode === m.value}
               title={m.hint}
               onClick={() => setMode(m.value)}
-              className={cn("press min-h-10 flex-1 rounded-xl py-2 text-sm font-extrabold", mode === m.value ? "bg-white text-wine-800 shadow-soft" : "text-wine-600")}
+              className={cn("press min-h-10 flex-1 rounded-xl py-2 text-sm font-extrabold", mode === m.value ? "bg-surface text-vio-800 shadow-soft" : "text-vio-600")}
             >
               {m.label}
             </button>
@@ -335,8 +335,8 @@ export function Chat({
       >
         {(!available || offline) && (
           <div className="paper rounded-3xl p-4 text-center">
-            <WifiOff className="mx-auto size-6 text-wine-500" />
-            <p className="mt-2 font-bold text-wine-900">{unavailableText}</p>
+            <WifiOff className="mx-auto size-6 text-vio-500" />
+            <p className="mt-2 font-bold text-vio-900">{unavailableText}</p>
             {scope === "viola" && (
               <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
                 <Link href="/viola/calma/respira" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
@@ -356,8 +356,8 @@ export function Chat({
         {messages.length === 0 && available && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-6 text-center">
             <Avatar url={profile.avatarUrl} size="lg" />
-            <p className="mt-4 max-w-xs font-display text-2xl leading-snug text-wine-900">{profile.welcome}</p>
-            {profile.signature && <p className="mt-1 font-hand text-xl text-wine-500">{profile.signature}</p>}
+            <p className="mt-4 max-w-xs font-display text-2xl leading-snug text-vio-900">{profile.welcome}</p>
+            {profile.signature && <p className="mt-1 font-hand text-xl text-vio-500">{profile.signature}</p>}
           </motion.div>
         )}
 
@@ -380,8 +380,8 @@ export function Chat({
                     <div
                       className={cn(
                         "rounded-3xl px-4 py-2.5 text-[15.5px] leading-relaxed break-words",
-                        mine ? "rounded-br-lg bg-wine-700 text-white" : "rounded-bl-lg bg-white text-ink shadow-soft",
-                        m.status === "error" && "bg-blush-100 text-wine-900",
+                        mine ? "rounded-br-lg bg-wine-700 text-white" : "rounded-bl-lg bg-surface text-ink shadow-soft",
+                        m.status === "error" && "bg-blush-100 text-vio-900",
                       )}
                     >
                       {mine ? <p className="whitespace-pre-wrap">{m.content}</p> : m.content ? <Markdown className="prose-vio [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{m.content}</Markdown> : <Typing />}
@@ -400,13 +400,13 @@ export function Chat({
                       <button
                         type="button"
                         onClick={() => navigator.clipboard?.writeText(m.content).then(() => toast.show("Copiato ♡", "info"))}
-                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-white"
+                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface"
                         aria-label="Copia"
                       >
                         <Copy className="size-4" />
                       </button>
                       {!mine && isLast && !streaming && (
-                        <button type="button" onClick={() => send("", { regenerate: true })} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-white" aria-label="Rigenera risposta">
+                        <button type="button" onClick={() => send("", { regenerate: true })} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface" aria-label="Rigenera risposta">
                           <RefreshCw className="size-4" />
                         </button>
                       )}
@@ -416,7 +416,7 @@ export function Chat({
                           setMessages((ms) => ms.filter((x) => x.id !== m.id));
                           if (!m.id.startsWith("tmp-")) await callAction(() => deleteAiMessage(m.id));
                         }}
-                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-white"
+                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface"
                         aria-label="Elimina messaggio"
                       >
                         <Trash2 className="size-4" />
@@ -434,7 +434,7 @@ export function Chat({
       {scope === "viola" && mode === "comfort" ? (
         <nav aria-label="Cose che puoi fare adesso" className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
           {COMFORT_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className={cn("press inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-bold whitespace-nowrap", l.href === "/viola/adam" ? "bg-rouge-500 text-white" : "border border-blush-200 bg-white/80 text-wine-700")}>
+            <Link key={l.href} href={l.href} className={cn("press inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-bold whitespace-nowrap", l.href === "/viola/adam" ? "bg-rouge-500 text-white" : "border border-blush-200 bg-surface/80 text-vio-700")}>
               {l.label}
             </Link>
           ))}
@@ -444,7 +444,7 @@ export function Chat({
         !streaming && (
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
             {quickActions.map((q) => (
-              <button key={q} type="button" onClick={() => send(q)} className="press min-h-11 shrink-0 rounded-full border border-blush-200 bg-white/80 px-4 text-sm font-bold whitespace-nowrap text-wine-700">
+              <button key={q} type="button" onClick={() => send(q)} className="press min-h-11 shrink-0 rounded-full border border-blush-200 bg-surface/80 px-4 text-sm font-bold whitespace-nowrap text-vio-700">
                 {q}
               </button>
             ))}
@@ -462,7 +462,7 @@ export function Chat({
       >
         {allowAttachments && (
           <>
-            <button type="button" onClick={() => fileInput.current?.click()} disabled={attaching || streaming} className="grid size-11 shrink-0 place-items-center rounded-2xl text-wine-600 hover:bg-wine-50 disabled:opacity-40" aria-label="Allega una foto">
+            <button type="button" onClick={() => fileInput.current?.click()} disabled={attaching || streaming} className="grid size-11 shrink-0 place-items-center rounded-2xl text-vio-600 hover:bg-tint-50 disabled:opacity-40" aria-label="Allega una foto">
               <ImagePlus className="size-5" />
             </button>
             <input
@@ -517,9 +517,9 @@ export function Chat({
           ) : (
             <ul className="mt-4 space-y-2">
               {knownFacts.map((f, i) => (
-                <li key={i} className="rounded-2xl bg-white px-4 py-3">
-                  <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{f.key}</p>
-                  <p className="text-wine-900">{f.value}</p>
+                <li key={i} className="rounded-2xl bg-surface px-4 py-3">
+                  <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{f.key}</p>
+                  <p className="text-vio-900">{f.value}</p>
                 </li>
               ))}
             </ul>
@@ -535,9 +535,9 @@ export function Chat({
         ) : (
           <ul className="space-y-2">
             {history.map((c) => (
-              <li key={c.id} className="flex items-center gap-2 rounded-2xl bg-white p-2 pl-4">
+              <li key={c.id} className="flex items-center gap-2 rounded-2xl bg-surface p-2 pl-4">
                 <button type="button" onClick={() => openConversation(c.id)} className="min-w-0 flex-1 text-left">
-                  <span className="block truncate font-bold text-wine-900">{c.title || "Conversazione"}</span>
+                  <span className="block truncate font-bold text-vio-900">{c.title || "Conversazione"}</span>
                   <span className="text-xs text-ink-muted">
                     {relativeTime(c.updatedAt)} · {c.mode}
                   </span>
@@ -545,7 +545,7 @@ export function Chat({
                 <button
                   type="button"
                   aria-label="Elimina conversazione"
-                  className="grid size-9 place-items-center rounded-xl text-ink-muted hover:bg-wine-50"
+                  className="grid size-9 place-items-center rounded-xl text-ink-muted hover:bg-tint-50"
                   onClick={async () => {
                     const res = await callAction(() => deleteConversation(c.id));
                     if (!res.ok) return toast.show(res.error, "error");

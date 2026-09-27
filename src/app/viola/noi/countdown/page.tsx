@@ -36,7 +36,7 @@ export default async function CountdownPage() {
     <div>
       <PageHeader title="Manca poco" subtitle="I giorni che contiamo insieme." back="/viola/noi" />
       {list.length === 0 ? (
-        <EmptyState title="Nessun countdown ancora" text="Adam sta segnando le date importanti ♡" />
+        <EmptyState title="Nessun countdown ancora" text={`${general.adamName} sta segnando le date importanti ♡`} />
       ) : (
         <div className="space-y-4">
           {list.map((c, i) => {
@@ -50,12 +50,12 @@ export default async function CountdownPage() {
                   <img src={img.thumbUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
                 )}
                 <div className="relative">
-                  <p className={`flex items-center gap-2 text-xs font-extrabold tracking-widest uppercase ${i === 0 ? "text-white/70" : "text-wine-500"}`}>
+                  <p className={`flex items-center gap-2 text-xs font-extrabold tracking-widest uppercase ${i === 0 ? "text-white/70" : "text-vio-500"}`}>
                     <Icon name={c.icon ?? "hourglass"} className="size-4 text-base" /> {KIND[c.kind] ?? "Countdown"}
                   </p>
                   <h2 className="mt-1 font-display text-2xl font-semibold">{c.title}</h2>
                   {c.description && <p className={`text-sm ${i === 0 ? "text-white/75" : "text-ink-soft"}`}>{c.description}</p>}
-                  <p className={`mt-1 text-sm font-bold ${i === 0 ? "text-white/80" : "text-wine-600"}`}>{formatDate(c.next, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
+                  <p className={`mt-1 text-sm font-bold ${i === 0 ? "text-white/80" : "text-vio-600"}`}>{formatDate(c.next, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
                   <div className="mt-4">
                     {past ? (
                       <p className="font-hand text-2xl">{texts.countdownDone}</p>

@@ -31,7 +31,7 @@ export function RandomQuestions({ questions, whatsappNumber, adamName }: { quest
           className="grid min-h-64 place-items-center rounded-[2rem] bg-gradient-to-br from-lilac-100 to-blush-100 p-8 text-center shadow-soft"
           style={{ transformPerspective: 800 }}
         >
-          <p className="font-display text-[1.7rem] leading-snug font-semibold text-wine-900">{cur.q}</p>
+          <p className="font-display text-[1.7rem] leading-snug font-semibold text-vio-900">{cur.q}</p>
         </motion.div>
       </AnimatePresence>
       <div className="mt-4 grid gap-3">

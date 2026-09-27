@@ -72,7 +72,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
 
       {tab === "image" ? (
         <section className="paper space-y-4 rounded-4xl p-5">
-          <h2 className="font-display text-lg font-semibold text-wine-900">Carica nuove foto</h2>
+          <h2 className="font-display text-lg font-semibold text-vio-900">Carica nuove foto</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Categoria">
               {(id) => (
@@ -91,7 +91,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
             </div>
           </div>
           <div>
-            <p className="mb-1.5 text-sm font-bold text-wine-800">Dove possono comparire</p>
+            <p className="mb-1.5 text-sm font-bold text-vio-800">Dove possono comparire</p>
             <div className="flex flex-wrap gap-2">
               {Object.entries(MEDIA_CONTEXTS).map(([k, l]) => (
                 <Chip key={k} active={meta.contexts.includes(k)} onClick={() => setMeta({ ...meta, contexts: meta.contexts.includes(k) ? meta.contexts.filter((x) => x !== k) : [...meta.contexts, k] })}>
@@ -105,7 +105,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
         </section>
       ) : (
         <section className="paper space-y-3 rounded-4xl p-5">
-          <h2 className="font-display text-lg font-semibold text-wine-900">Carica un audio</h2>
+          <h2 className="font-display text-lg font-semibold text-vio-900">Carica un audio</h2>
           <p className="text-sm text-ink-soft">Poi aggiungilo in &quot;Audio&quot; (La voce di Adam), in una dedica, in una busta o in un preset di respiro.</p>
           <AudioUploader onUploaded={() => router.refresh()} />
         </section>
@@ -129,7 +129,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
       ) : tab === "image" ? (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {list.map((m) => (
-            <button key={m.id} type="button" onClick={() => setEdit({ ...m })} className="press relative overflow-hidden rounded-2xl bg-white shadow-soft" aria-label={`Modifica ${String(m.title ?? "foto")}`}>
+            <button key={m.id} type="button" onClick={() => setEdit({ ...m })} className="press relative overflow-hidden rounded-2xl bg-surface shadow-soft" aria-label={`Modifica ${String(m.title ?? "foto")}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={m.thumbUrl} alt={String(m.title ?? "")} loading="lazy" className="aspect-square w-full object-cover" />
               <span className="absolute top-1.5 left-1.5 flex gap-1">
@@ -144,9 +144,9 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
         <ul className="space-y-2">
           {list.map((m) => (
             <li key={m.id} className="paper flex items-center gap-3 rounded-3xl p-3">
-              <Music className="size-5 shrink-0 text-wine-500" />
+              <Music className="size-5 shrink-0 text-vio-500" />
               <div className="min-w-0 flex-1">
-                <p className="truncate font-bold text-wine-900">{String(m.title ?? "Audio")}</p>
+                <p className="truncate font-bold text-vio-900">{String(m.title ?? "Audio")}</p>
                 <audio src={m.url} controls preload="none" className="mt-1 h-9 w-full" />
               </div>
               <Button size="sm" variant="soft" onClick={() => setEdit({ ...m })}>

@@ -10,7 +10,7 @@ import { findTelegramChats, sendTestNotification, selectTelegramChat } from "./n
 import { callAction } from "@/utils/call-action";
 
 type Status = { state: "CONNECTED" | "DISCONNECTED" | "NOT CONFIGURED"; detail: string };
-const CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-wine-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" };
+const CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-vio-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" };
 
 export function ChannelCards({ status }: { status: { telegram: Status; webpush: Status; whatsapp: Status } }) {
   const [pending, start] = useTransition();
@@ -39,7 +39,7 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
         {cards.map((c) => (
           <div key={c.key} className="paper rounded-4xl p-5">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="font-display text-lg font-semibold text-wine-900">{c.name}</h3>
+              <h3 className="font-display text-lg font-semibold text-vio-900">{c.name}</h3>
               <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-extrabold", CLS[c.s.state])}>{c.s.state}</span>
             </div>
             <p className="mt-1 min-h-10 text-sm text-ink-soft">{c.s.detail}</p>
@@ -57,7 +57,7 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
         <Button onClick={() => test("chain")} loading={pending}>
           <Send className="size-4" /> Prova la catena completa (come &quot;Ho bisogno di Adam&quot;)
         </Button>
-        {last && <p className="text-sm font-bold text-wine-800">{last}</p>}
+        {last && <p className="text-sm font-bold text-vio-800">{last}</p>}
       </div>
     </div>
   );
@@ -94,7 +94,7 @@ export function TelegramChatFinder({ hasToken }: { hasToken: boolean }) {
       {chats && chats.length > 0 && (
         <ul className="space-y-2">
           {chats.map((c) => (
-            <li key={c.id} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-4 py-2">
+            <li key={c.id} className="flex items-center justify-between gap-2 rounded-2xl bg-surface px-4 py-2">
               <span className="text-sm">
                 <b>{c.name}</b> · <code>{c.id}</code>
               </span>

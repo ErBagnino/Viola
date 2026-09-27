@@ -34,7 +34,7 @@ export default async function BuonanottePage() {
           <p className="mt-4 font-display text-xl text-moon/80 italic">{phrase}</p>
         </header>
         {photo && (
-          <figure className="mx-auto w-3/4 rotate-2 rounded-md bg-white/95 p-2 pb-4 shadow-2xl">
+          <figure className="mx-auto w-3/4 rotate-2 polaroid rounded-md p-2 pb-4 shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photo.url} alt="Noi" className="aspect-square w-full rounded-sm object-cover" />
             <figcaption className="mt-2 text-center font-hand text-xl text-night-800">sogni d&apos;oro</figcaption>
@@ -43,10 +43,10 @@ export default async function BuonanottePage() {
         <NightBreathing preset={preset} photos={breathing.photos} endText="Ora chiudi gli occhi. Sei al sicuro. ♡" />
         {dedication && (
           <article className="rounded-4xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-            <p className="font-hand text-xl text-blush-200">Una dedica per la notte</p>
+            <p className="font-hand text-xl text-wine-200">Una dedica per la notte</p>
             <h2 className="mt-1 font-display text-2xl font-semibold">{dedication.title}</h2>
             <Markdown className="mt-2 text-moon/85">{dedication.body}</Markdown>
-            <p className="mt-3 text-right font-hand text-xl text-blush-200">{dedication.signature}</p>
+            <p className="mt-3 text-right font-hand text-xl text-wine-200">{dedication.signature}</p>
           </article>
         )}
       </div>

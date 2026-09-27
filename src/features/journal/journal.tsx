@@ -48,7 +48,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
             <motion.article key={e.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="paper rounded-[1.75rem] p-4">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-bold text-ink-muted">{formatDateTime(e.createdAt, tz)}</span>
-                <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-extrabold", e.visibility === "shared" ? "bg-blush-100 text-wine-700" : "bg-cream-200 text-ink-soft")}>
+                <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-extrabold", e.visibility === "shared" ? "bg-blush-100 text-vio-700" : "bg-cream-200 text-ink-soft")}>
                   {e.visibility === "shared" ? (
                     <>
                       <Share2 className="size-3" /> Condivisa
@@ -60,7 +60,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
                   )}
                 </span>
               </div>
-              <h3 className="mt-2 font-display text-lg font-semibold text-wine-900">
+              <h3 className="mt-2 font-display text-lg font-semibold text-vio-900">
                 {e.mood ? `${MOODS[e.mood - 1]?.emoji} ` : ""}
                 {e.title || "Senza titolo"}
               </h3>
@@ -86,7 +86,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
               {(id) => <Textarea id={id} rows={9} value={draft.body} maxLength={20000} onChange={(e) => setDraft({ ...draft, body: e.target.value })} placeholder="Scrivi tutto quello che vuoi…" />}
             </Field>
             <div>
-              <p className="mb-1.5 text-sm font-bold text-wine-800">Come ti senti? (facoltativo)</p>
+              <p className="mb-1.5 text-sm font-bold text-vio-800">Come ti senti? (facoltativo)</p>
               <div className="flex gap-2">
                 {MOODS.map((m) => (
                   <button
@@ -95,7 +95,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
                     onClick={() => setDraft({ ...draft, mood: draft.mood === m.value ? null : m.value })}
                     aria-pressed={draft.mood === m.value}
                     aria-label={m.label}
-                    className={cn("grid size-11 place-items-center rounded-2xl text-2xl", draft.mood === m.value ? "bg-wine-100 ring-2 ring-wine-400" : "bg-white")}
+                    className={cn("grid size-11 place-items-center rounded-2xl text-2xl", draft.mood === m.value ? "bg-tint-100 ring-2 ring-wine-400" : "bg-surface")}
                   >
                     {m.emoji}
                   </button>

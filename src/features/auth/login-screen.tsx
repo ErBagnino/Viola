@@ -59,7 +59,7 @@ export function LoginScreen({
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
-          className="text-[2rem] leading-tight font-semibold text-balance text-wine-900"
+          className="text-[2rem] leading-tight font-semibold text-balance text-vio-900"
         >
           {title}
         </motion.h1>
@@ -73,12 +73,12 @@ export function LoginScreen({
         </motion.p>
 
         {!configured && (
-          <p className="mt-6 rounded-2xl bg-peach-100 px-4 py-3 text-sm font-semibold text-wine-800">
+          <p className="mt-6 rounded-2xl bg-peach-100 px-4 py-3 text-sm font-semibold text-vio-800">
             La configurazione non è ancora completa: segui il file SETUP.md per collegare Supabase.
           </p>
         )}
         {pending && configured && (
-          <p className="mt-6 rounded-2xl bg-lilac-100 px-4 py-3 text-sm font-semibold text-wine-800" role="status">
+          <p className="mt-6 rounded-2xl bg-lilac-100 px-4 py-3 text-sm font-semibold text-vio-800" role="status">
             Il tuo account esiste ma non è ancora abilitato. Chiedi ad {adamName} di attivarlo ♡
             <span className="mt-1 block text-xs font-normal">Per {adamName}: assegna il ruolo con lo SQL del passo 9 di SETUP.md.</span>
           </p>
@@ -117,7 +117,7 @@ export function LoginScreen({
               exit={{ y: 10, opacity: 0 }}
               className="paper mt-8 grid gap-4 rounded-4xl p-5 text-left"
             >
-              <p className="text-center font-hand text-3xl text-wine-700">
+              <p className="text-center font-hand text-3xl text-vio-700">
                 {persona === "viola" ? `Ciao ${violaName} ♡` : `Ciao ${adamName}`}
               </p>
               <Field label="Email">
@@ -150,7 +150,7 @@ export function LoginScreen({
                     <button
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
-                      className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-xl text-wine-600"
+                      className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-xl text-vio-600"
                       aria-label={showPw ? "Nascondi password" : "Mostra password"}
                     >
                       {showPw ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
@@ -159,7 +159,7 @@ export function LoginScreen({
                 )}
               </Field>
               {state?.error && (
-                <p className="rounded-xl bg-blush-100 px-3 py-2 text-sm font-semibold text-wine-800" role="alert">
+                <p className="rounded-xl bg-blush-100 px-3 py-2 text-sm font-semibold text-vio-800" role="alert">
                   {state.error}
                 </p>
               )}
@@ -169,7 +169,7 @@ export function LoginScreen({
               <button
                 type="button"
                 onClick={() => setPersona(null)}
-                className="text-center text-sm font-bold text-wine-600 underline-offset-4 hover:underline"
+                className="text-center text-sm font-bold text-vio-600 underline-offset-4 hover:underline"
               >
                 Torna indietro
               </button>

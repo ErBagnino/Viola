@@ -11,13 +11,13 @@ export function DistanceMap({ from, to, km, fromLabel, toLabel }: { from: string
       <svg viewBox="0 0 440 240" className="w-full" role="img" aria-label={`${from} e ${to}: ${km} chilometri`}>
         <defs>
           <linearGradient id="dm-line" x1="0" x2="1">
-            <stop offset="0" stopColor="#bd5a72" />
-            <stop offset="1" stopColor="#a98fd6" />
+            <stop offset="0" stopColor="#c0455f" />
+            <stop offset="1" stopColor="#e3262b" />
           </linearGradient>
         </defs>
         {/* soft hills */}
-        <path d="M0 210 C 80 180, 140 200, 220 190 C 300 180, 360 200, 440 185 L 440 240 L 0 240 Z" fill="#fde9e7" />
-        <path d="M0 225 C 100 205, 180 225, 260 212 C 340 200, 400 222, 440 210 L 440 240 L 0 240 Z" fill="#f1ebf9" />
+        <path d="M0 210 C 80 180, 140 200, 220 190 C 300 180, 360 200, 440 185 L 440 240 L 0 240 Z" style={{ fill: "var(--color-blush-100)" }} />
+        <path d="M0 225 C 100 205, 180 225, 260 212 C 340 200, 400 222, 440 210 L 440 240 L 0 240 Z" style={{ fill: "var(--color-tint-100)" }} />
         <motion.path
           d={path}
           fill="none"
@@ -38,31 +38,31 @@ export function DistanceMap({ from, to, km, fromLabel, toLabel }: { from: string
             </text>
           ))}
         <g>
-          <circle cx="60" cy="170" r="14" fill="#82203d" />
-          <circle cx="60" cy="170" r="24" fill="#82203d" opacity="0.15" />
-          <text x="60" y="205" textAnchor="middle" fontSize="16" fontWeight="800" fill="#3b1822">
+          <circle cx="60" cy="170" r="14" fill="#7e1730" />
+          <circle cx="60" cy="170" r="24" fill="#7e1730" opacity="0.18" />
+          <text x="60" y="205" textAnchor="middle" fontSize="16" fontWeight="800" style={{ fill: "var(--color-ink)" }}>
             {from}
           </text>
           {fromLabel && (
-            <text x="60" y="222" textAnchor="middle" fontSize="12" fill="#6f4e57">
+            <text x="60" y="222" textAnchor="middle" fontSize="12" style={{ fill: "var(--color-ink-soft)" }}>
               {fromLabel}
             </text>
           )}
         </g>
         <g>
-          <circle cx="380" cy="150" r="14" fill="#6f55a8" />
-          <circle cx="380" cy="150" r="24" fill="#6f55a8" opacity="0.15" />
-          <text x="380" y="185" textAnchor="middle" fontSize="16" fontWeight="800" fill="#3b1822">
+          <circle cx="380" cy="150" r="14" fill="#da0e14" />
+          <circle cx="380" cy="150" r="24" fill="#da0e14" opacity="0.18" />
+          <text x="380" y="185" textAnchor="middle" fontSize="16" fontWeight="800" style={{ fill: "var(--color-ink)" }}>
             {to}
           </text>
           {toLabel && (
-            <text x="380" y="202" textAnchor="middle" fontSize="12" fill="#6f4e57">
+            <text x="380" y="202" textAnchor="middle" fontSize="12" style={{ fill: "var(--color-ink-soft)" }}>
               {toLabel}
             </text>
           )}
         </g>
       </svg>
-      <p className="text-center font-display text-3xl font-semibold text-wine-900">{km} km</p>
+      <p className="text-center font-display text-3xl font-semibold text-vio-900">{km} km</p>
       <p className="text-center text-sm text-ink-soft">di strada, zero di distanza nel cuore</p>
     </div>
   );

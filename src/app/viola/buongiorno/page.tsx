@@ -32,20 +32,20 @@ export default async function BuongiornoPage() {
     <div className="space-y-5">
       <PageHeader title={`Buongiorno ${settings.general.violaNickname} ♡`} back="/viola" />
       <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-peach-200 via-blush-100 to-cream-50 p-6 shadow-soft">
-        <Sunrise className="absolute -top-2 -right-2 size-28 text-peach-300/60" strokeWidth={1} />
-        <Sparkle className="absolute bottom-4 left-5 size-4 animate-twinkle text-white" />
-        <p className="relative font-display text-2xl leading-snug text-wine-900">{phrase}</p>
+        <Sunrise className="absolute -top-2 -right-2 size-28 text-peach-300/50" strokeWidth={1} aria-hidden />
+        <Sparkle className="absolute bottom-4 left-5 size-4 animate-twinkle text-rouge-400/50" />
+        <p className="relative pr-16 font-display text-2xl leading-snug text-vio-900">{phrase}</p>
       </section>
       {photo && (
-        <figure className="mx-auto w-4/5 -rotate-2 rounded-md bg-white p-2 pb-4 shadow-float">
+        <figure className="mx-auto w-4/5 -rotate-2 polaroid rounded-md p-2 pb-4 shadow-float">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={photo.url} alt={photo.title ?? "Noi"} className="aspect-square w-full rounded-sm object-cover" />
-          <figcaption className="mt-2 text-center font-hand text-xl text-wine-700">{photo.title || "per il tuo buongiorno"}</figcaption>
+          <figcaption className="mt-2 text-center font-hand text-xl text-vio-700">{photo.title || "per il tuo buongiorno"}</figcaption>
         </figure>
       )}
       <section className="paper rounded-4xl p-5">
-        <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">La micro missione di oggi</p>
-        <p className="mt-2 font-display text-xl font-semibold text-wine-900">{mission}</p>
+        <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">La micro missione di oggi</p>
+        <p className="mt-2 font-display text-xl font-semibold text-vio-900">{mission}</p>
       </section>
       {wa && (
         <Link href={wa} target="_blank" rel="noopener noreferrer" className="press btn-3d flex items-center justify-center gap-2 rounded-[1.25rem] bg-gradient-to-b from-wine-500 to-wine-700 px-6 py-4 font-extrabold text-white">

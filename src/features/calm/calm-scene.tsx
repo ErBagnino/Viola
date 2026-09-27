@@ -20,8 +20,8 @@ export function CalmScene({ mode }: { mode: CalmMode }) {
         <motion.svg viewBox="-100 -100 200 200" className="size-[70vmin] max-w-sm" animate={reduce ? undefined : { scale: [0.8, 1.05, 0.8] }} transition={slow} aria-hidden>
           <defs>
             <radialGradient id="ch" cx="35%" cy="30%">
-              <stop offset="0%" stopColor="#f8d3d0" />
-              <stop offset="100%" stopColor="#9c3350" />
+              <stop offset="0%" stopColor="#fbe1e1" />
+              <stop offset="100%" stopColor="#a1203a" />
             </radialGradient>
           </defs>
           <path d="M0 62 C -46 30, -84 4, -78 -34 C -73 -64, -34 -76, 0 -44 C 34 -76, 73 -64, 78 -34 C 84 4, 46 30, 0 62 Z" fill="url(#ch)" />
@@ -37,7 +37,7 @@ export function CalmScene({ mode }: { mode: CalmMode }) {
               cy={-45}
               rx={22}
               ry={48}
-              fill={i % 2 ? "#e2d6f3" : "#f8d3d0"}
+              fill={i % 2 ? "#f4c2c6" : "#fbe1e1"}
               stroke="#fff"
               strokeWidth={2}
               style={{ originX: "0px", originY: "0px" }}
@@ -46,7 +46,7 @@ export function CalmScene({ mode }: { mode: CalmMode }) {
               transition={slow}
             />
           ))}
-          <circle r={20} fill="#f7bb93" />
+          <circle r={20} fill="#e3262b" />
         </svg>
       );
     case "wave":
@@ -56,7 +56,7 @@ export function CalmScene({ mode }: { mode: CalmMode }) {
             <motion.div
               key={i}
               className="absolute inset-x-[-50%] h-full rounded-[45%]"
-              style={{ background: ["#cbb8e8", "#e8948f", "#f7bb93"][i], opacity: 0.45, top: `${40 + i * 12}%` }}
+              style={{ background: ["#7e1730", "#e3262b", "#f4a7ab"][i], opacity: 0.45, top: `${40 + i * 12}%` }}
               animate={reduce ? undefined : { rotate: [0, 360], y: [0, -20, 0] }}
               transition={{ duration: CYCLE * (1.4 + i * 0.4), repeat: Infinity, ease: "linear" }}
             />
@@ -138,14 +138,14 @@ function BreathCircle({ reduce }: { reduce: boolean }) {
         transition={{ duration: CYCLE, times: [0, 0.4, 0.5, 1], repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.p
-        className="relative font-display text-3xl font-semibold text-wine-800"
+        className="relative font-display text-3xl font-semibold text-vio-800"
         animate={reduce ? undefined : { opacity: [1, 1, 0, 0, 1] }}
         transition={{ duration: CYCLE, times: [0, 0.4, 0.45, 0.95, 1], repeat: Infinity }}
       >
         dentro…
       </motion.p>
       <motion.p
-        className="absolute font-display text-3xl font-semibold text-wine-800"
+        className="absolute font-display text-3xl font-semibold text-vio-800"
         animate={reduce ? undefined : { opacity: [0, 0, 1, 1, 0] }}
         transition={{ duration: CYCLE, times: [0, 0.45, 0.5, 0.95, 1], repeat: Infinity }}
       >

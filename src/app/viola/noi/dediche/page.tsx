@@ -17,7 +17,7 @@ export default async function DedichePage({ searchParams }: PageProps<"/viola/no
       {items.length ? (
         <DedicationsList items={items} initialOpenId={caso === "1" ? pickOne(items)?.id : null} eyebrow={settings.general.showDaAdam ? eyebrow : ""} />
       ) : (
-        <EmptyState title="Le dediche stanno arrivando" text="Adam le sta scrivendo proprio adesso ♡" />
+        <EmptyState title={`${settings.general.adamName} non ha ancora lasciato nulla qui.`} text="Ma sta scrivendo proprio adesso ♡" />
       )}
     </div>
   );

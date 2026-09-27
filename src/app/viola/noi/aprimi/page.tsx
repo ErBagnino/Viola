@@ -31,7 +31,7 @@ export default async function AprimiPage() {
   return (
     <div>
       <PageHeader title="Aprimi quando…" subtitle="Lettere da aprire nel momento giusto." back="/viola/noi" />
-      {cards.length ? <OpenWhenGrid cards={cards} signature={settings.general.signature} /> : <EmptyState title="Le buste sono ancora chiuse" text="Adam le sta preparando ♡" />}
+      {cards.length ? <OpenWhenGrid cards={cards} signature={settings.general.signature} /> : <EmptyState title="Le buste sono ancora chiuse" text={`${settings.general.adamName} le sta preparando ♡`} />}
     </div>
   );
 }

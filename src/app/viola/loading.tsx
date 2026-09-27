@@ -1,5 +1,5 @@
-import { LoadingHeart } from "@/components/ui/loading-heart";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
 
 export default function Loading() {
-  return <LoadingHeart />;
+  return <PageSkeleton />;
 }

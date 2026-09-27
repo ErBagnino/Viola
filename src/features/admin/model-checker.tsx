@@ -29,7 +29,7 @@ export function ModelChecker() {
       {models && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {models.map((m) => (
-            <code key={m} className="rounded-lg bg-white px-2 py-1 text-xs text-wine-800">
+            <code key={m} className="rounded-lg bg-surface px-2 py-1 text-xs text-vio-800">
               {m}
             </code>
           ))}

@@ -13,7 +13,8 @@ const schema = z.object({
 export async function logActivity(type: string, payload?: Record<string, string | number | boolean | null>) {
   try {
     const viewer = await getViewer();
-    if (!viewer || viewer.role !== "user") return;
+    // Only Viola's usage is recorded, and only if she lets Adam see it.
+    if (!viewer || viewer.role !== "user" || !viewer.shareActivity) return;
     const parsed = schema.safeParse({ type, payload });
     if (!parsed.success) return;
     const supabase = await createClient();

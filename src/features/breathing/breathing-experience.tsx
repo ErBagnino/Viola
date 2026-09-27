@@ -95,7 +95,7 @@ export function BreathingExperience({
           ))}
         </div>
         {photos.length > 0 && selected.showPhotos && (
-          <label className="mt-3 flex items-center gap-2 px-1 text-sm font-bold text-wine-800">
+          <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 px-1 text-sm font-bold text-wine-800">
             <input type="checkbox" checked={withPhotos} onChange={(e) => setWithPhotos(e.target.checked)} className="size-5 accent-wine-600" />
             Con le nostre foto
           </label>

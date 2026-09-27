@@ -51,7 +51,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
   return (
     <div>
       <div className="flex items-center gap-3">
-        <button type="button" onClick={openPicker} className="press grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-wine-200 bg-white/70 text-wine-500">
+        <button type="button" onClick={openPicker} aria-label={preview ? "Cambia file" : "Scegli un file"} className="press grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-wine-200 bg-white/70 text-wine-500">
           {preview ? (
             kind === "image" ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -103,7 +103,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
           )}
           <div className="relative">
             <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-muted" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca per titolo o categoria" className="pl-10" />
+            <Input value={q} aria-label="Cerca" onChange={(e) => setQ(e.target.value)} placeholder="Cerca per titolo o categoria" className="pl-10" />
           </div>
           {!items ? (
             <p className="py-6 text-center text-ink-muted">Carico…</p>
@@ -311,14 +311,14 @@ export function ListInput({ value, onChange, placeholder }: { value: string[]; o
     <div className="space-y-2">
       {value.map((v, i) => (
         <div key={i} className="flex gap-2">
-          <Input value={v} onChange={(e) => onChange(value.map((x, k) => (k === i ? e.target.value : x)))} />
-          <Button variant="ghost" size="icon" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Rimuovi">
+          <Input value={v} aria-label={`Voce ${i + 1}`} onChange={(e) => onChange(value.map((x, k) => (k === i ? e.target.value : x)))} />
+          <Button variant="ghost" size="icon" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label={`Rimuovi voce ${i + 1}`}>
             <X className="size-4" />
           </Button>
         </div>
       ))}
       <div className="flex gap-2">
-        <Input value={draft} placeholder={placeholder ?? "Aggiungi…"} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())} />
+        <Input value={draft} aria-label="Nuova voce" placeholder={placeholder ?? "Aggiungi…"} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())} />
         <Button variant="soft" onClick={add}>
           Aggiungi
         </Button>
@@ -346,7 +346,7 @@ export function TagsInput({ value, onChange, suggestions = [] }: { value: string
           </span>
         ))}
       </div>
-      <Input className="mt-2" value={draft} placeholder="Scrivi un tag e premi Invio" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => (e.key === "Enter" || e.key === ",") && (e.preventDefault(), add(draft))} />
+      <Input className="mt-2" value={draft} aria-label="Nuovo tag" placeholder="Scrivi un tag e premi Invio" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => (e.key === "Enter" || e.key === ",") && (e.preventDefault(), add(draft))} />
       {suggestions.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {suggestions
@@ -379,11 +379,11 @@ export function StepsEditor({ value, onChange }: { value: Step[]; onChange: (v: 
               <X className="size-4" /> Rimuovi
             </Button>
           </div>
-          <Input value={s.title} onChange={(e) => set(i, { title: e.target.value })} placeholder="Titolo (es. 5 cose che vedi)" />
-          <Textarea rows={2} value={s.text ?? ""} onChange={(e) => set(i, { text: e.target.value })} placeholder="Testo" />
+          <Input value={s.title} aria-label={`Passo ${i + 1}: titolo`} onChange={(e) => set(i, { title: e.target.value })} placeholder="Titolo (es. 5 cose che vedi)" />
+          <Textarea rows={2} value={s.text ?? ""} aria-label={`Passo ${i + 1}: testo`} onChange={(e) => set(i, { text: e.target.value })} placeholder="Testo" />
           <div className="grid grid-cols-2 gap-2">
-            <Input type="number" min={0} max={10} value={s.count ?? ""} onChange={(e) => set(i, { count: e.target.value === "" ? undefined : Number(e.target.value) })} placeholder="Campi da compilare (0-10)" />
-            <Input value={s.emoji ?? ""} maxLength={8} onChange={(e) => set(i, { emoji: e.target.value || undefined })} placeholder="Emoji" />
+            <Input type="number" min={0} max={10} aria-label={`Passo ${i + 1}: campi da compilare`} value={s.count ?? ""} onChange={(e) => set(i, { count: e.target.value === "" ? undefined : Number(e.target.value) })} placeholder="Campi da compilare (0-10)" />
+            <Input value={s.emoji ?? ""} aria-label={`Passo ${i + 1}: emoji`} maxLength={8} onChange={(e) => set(i, { emoji: e.target.value || undefined })} placeholder="Emoji" />
           </div>
         </div>
       ))}
@@ -402,7 +402,7 @@ export function OptionsEditor({ options, correct, onChange }: { options: string[
           <button type="button" onClick={() => onChange(options, i)} className={cn("grid size-10 shrink-0 place-items-center rounded-xl", correct === i ? "bg-green-600 text-white" : "bg-white text-ink-muted")} aria-label={`Segna la risposta ${i + 1} come giusta`} aria-pressed={correct === i}>
             <Check className="size-5" />
           </button>
-          <Input value={o} onChange={(e) => onChange(options.map((x, k) => (k === i ? e.target.value : x)), correct)} placeholder={`Risposta ${i + 1}`} />
+          <Input value={o} aria-label={`Risposta ${i + 1}`} onChange={(e) => onChange(options.map((x, k) => (k === i ? e.target.value : x)), correct)} placeholder={`Risposta ${i + 1}`} />
           {options.length > 2 && (
             <Button variant="ghost" size="icon" onClick={() => onChange(options.filter((_, k) => k !== i), correct >= i && correct > 0 ? correct - 1 : correct)} aria-label="Rimuovi">
               <X className="size-4" />
@@ -466,14 +466,14 @@ export function PairsEditor({ value, onChange, max = 8 }: { value: Pair[]; onCha
         <div key={i} className="space-y-2 rounded-2xl bg-white/70 p-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-extrabold text-wine-500">{i + 1}.</span>
-            <Input value={p.title} onChange={(e) => set(i, { title: e.target.value })} placeholder="Titolo" />
+            <Input value={p.title} aria-label={`Elemento ${i + 1}: titolo`} onChange={(e) => set(i, { title: e.target.value })} placeholder="Titolo" />
             {value.length > 1 && (
               <Button variant="ghost" size="icon" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Rimuovi">
                 <X className="size-4" />
               </Button>
             )}
           </div>
-          <Textarea rows={2} value={p.text ?? ""} onChange={(e) => set(i, { text: e.target.value })} placeholder="Testo (facoltativo)" />
+          <Textarea rows={2} value={p.text ?? ""} aria-label={`Elemento ${i + 1}: testo`} onChange={(e) => set(i, { text: e.target.value })} placeholder="Testo (facoltativo)" />
         </div>
       ))}
       {value.length < max && (

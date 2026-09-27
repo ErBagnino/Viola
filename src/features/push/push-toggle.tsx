@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { publicEnv } from "@/lib/env";
 import { removePushSubscription, savePushSubscription } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 function urlBase64ToUint8Array(base64: string) {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -50,7 +51,7 @@ export function PushToggle({ label = "Notifiche su questo dispositivo" }: { labe
       await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicEnv.vapidPublicKey) });
       const json = sub.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } };
-      const res = await savePushSubscription({ endpoint: json.endpoint, keys: json.keys, userAgent: navigator.userAgent.slice(0, 300) });
+      const res = await callAction(() => savePushSubscription({ endpoint: json.endpoint, keys: json.keys, userAgent: navigator.userAgent.slice(0, 300) }));
       if (!res.ok) throw new Error(res.error);
       setState("on");
       toast.show("Notifiche attivate ♡");
@@ -67,7 +68,7 @@ export function PushToggle({ label = "Notifiche su questo dispositivo" }: { labe
       const reg = await navigator.serviceWorker.getRegistration();
       const sub = await reg?.pushManager.getSubscription();
       if (sub) {
-        await removePushSubscription(sub.endpoint);
+        await callAction(() => removePushSubscription(sub.endpoint));
         await sub.unsubscribe();
       }
       setState("off");

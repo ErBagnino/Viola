@@ -17,6 +17,8 @@ import type { Json } from "@/db/database.types";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+// Stop waiting for the model before the platform kills the function, so the user gets a real answer.
+const AI_TIMEOUT_MS = 50_000;
 
 const bodySchema = z.object({
   conversationId: z.uuid().nullish(),
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
         tools: VIOLA_TOOLS,
         maxOutputTokens: settings.ai.maxOutputTokens,
         temperature: settings.ai.temperature,
-        signal: request.signal,
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(AI_TIMEOUT_MS)]),
         send: (e) => {
           if (e.t === "text") text += e.v;
           if (e.t === "action") actions = [...actions, e.action];

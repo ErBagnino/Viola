@@ -13,6 +13,14 @@ export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: 
   const vib = useRef<ReturnType<typeof setInterval> | null>(null);
   const seq = lines.length ? lines : ["Chiudi gli occhi un secondo.", "Immagina che ti stia abbracciando."];
 
+  // stop the vibration pattern if the page is left while holding
+  useEffect(
+    () => () => {
+      if (vib.current) clearInterval(vib.current);
+    },
+    [],
+  );
+
   useEffect(() => {
     if (i >= seq.length - 1) return;
     const t = setTimeout(() => setI((v) => v + 1), 3800);
@@ -36,6 +44,7 @@ export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: 
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col items-center justify-between overflow-hidden bg-gradient-to-b from-wine-900 via-wine-800 to-rouge-600 px-6 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1.5rem)] text-white">
+      <h1 className="sr-only">Un abbraccio da {adamName}</h1>
       <div className="flex w-full max-w-md justify-start">
         <Link href="/viola" className="press grid size-11 place-items-center rounded-2xl bg-white/10" aria-label="Chiudi">
           <X className="size-5" />

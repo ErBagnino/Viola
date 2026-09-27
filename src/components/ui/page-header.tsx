@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ChevronLeft, HeartHandshake } from "lucide-react";
+import { useNeedAdamShortcut } from "@/components/layout/shell-context";
 import type { ReactNode } from "react";
 import { cn } from "@/utils/cn";
 
@@ -22,6 +23,9 @@ export function PageHeader({
   tone?: "light" | "dark";
 }) {
   const router = useRouter();
+  const path = usePathname();
+  const needAdam = useNeedAdamShortcut();
+  const showNeedAdam = Boolean(needAdam) && path !== needAdam;
   const backCls = cn(
     "press grid size-11 shrink-0 place-items-center rounded-2xl",
     tone === "dark" ? "bg-white/10 text-moon hover:bg-white/15" : "paper text-wine-700",
@@ -47,6 +51,19 @@ export function PageHeader({
         )}
       </div>
       {right}
+      {showNeedAdam && (
+        <Link
+          href={needAdam!}
+          className={cn(
+            "press grid size-11 shrink-0 place-items-center rounded-2xl",
+            tone === "dark" ? "bg-white/10 text-rouge-400 hover:bg-white/15" : "paper text-rouge-500",
+          )}
+          aria-label="Ho bisogno di Adam"
+          title="Ho bisogno di Adam"
+        >
+          <HeartHandshake className="size-6" />
+        </Link>
+      )}
     </header>
   );
 }

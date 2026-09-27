@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { Bot, Flower2, Heart, Home, LayoutDashboard, MoreHorizontal } from "lucide-react";
 import type { ReactNode } from "react";
 import { HeartFlower } from "@/components/decor/stars";
+import { NeedAdamShortcut } from "@/components/layout/shell-context";
 import { cn } from "@/utils/cn";
 
 const NAV = [
@@ -71,7 +72,7 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
             <LayoutDashboard className="size-3.5" /> Anteprima di Viola · torna all&apos;admin
           </Link>
         )}
-        {children}
+        <NeedAdamShortcut.Provider value="/viola/adam">{children}</NeedAdamShortcut.Provider>
       </main>
 
       {!immersive && (

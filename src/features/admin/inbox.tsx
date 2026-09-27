@@ -11,6 +11,7 @@ import { MOODS } from "@/features/content/constants";
 import { cn } from "@/utils/cn";
 import { formatDateTime } from "@/utils/dates";
 import { deleteMessageAdmin, markMessageRead, replyToMessage } from "./inbox-actions";
+import { callAction } from "@/utils/call-action";
 
 export type InboxMessage = { id: string; body: string; category: string; isPrivate: boolean; readAt: string | null; reply: string | null; respondedAt: string | null; createdAt: string };
 export type SharedJournal = { id: string; title: string | null; body: string; mood: number | null; createdAt: string };
@@ -28,7 +29,7 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
 
   const run = (fn: () => Promise<{ ok: boolean; error?: string }>, ok?: string) =>
     start(async () => {
-      const r = await fn();
+      const r = await callAction(fn);
       if (r.ok) {
         if (ok) toast.show(ok);
         router.refresh();
@@ -87,7 +88,7 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
                         loading={pending}
                         onClick={() =>
                           run(async () => {
-                            const r = await replyToMessage(m.id, text);
+                            const r = await callAction(() => replyToMessage(m.id, text));
                             if (r.ok) {
                               setReplying(null);
                               setText("");

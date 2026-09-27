@@ -35,7 +35,7 @@ export function LoveSlider({ adamName }: { adamName: string }) {
           setV(Number(e.target.value));
           setSent(false);
         }}
-        className="mt-6 w-full accent-rouge-500"
+        className="mt-6 h-11 w-full cursor-pointer accent-rouge-500"
         aria-label="Quanto mi vuoi bene"
       />
       <Button size="lg" className="mt-6 w-full" onClick={() => setSent(true)}>

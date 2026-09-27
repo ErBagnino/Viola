@@ -15,6 +15,7 @@ import { cn } from "@/utils/cn";
 import { createResourceAction, deleteResourceAction, reorderResourceAction, updateResourceAction } from "./actions";
 import { ResourceForm } from "./resource-form";
 import { defaultsFor, getResource, type Option } from "./resources";
+import { callAction } from "@/utils/call-action";
 
 type Row = Record<string, unknown> & { id: string };
 
@@ -83,7 +84,8 @@ export function ResourceManager({
     start(async () => {
       if (!editing) return;
       const data = payloadOf(editing.values);
-      const res = editing.id ? await updateResourceAction(def.key, editing.id, data) : await createResourceAction(def.key, data);
+      const id = editing.id;
+      const res = await callAction(() => (id ? updateResourceAction(def.key, id, data) : createResourceAction(def.key, data)));
       if (res.ok) {
         toast.show(editing.id ? "Salvato ♡" : "Creato ♡");
         setEditing(null);
@@ -97,10 +99,11 @@ export function ResourceManager({
 
   const toggle = (r: Row) =>
     start(async () => {
-      if (!def.toggleField) return;
-      const cur = r[def.toggleField];
-      const next = def.toggleField === "visibility" ? (cur === "shared" ? "private" : "shared") : !cur;
-      const res = await updateResourceAction(def.key, r.id, { [def.toggleField]: next });
+      const field = def.toggleField;
+      if (!field) return;
+      const cur = r[field];
+      const next = field === "visibility" ? (cur === "shared" ? "private" : "shared") : !cur;
+      const res = await callAction(() => updateResourceAction(def.key, r.id, { [field]: next }));
       if (res.ok) router.refresh();
       else toast.show(res.error, "error");
     });
@@ -111,7 +114,7 @@ export function ResourceManager({
       const j = i + d;
       if (j < 0 || j >= ids.length) return;
       [ids[i], ids[j]] = [ids[j], ids[i]];
-      const res = await reorderResourceAction(def.key, ids);
+      const res = await callAction(() => reorderResourceAction(def.key, ids));
       if (res.ok) router.refresh();
       else toast.show(res.error, "error");
     });
@@ -119,7 +122,7 @@ export function ResourceManager({
   const remove = () =>
     start(async () => {
       if (!confirm) return;
-      const res = await deleteResourceAction(def.key, confirm.id);
+      const res = await callAction(() => deleteResourceAction(def.key, confirm.id));
       if (res.ok) {
         toast.show("Eliminato");
         setConfirm(null);
@@ -221,9 +224,11 @@ export function ResourceManager({
                     aria-label={def.toggleLabel ?? "Attivo"}
                     title={def.toggleLabel}
                     onClick={() => toggle(r)}
-                    className={cn("relative mt-1 h-7 w-12 shrink-0 rounded-full transition-colors", isOn(r) ? "bg-wine-600" : "bg-wine-100")}
+                    className="-mt-1 -mr-1 grid h-11 w-14 shrink-0 place-items-center"
                   >
-                    <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", isOn(r) ? "left-6" : "left-1")} />
+                    <span className={cn("relative h-7 w-12 rounded-full transition-colors", isOn(r) ? "bg-wine-600" : "bg-wine-100")}>
+                      <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", isOn(r) ? "left-6" : "left-1")} />
+                    </span>
                   </button>
                 )}
               </motion.article>

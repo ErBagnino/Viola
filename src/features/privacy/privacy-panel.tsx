@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/toast";
 import { deleteMyData } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 const OPTIONS = [
   { key: "moods", label: "Il mio umore" },
@@ -45,13 +46,13 @@ export function PrivacyPanel() {
           loading={pending}
           onClick={() =>
             start(async () => {
-              const res = await deleteMyData({
+              const res = await callAction(() => deleteMyData({
                 moods: Boolean(sel.moods),
                 journal: Boolean(sel.journal),
                 messages: Boolean(sel.messages),
                 activity: Boolean(sel.activity),
                 aiChats: Boolean(sel.aiChats),
-              });
+              }));
               if (res.ok) {
                 toast.show("Fatto. Cancellato ♡");
                 setOpen(false);

@@ -224,3 +224,60 @@ describe("Adam (admin)", () => {
     expect(await as(ADAM, () => fails(`insert into public.admin_audit_logs (admin_id, action) values ('${VIOLA}', 'spoof')`))).toBe(true);
   });
 });
+
+describe("attack paths (defence in depth)", () => {
+  it("Viola cannot change the status of her requests (only Adam can)", async () => {
+    await as(VIOLA, () => q("insert into public.adam_requests (message) values ('prova stato')"));
+    await as(VIOLA, () => q("update public.adam_requests set status = 'closed', response = 'finto' where message = 'prova stato'"));
+    const r = (await rows("select status, response from public.adam_requests where message = 'prova stato'"))[0];
+    expect(r).toEqual({ status: "new", response: null });
+  });
+
+  it("private settings and private media stay invisible to Viola", async () => {
+    await q("insert into public.app_settings (key, value, is_public) values ('notifications', '{\"telegramChatId\":\"123\"}', false) on conflict (key) do update set is_public = false");
+    await q("insert into public.app_settings (key, value, is_public) values ('general', '{}', true) on conflict (key) do update set is_public = true");
+    const keys = await as(VIOLA, () => rows("select key from public.app_settings order by key"));
+    expect(keys.map((k) => k.key)).toEqual(["general"]);
+    await q("insert into public.media (kind, path, mime, visibility, title) values ('image', 'images/p/full.webp', 'image/webp', 'private', 'privata'), ('image', 'images/s/full.webp', 'image/webp', 'shared', 'condivisa')");
+    const titles = await as(VIOLA, () => rows("select title from public.media where title in ('privata', 'condivisa') order by title"));
+    expect(titles.map((t) => t.title)).toEqual(["condivisa"]);
+  });
+
+  it("nobody can write rows on someone else's behalf", async () => {
+    expect(await as(VIOLA, () => fails(`insert into public.journal_entries (user_id, body) values ('${ADAM}', 'finto')`))).toBe(true);
+    expect(await as(VIOLA, () => fails(`insert into public.mood_entries (user_id, mood) values ('${ADAM}', 3)`))).toBe(true);
+    expect(await as(VIOLA, () => fails(`insert into public.notification_subscriptions (user_id, endpoint, p256dh, auth) values ('${ADAM}', 'https://push.example/x', 'k', 'a')`))).toBe(true);
+    await as(ADAM, () => q("insert into public.notification_subscriptions (endpoint, p256dh, auth) values ('https://push.example/adam', 'k', 'a')"));
+    expect(await as(VIOLA, async () => (await rows("select count(*)::int n from public.notification_subscriptions"))[0].n)).toBe(0);
+    await as(VIOLA, () => q("delete from public.notification_subscriptions"));
+    expect((await rows("select count(*)::int n from public.notification_subscriptions"))[0].n).toBe(1);
+  });
+
+  it("pending accounts cannot write anything", async () => {
+    for (const sql of [
+      "insert into public.messages (body) values ('x')",
+      "insert into public.adam_requests (message) values ('x')",
+      "insert into public.mood_entries (mood) values (3)",
+      "insert into public.journal_entries (body) values ('x')",
+      "insert into public.ai_conversations (scope) values ('viola')",
+    ]) {
+      expect(await as(STRANGER, () => fails(sql)), sql).toBe(true);
+    }
+  });
+
+  it("admin-only RPCs refuse Viola, and anon cannot call any RPC", async () => {
+    expect(await as(VIOLA, () => fails("select public.admin_usage_stats()"))).toBe(true);
+    expect(await as(null, () => fails("select * from public.list_time_capsules()"))).toBe(true);
+    expect(await as(null, () => fails("select public.is_admin()"))).toBe(true);
+    for (const fn of ["public.admin_usage_stats()", "public.increment_ai_usage('viola', 1, 1, 1)", "public.mark_open_when_opened(gen_random_uuid())"]) {
+      expect(await as(null, () => fails(`select ${fn}`)), fn).toBe(true);
+    }
+  });
+
+  it("tool logs cannot be rewritten by Viola", async () => {
+    await as(VIOLA, () => q("insert into public.ai_tool_logs (user_id, scope, tool) values ($1, 'viola', 'start_breathing')", [VIOLA]));
+    await as(VIOLA, () => q("update public.ai_tool_logs set tool = 'hack'"));
+    expect((await rows("select count(*)::int n from public.ai_tool_logs where tool = 'hack'"))[0].n).toBe(0);
+    expect(await as(VIOLA, async () => (await rows("select count(*)::int n from public.ai_tool_logs"))[0].n)).toBe(0);
+  });
+});

@@ -14,6 +14,8 @@ import { ndjsonStream } from "@/server/ai/stream";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+// Stop waiting for the model before the platform kills the function, so the user gets a real answer.
+const AI_TIMEOUT_MS = 50_000;
 
 const bodySchema = z.object({
   conversationId: z.uuid().nullish(),
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
         tools: copilotDeclarations(),
         maxOutputTokens: Math.max(1024, settings.ai.maxOutputTokens),
         temperature: 0.6,
-        signal: request.signal,
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(AI_TIMEOUT_MS)]),
         send: (e) => {
           if (e.t === "text") text += e.v;
           send(e);

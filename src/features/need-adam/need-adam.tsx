@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/fields";
 import { HeartBurst } from "@/components/decor/burst";
 import { whatsappLink } from "@/features/actions/registry";
+import { callAction } from "@/utils/call-action";
 import { requestAdam } from "./actions";
 
 type Result = { delivered: boolean; throttled: boolean; channels: string[]; whatsappUrl: string | null; phoneUrl: string | null };
@@ -37,14 +38,15 @@ export function NeedAdam({
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const hasContacts = Boolean(whatsappNumber || phoneUrl);
 
   const send = () =>
     start(async () => {
       setError(null);
       if ("vibrate" in navigator) navigator.vibrate?.(40);
-      const res = await requestAdam({ message });
+      const res = await callAction(() => requestAdam({ message }));
       if (res.ok) setResult(res);
-      else setError(res.error);
+      else setError(hasContacts ? `${res.error} Intanto puoi scrivergli o chiamarlo qui sotto.` : res.error);
     });
 
   const contactButtons = (
@@ -104,7 +106,7 @@ export function NeedAdam({
                 {error}
               </p>
             )}
-            <p className="mt-4 text-center text-sm text-ink-muted">Se preferisci, scrivigli o chiamalo direttamente:</p>
+            {hasContacts && <p className="mt-4 text-center text-sm text-ink-muted">Se preferisci, scrivigli o chiamalo direttamente:</p>}
             <div className="w-full">{contactButtons}</div>
           </motion.div>
         ) : (

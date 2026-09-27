@@ -50,6 +50,14 @@ export const COUNTDOWN_KINDS: Record<string, string> = {
   custom: "Data personalizzata",
 };
 
+/** "Mancano 12 giorni …" — the end of the sentence for each countdown type. */
+export const COUNTDOWN_LEADS: Record<string, string> = {
+  anniversary: "al nostro anniversario",
+  birthday: "al tuo compleanno",
+  meeting: "per rivederti",
+  trip: "alla partenza",
+};
+
 export const SURPRISE_KINDS: Record<string, string> = {
   photo: "Foto",
   memory: "Ricordo",

@@ -9,6 +9,7 @@ import { toneClass, isDarkTone } from "@/components/ui/card";
 import { LetterView } from "@/features/letters/letter-view";
 import { cn } from "@/utils/cn";
 import { markOpenWhenOpened } from "./actions";
+import { callQuietly } from "@/utils/call-action";
 
 export type OpenWhenCard = {
   id: string;
@@ -62,7 +63,7 @@ export function OpenWhenGrid({ cards, signature }: { cards: OpenWhenCard[]; sign
               whileTap={{ scale: 0.95, rotate: -1 }}
               onClick={() => {
                 setOpen(c);
-                markOpenWhenOpened(c.id);
+                void callQuietly(() => markOpenWhenOpened(c.id));
               }}
               className={cn("relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-gradient-to-br p-4 text-left shadow-soft", toneClass(c.color))}
             >

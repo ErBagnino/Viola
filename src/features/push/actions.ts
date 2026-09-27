@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { assertMember } from "@/server/auth";
 import { safeAction, UserError } from "@/server/action-result";
 
@@ -17,8 +18,12 @@ export async function savePushSubscription(input: z.input<typeof subSchema>) {
     const parsed = subSchema.safeParse(input);
     if (!parsed.success) throw new UserError("Iscrizione alle notifiche non valida.");
     const supabase = await createClient();
-    // Same endpoint may already exist (re-subscribe): replace it.
-    await supabase.from("notification_subscriptions").delete().eq("endpoint", parsed.data.endpoint);
+    // The same browser endpoint may already exist: a re-subscribe, or the same
+    // phone previously used with the other account. The device now belongs to
+    // whoever just subscribed from it, so the old row is replaced (service
+    // role: RLS would hide the other account's row and the insert would fail).
+    const admin = createAdminClient();
+    await (admin ?? supabase).from("notification_subscriptions").delete().eq("endpoint", parsed.data.endpoint);
     const { error } = await supabase.from("notification_subscriptions").insert({
       user_id: viewer.id,
       endpoint: parsed.data.endpoint,

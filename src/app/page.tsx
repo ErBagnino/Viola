@@ -6,7 +6,8 @@ import { isSupabaseConfigured } from "@/lib/env";
 
 export default async function Page({ searchParams }: PageProps<"/">) {
   const params = await searchParams;
-  const viewer = await getViewer();
+  // If the profile cannot be read right now, still show the login screen.
+  const viewer = await getViewer().catch(() => null);
   if (viewer && viewer.role !== "pending") redirect(homeFor(viewer.role));
 
   const { general } = await getSystemSettings();

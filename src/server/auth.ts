@@ -23,11 +23,14 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const claims = data?.claims;
   if (error || !claims?.sub) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role, display_name, nickname, onboarded_at")
     .eq("id", claims.sub)
     .maybeSingle();
+  // A failed lookup (database paused or unreachable) is not the same as
+  // "no role yet": never show a working account as "not enabled".
+  if (profileError) throw new Error(`profile lookup failed: ${profileError.code ?? "unknown"}`);
 
   const role = (profile?.role ?? "pending") as Role;
   return {

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/utils/cn";
 import { findTelegramChats, sendTestNotification, selectTelegramChat } from "./notification-actions";
+import { callAction } from "@/utils/call-action";
 
 type Status = { state: "CONNECTED" | "DISCONNECTED" | "NOT CONFIGURED"; detail: string };
 const CLS = { CONNECTED: "bg-green-100 text-green-800", DISCONNECTED: "bg-peach-100 text-wine-800", "NOT CONFIGURED": "bg-cream-200 text-ink-soft" };
@@ -19,7 +20,7 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
 
   const test = (c: "telegram" | "webpush" | "chain") =>
     start(async () => {
-      const r = await sendTestNotification(c);
+      const r = await callAction(() => sendTestNotification(c));
       if (!r.ok) return toast.show(r.error, "error");
       const txt = r.results.map((x) => `${x.channel}: ${x.status}${x.detail ? ` (${x.detail})` : ""}`).join(" · ");
       setLast(txt || "nessun canale configurato");
@@ -80,7 +81,7 @@ export function TelegramChatFinder({ hasToken }: { hasToken: boolean }) {
         loading={pending}
         onClick={() =>
           start(async () => {
-            const r = await findTelegramChats();
+            const r = await callAction(() => findTelegramChats());
             if (r.ok) {
               setChats(r.chats);
               if (!r.chats.length) toast.show("Nessuna chat trovata: scrivi /start al bot e riprova.", "info");
@@ -101,7 +102,7 @@ export function TelegramChatFinder({ hasToken }: { hasToken: boolean }) {
                 size="sm"
                 onClick={() =>
                   start(async () => {
-                    const r = await selectTelegramChat(c.id);
+                    const r = await callAction(() => selectTelegramChat(c.id));
                     if (r.ok) {
                       toast.show("Chat collegata ♡ Ora prova una notifica.");
                       router.refresh();

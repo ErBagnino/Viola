@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/toast";
 import { cn } from "@/utils/cn";
 import { saveMood } from "./actions";
 import { MOODS } from "@/features/content/constants";
+import { callAction } from "@/utils/call-action";
 
 
 type Suggestion = { text: string; links: { href: string; label: string }[] };
@@ -58,7 +59,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
 
   const pick = (mood: number | null) =>
     start(async () => {
-      const res = await saveMood({ mood, shared });
+      const res = await callAction(() => saveMood({ mood, shared }));
       if (res.ok) setSaved(mood);
       else toast.show(res.error, "error");
     });
@@ -107,10 +108,17 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
               ))}
             </div>
             <div className="mt-3 flex items-center justify-between gap-2">
-              <button type="button" disabled={pending} onClick={() => pick(null)} className="press rounded-full bg-lilac-100 px-4 py-2 text-sm font-bold text-lilac-600">
+              <button type="button" disabled={pending} onClick={() => pick(null)} className="press min-h-11 rounded-full bg-lilac-100 px-4 text-sm font-bold text-lilac-600">
                 Non lo so
               </button>
-              <button type="button" onClick={toggleShared} className="text-xs font-bold text-ink-muted underline-offset-2 hover:underline" aria-pressed={shared}>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={shared}
+                aria-label="Adam può vedere come mi sento"
+                onClick={toggleShared}
+                className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-ink-soft hover:bg-white/70"
+              >
                 {shared ? "♡ Adam può vederlo" : "🔒 Solo per me"}
               </button>
             </div>

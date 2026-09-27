@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { createClient, type ServerSupabase } from "@/lib/supabase/server";
 import { signOne, type MediaView } from "@/server/media";
-import { todayKey } from "@/utils/dates";
+import { todayKey, occurrenceOf } from "@/utils/dates";
 import { seededRandom, weightedPick } from "@/utils/random";
 import type { Tables } from "@/db/database.types";
 
@@ -46,16 +46,18 @@ export async function mediaFor(supabase: ServerSupabase, id: string | null | und
   return signOne(supabase, data);
 }
 
-export async function getNextCountdown(): Promise<Tables<"countdowns"> | null> {
+export async function getNextCountdown(tz: string): Promise<(Tables<"countdowns"> & { isToday: boolean }) | null> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("countdowns")
-    .select("*")
-    .eq("show_on_home", true)
-    .order("target_at", { ascending: true });
-  const now = Date.now();
-  const upcoming = (data ?? []).filter((c) => c.recurring_yearly || new Date(c.target_at).getTime() > now);
-  return upcoming[0] ?? null;
+  const { data } = await supabase.from("countdowns").select("*").eq("show_on_home", true);
+  const now = new Date();
+  // Rank by the NEXT occurrence (a yearly birthday stored in 1998 is not "first"),
+  // and keep the whole day of the date: "È oggi" is the best moment to show it.
+  const ranked = (data ?? [])
+    .map((c) => ({ c, occ: occurrenceOf(c.target_at, c.recurring_yearly, now, tz) }))
+    .filter((x) => !x.occ.past)
+    .sort((a, b) => Number(b.occ.isToday) - Number(a.occ.isToday) || a.occ.at.getTime() - b.occ.at.getTime());
+  const first = ranked[0];
+  return first ? { ...first.c, isToday: first.occ.isToday } : null;
 }
 
 /** Media the app may use for a given purpose (random photos, breathing, …). */

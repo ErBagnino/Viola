@@ -9,6 +9,7 @@ import { LetterView } from "@/features/letters/letter-view";
 import { useNow } from "@/hooks/use-now";
 import { countdownParts, formatDate } from "@/utils/dates";
 import { openCapsule } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 export type CapsuleItem = { id: string; title: string; teaser: string | null; unlockAt: string; unlocked: boolean; openedAt: string | null };
 
@@ -20,7 +21,7 @@ export function CapsuleList({ items, lockedText, readyText, signature }: { items
 
   const open = (c: CapsuleItem) =>
     start(async () => {
-      const res = await openCapsule(c.id);
+      const res = await callAction(() => openCapsule(c.id));
       if (res.ok) setLetter(res);
       else toast.show(res.error, "info");
     });

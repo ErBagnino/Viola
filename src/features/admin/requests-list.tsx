@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/utils/cn";
 import { formatDateTime, relativeTime } from "@/utils/dates";
 import { respondToRequest, setRequestStatus } from "./inbox-actions";
+import { callAction } from "@/utils/call-action";
 
 export type RequestView = {
   id: string;
@@ -38,7 +39,7 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
 
   const run = (fn: () => Promise<{ ok: boolean; error?: string } & Record<string, unknown>>, ok?: string) =>
     start(async () => {
-      const r = await fn();
+      const r = await callAction(fn);
       if (r.ok) {
         if (ok) toast.show(ok);
         router.refresh();
@@ -82,7 +83,7 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
                   loading={pending}
                   onClick={() =>
                     run(async () => {
-                      const res = await respondToRequest(r.id, text);
+                      const res = await callAction(() => respondToRequest(r.id, text));
                       if (res.ok) {
                         setReplying(null);
                         setText("");
@@ -99,15 +100,15 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
             <div className="mt-4 flex flex-wrap gap-2">
               {r.status === "new" && (
                 <Button size="sm" variant="soft" onClick={() => run(() => setRequestStatus(r.id, "seen"))} loading={pending}>
-                  <Eye className="size-4" /> Mark seen
+                  <Eye className="size-4" /> Segna come vista
                 </Button>
               )}
               <Button size="sm" onClick={() => setReplying(r.id)}>
-                <MessageCircleReply className="size-4" /> Respond
+                <MessageCircleReply className="size-4" /> Rispondi
               </Button>
               {r.status !== "closed" ? (
                 <Button size="sm" variant="ghost" onClick={() => run(() => setRequestStatus(r.id, "closed"))}>
-                  <X className="size-4" /> Close
+                  <X className="size-4" /> Chiudi
                 </Button>
               ) : (
                 <Button size="sm" variant="ghost" onClick={() => run(() => setRequestStatus(r.id, "new"))}>

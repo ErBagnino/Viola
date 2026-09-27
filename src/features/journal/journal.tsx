@@ -12,6 +12,7 @@ import { MOODS } from "@/features/content/constants";
 import { formatDateTime } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 import { deleteJournal, saveJournal } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 export type JournalEntry = { id: string; title: string | null; body: string; mood: number | null; visibility: "private" | "shared"; createdAt: string };
 
@@ -27,7 +28,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
   const save = () =>
     start(async () => {
       if (!draft) return;
-      const res = await saveJournal(draft);
+      const res = await callAction(() => saveJournal(draft));
       if (res.ok) {
         toast.show(draft.visibility === "shared" ? `Salvato e condiviso con ${adamName} ♡` : "Salvato, solo per te 🔒");
         setDraft(null);
@@ -130,7 +131,7 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
             onClick={() =>
               start(async () => {
                 if (!confirm) return;
-                const res = await deleteJournal(confirm);
+                const res = await callAction(() => deleteJournal(confirm));
                 if (!res.ok) toast.show(res.error, "error");
                 setConfirm(null);
               })

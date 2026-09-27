@@ -4,7 +4,9 @@
  * - network-first for pages (calm pages are kept for offline use)
  * - Web Push notifications
  */
-const VERSION = "vio-v1";
+// The page registers /sw.js?v=<build id>: each deploy gets its own caches,
+// and "activate" deletes the ones left by older versions.
+const VERSION = `vio-${new URL(self.location.href).searchParams.get("v") || "dev"}`;
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = "/offline";
@@ -43,7 +45,8 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => !k.startsWith(VERSION)).map((k) => caches.delete(k)));
+      const current = [STATIC_CACHE, PAGE_CACHE];
+      await Promise.all(keys.filter((k) => !current.includes(k)).map((k) => caches.delete(k)));
       await self.clients.claim();
     })(),
   );

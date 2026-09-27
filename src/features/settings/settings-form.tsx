@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/toast";
 import { ResourceForm } from "@/features/admin/resource-form";
 import type { FieldDef, Option } from "@/features/admin/resources";
 import { saveSettingsAction } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 export function SettingsForm({
   settingsKey,
@@ -32,7 +33,7 @@ export function SettingsForm({
 
   const save = () =>
     start(async () => {
-      const res = await saveSettingsAction(settingsKey, values);
+      const res = await callAction(() => saveSettingsAction(settingsKey, values));
       if (res.ok) {
         toast.show("Impostazioni salvate ♡");
         setDirty(false);

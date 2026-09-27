@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
+// One id per deploy: the service worker is registered with it, so every new
+// version reinstalls it, refreshes the offline kit and drops old caches.
+const buildId = (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 12) || `b${Date.now().toString(36)}`;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseOrigin = (() => {
   try {
@@ -36,10 +39,14 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  // Private app: keep every response (pages, manifest, images) out of search engines.
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
 ];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  generateBuildId: async () => buildId,
+  env: { NEXT_PUBLIC_BUILD_ID: buildId },
   reactStrictMode: true,
   serverExternalPackages: ["sharp", "web-push"],
   experimental: {

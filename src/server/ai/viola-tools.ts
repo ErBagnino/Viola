@@ -5,7 +5,7 @@ import type { SettingsMap } from "@/features/settings/schema";
 import type { ChatAction } from "@/features/ai-chat/types";
 import { signOne } from "@/server/media";
 import { getContact } from "@/server/contact";
-import { countdownParts, nextOccurrence } from "@/utils/dates";
+import { countdownParts, occurrenceOf } from "@/utils/dates";
 import { pickOne, shuffle } from "@/utils/random";
 
 const obj = (properties: Record<string, unknown> = {}, required: string[] = []) => ({ type: "object", properties, required });
@@ -78,11 +78,21 @@ export async function runViolaTool(name: string, args: Record<string, unknown>, 
       return link(g.title, g.href, "gamepad", "Un piccolo gioco");
     }
     case "open_countdown": {
-      const { data } = await supabase.from("countdowns").select("*").order("target_at");
+      const { data } = await supabase.from("countdowns").select("*");
       const now = new Date();
-      const next = (data ?? []).map((c) => ({ ...c, at: nextOccurrence(c.target_at, c.recurring_yearly, now) })).filter((c) => c.at > now).sort((a, b) => +a.at - +b.at)[0];
+      const tz = settings.general.timezone;
+      const next = (data ?? [])
+        .map((c) => ({ ...c, occ: occurrenceOf(c.target_at, c.recurring_yearly, now, tz) }))
+        .filter((c) => !c.occ.past)
+        .sort((a, b) => Number(b.occ.isToday) - Number(a.occ.isToday) || +a.occ.at - +b.occ.at)[0];
       if (!next) return { result: { countdown: "nessuna data impostata" }, actions: [] };
-      const p = countdownParts(next.at, now);
+      if (next.occ.isToday) {
+        return {
+          result: { titolo: next.title, oggi: true },
+          actions: [{ type: "link", title: next.title, subtitle: settings.texts.countdownToday, href: "/viola/noi/countdown", icon: "hourglass" }],
+        };
+      }
+      const p = countdownParts(next.occ.at, now);
       return {
         result: { titolo: next.title, giorni: p.days, ore: p.hours },
         actions: [{ type: "link", title: next.title, subtitle: `Mancano ${p.days} giorni e ${p.hours} ore`, href: "/viola/noi/countdown", icon: "hourglass" }],
@@ -132,6 +142,7 @@ export async function runViolaTool(name: string, args: Record<string, unknown>, 
       if (contact.whatsappNumber) actions.push({ type: "link", title: `Scrivi ad ${adam} su WhatsApp`, subtitle: text, href: `https://wa.me/${contact.whatsappNumber}?text=${encodeURIComponent(text ?? "")}`, icon: "message-heart" });
       if (contact.phoneUrl) actions.push({ type: "link", title: `Chiama ${adam}`, href: contact.phoneUrl, icon: "phone" });
       actions.push({ type: "link", title: `Ho bisogno di ${adam}`, subtitle: "Gli arriva subito un avviso", href: "/viola/adam", icon: "heart-handshake" });
+      actions.push({ type: "link", title: `Scrivi ad ${adam} qui nell'app`, subtitle: "Lo legge appena può", href: "/viola/scrivi", icon: "pen" });
       return { result: { mostrato: "contatti di Adam" }, actions };
     }
     default:

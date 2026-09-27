@@ -30,7 +30,12 @@ export async function signIn(_prev: SignInState, formData: FormData): Promise<Si
   if (profileError) {
     console.error("[auth] profile lookup failed", { code: profileError.code, message: profileError.message });
     await supabase.auth.signOut();
-    return { error: "Il database non è pronto: in Supabase → SQL Editor esegui il file supabase/setup.sql (SETUP.md, passo 4)." };
+    return {
+      error:
+        profileError.code === "PGRST205" || profileError.code === "42P01"
+          ? "Il database non è pronto: in Supabase → SQL Editor esegui il file supabase/setup.sql (SETUP.md, passo 4)."
+          : "Non riesco a leggere il tuo profilo in questo momento. Riprova tra poco ♡",
+    };
   }
   redirect(homeFor((profile?.role ?? "pending") as Role));
 }

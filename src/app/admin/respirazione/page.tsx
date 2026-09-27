@@ -16,7 +16,7 @@ export default async function RespirazioneAdmin() {
         <ResourceManager resourceKey="breathing_presets" rows={presets} />
       </div>
       <div>
-        <AdminHeader title="Foto durante il respiro" description="Foto con una frase (es. &quot;Respira con me.&quot;). Si aggiungono alle foto marcate &quot;durante la respirazione&quot; nella libreria." icon="image" />
+        <AdminHeader as="h2" title="Foto durante il respiro" description="Foto con una frase (es. &quot;Respira con me.&quot;). Si aggiungono alle foto marcate &quot;durante la respirazione&quot; nella libreria." icon="image" />
         <ResourceManager resourceKey="breathing_media" rows={media} thumbs={thumbs} extraOptions={{ preset_id: presetOptions }} />
       </div>
     </div>

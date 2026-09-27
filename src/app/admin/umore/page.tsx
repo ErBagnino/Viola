@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/server/settings";
 import { MOODS } from "@/features/content/constants";
-import { formatDate, formatDateTime, isoDaysAgo, lastDaysKeys } from "@/utils/dates";
+import { formatDate, formatDateTime, isoDaysAgo, lastDaysKeys, todayKey } from "@/utils/dates";
 
 export const metadata = { title: "Umore" };
 
@@ -13,8 +13,9 @@ export default async function UmoreAdminPage() {
   const since = isoDaysAgo(30);
   const { data } = await supabase.from("mood_entries").select("*").gte("created_at", since).order("created_at", { ascending: false });
   const list = data ?? [];
-  const days = lastDaysKeys(30).map((key) => {
-    const entries = list.filter((m) => m.created_at.slice(0, 10) === key && m.mood);
+  const tz = settings.general.timezone;
+  const days = lastDaysKeys(30, new Date(), tz).map((key) => {
+    const entries = list.filter((m) => todayKey(tz, new Date(m.created_at)) === key && m.mood);
     const avg = entries.length ? entries.reduce((s, m) => s + (m.mood ?? 0), 0) / entries.length : null;
     return { key, avg, n: entries.length };
   });

@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/toast";
 import { HeartBurst } from "@/components/decor/burst";
 import { formatDateTime } from "@/utils/dates";
 import { deleteMessage, sendMessage } from "./actions";
+import { callAction } from "@/utils/call-action";
 
 const CATS = [
   ["thought", "💭 Un pensiero"],
@@ -30,7 +31,7 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
 
   const send = () =>
     start(async () => {
-      const res = await sendMessage({ body, category, isPrivate });
+      const res = await callAction(() => sendMessage({ body, category, isPrivate }));
       if (res.ok) {
         setBody("");
         setBurst(true);
@@ -54,7 +55,7 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
           Messaggio
         </label>
         <Textarea id="msg" rows={6} value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} placeholder={`Scrivi ad ${adamName} tutto quello che stai pensando…`} className="mt-2" />
-        <label className="mt-3 flex items-center gap-2 text-sm font-bold text-wine-800">
+        <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold text-wine-800">
           <input type="checkbox" className="size-5 accent-wine-600" checked={isPrivate} onChange={(e) => setPrivate(e.target.checked)} />
           <Lock className="size-4" /> Non mostrare il testo nella notifica
         </label>
@@ -75,11 +76,16 @@ export function MessageComposer({ history, adamName, tz }: { history: SentMessag
                     {formatDateTime(m.createdAt, tz)} · {m.readAt ? "letto ♡" : "inviato"}
                     <button
                       type="button"
-                      className="rounded p-0.5 hover:bg-white/10"
+                      className="-my-2 -mr-2 grid size-10 place-items-center rounded-xl hover:bg-white/10"
                       aria-label="Elimina messaggio"
-                      onClick={() => start(async () => void (await deleteMessage(m.id)))}
+                      onClick={() =>
+                        start(async () => {
+                          const res = await callAction(() => deleteMessage(m.id));
+                          if (!res.ok) toast.show(res.error, "error");
+                        })
+                      }
                     >
-                      <Trash2 className="size-3.5" />
+                      <Trash2 className="size-4" />
                     </button>
                   </p>
                 </div>

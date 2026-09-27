@@ -5,13 +5,16 @@ import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 import { actionHref } from "@/features/actions/registry";
 import type { ComfortItem } from "@/features/comfort/help-now";
+import { FALLBACK_COMFORT } from "@/features/content/fallbacks";
 
 export async function getComfortItems(): Promise<ComfortItem[]> {
   const supabase = await createClient();
   const [{ data }, settings] = await Promise.all([supabase.from("comfort_actions").select("*"), getSettings()]);
   const contact = getContact(settings);
-  const media = await mediaByIds(supabase, (data ?? []).flatMap((c) => [c.media_id, c.sound_id]));
-  return (data ?? []).map((c) => ({
+  // Nothing configured (or the database is unreachable): never an empty "help me" screen.
+  if (!data?.length) return FALLBACK_COMFORT;
+  const media = await mediaByIds(supabase, data.flatMap((c) => [c.media_id, c.sound_id]));
+  return data.map((c) => ({
     id: c.id,
     title: c.title,
     text: c.text,

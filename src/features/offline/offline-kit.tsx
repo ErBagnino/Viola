@@ -10,6 +10,8 @@ import type { BreathingPresetView } from "@/features/breathing/types";
 import { GroundingFlow } from "@/features/grounding/grounding-flow";
 import { DEFAULT_54321, DEFAULT_FEET } from "@/features/grounding/types";
 import { pickOne } from "@/utils/random";
+import { OFFLINE_COMFORT_IDEAS } from "@/features/content/fallbacks";
+import { EmergencyContact } from "./emergency-contact";
 
 const PRESET: BreathingPresetView = {
   id: "offline",
@@ -27,16 +29,7 @@ const PRESET: BreathingPresetView = {
   audioUrl: null,
 };
 
-const COMFORT = [
-  "Appoggia i piedi a terra e senti il pavimento.",
-  "Bevi lentamente un bicchiere d'acqua.",
-  "Lavati il viso con acqua fresca.",
-  "Abbraccia un cuscino per venti secondi.",
-  "Apri la finestra e fai tre respiri lenti.",
-  "Trova 5 cose blu intorno a te.",
-  "Stringi forte i pugni per 5 secondi, poi lascia andare.",
-  "Metti una mano sul petto e senti il tuo respiro.",
-];
+const COMFORT = OFFLINE_COMFORT_IDEAS;
 
 /** Everything that must work without internet: breathing, grounding, 5-4-3-2-1, comfort ideas. */
 export function OfflineKit() {
@@ -114,7 +107,10 @@ export function OfflineKit() {
           </div>
         )}
       </div>
-      <p className="mt-8 text-center text-xs text-ink-muted">Se sei in pericolo chiama il 112. Appena torna la rete, puoi premere &quot;Ho bisogno di Adam&quot;.</p>
+      <section aria-label="Contatta Adam" className="mt-8">
+        <EmergencyContact />
+      </section>
+      <p className="mt-4 text-center text-sm text-ink-muted">Se sei in pericolo chiama il 112. Appena torna la rete, puoi premere &quot;Ho bisogno di Adam&quot;.</p>
       {breathing && <BreathingSession preset={PRESET} photos={[]} phrases={PRESET.texts} endText="Brava. Un passo alla volta. ♡" onClose={() => setBreathing(false)} />}
     </main>
   );

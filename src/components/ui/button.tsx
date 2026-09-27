@@ -20,7 +20,7 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm rounded-xl gap-1.5",
+  sm: "h-10 px-3.5 text-sm rounded-xl gap-1.5",
   md: "h-11 px-5 text-[15px] rounded-2xl gap-2",
   lg: "h-14 px-6 text-base rounded-[1.25rem] gap-2.5",
   xl: "min-h-16 px-7 py-4 text-lg rounded-3xl gap-3",

@@ -2,9 +2,10 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Copy, History, ImagePlus, Lightbulb, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
+import { ArrowUp, Copy, HeartHandshake, History, ImagePlus, Lightbulb, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useNeedAdamShortcut } from "@/components/layout/shell-context";
 import { Markdown } from "@/components/ui/markdown";
 import { Sheet } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/toast";
@@ -15,14 +16,26 @@ import { compressImage, uploadPhoto } from "@/features/admin/fields/image-compre
 import { deleteAiMessage, deleteConversation, listConversations, loadConversation } from "./actions";
 import { ActionCard } from "./action-cards";
 import type { ChatAction, ChatMessage, ConversationSummary, StreamEvent } from "./types";
+import { callAction } from "@/utils/call-action";
 
 export type ChatProfile = { name: string; subtitle: string; welcome: string; avatarUrl: string | null; signature?: string };
 type Mode = "general" | "personal" | "comfort";
 
 const MODES: { value: Mode; label: string; hint: string }[] = [
-  { value: "general", label: "General", hint: "Chiedimi qualsiasi cosa" },
-  { value: "personal", label: "Personal", hint: "Uso quello che Adam mi ha insegnato" },
-  { value: "comfort", label: "Comfort", hint: "Più piano, più morbido" },
+  { value: "general", label: "Generale", hint: "Chiedimi qualsiasi cosa" },
+  { value: "personal", label: "Personale", hint: "Uso quello che Adam mi ha insegnato" },
+  { value: "comfort", label: "Conforto", hint: "Più piano, più morbido" },
+];
+
+/** In Comfort mode these open the app's calming tools directly: no typing, no waiting, work even if the AI is down. */
+const COMFORT_LINKS = [
+  { label: "Respira con me", href: "/viola/calma/respira?via=1" },
+  { label: "Facciamo grounding", href: "/viola/calma/grounding" },
+  { label: "5-4-3-2-1", href: "/viola/calma/54321" },
+  { label: "Fammi vedere una foto", href: "/viola/noi/foto/random" },
+  { label: "Apriamo un ricordo", href: "/viola/noi/ricordi" },
+  { label: "Scrivi ad Adam", href: "/viola/scrivi" },
+  { label: "Ho bisogno di Adam", href: "/viola/adam" },
 ];
 
 function Avatar({ url, size = "sm" }: { url: string | null; size?: "sm" | "lg" }) {
@@ -84,6 +97,7 @@ export function Chat({
   const [history, setHistory] = useState<ConversationSummary[] | null>(null);
   const [offline, setOffline] = useState(false);
   const [attaching, setAttaching] = useState(false);
+  const needAdam = useNeedAdamShortcut();
   const abort = useRef<AbortController | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
@@ -156,6 +170,7 @@ export function Chat({
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buf = "";
+        let finished = false;
         for (;;) {
           const { value, done } = await reader.read();
           if (done) break;
@@ -179,12 +194,16 @@ export function Chat({
               setWaiting(false);
               patchLast((m) => ({ ...m, actions: [...m.actions, e.action] }));
             } else if (e.t === "done") {
+              finished = true;
               patchLast((m) => ({ ...m, id: e.messageId ?? m.id }));
             } else if (e.t === "error") {
+              finished = true;
               patchLast((m) => ({ ...m, content: m.content ? `${m.content}\n\n_${e.message}_` : e.message, status: "error" }));
             }
           }
         }
+        // The server went away mid-answer (timeout, lost connection): say so instead of leaving a blank bubble.
+        if (!finished) patchLast((m) => ({ ...m, content: m.content ? `${m.content}\n\n_${unavailableText}_` : unavailableText, status: "error" }));
       } catch {
         if (ctrl.signal.aborted) patchLast((m) => ({ ...m, status: "stopped" }));
         else patchLast((m) => ({ ...m, content: m.content || unavailableText, status: "error" }));
@@ -214,12 +233,16 @@ export function Chat({
 
   const openHistory = async () => {
     setHistoryOpen(true);
-    const r = await listConversations(scope);
+    const r = await callAction(() => listConversations(scope));
     if (r.ok) setHistory(r.items);
+    else {
+      setHistory([]);
+      toast.show(r.error, "error");
+    }
   };
 
   const openConversation = async (id: string) => {
-    const r = await loadConversation(id, scope);
+    const r = await callAction(() => loadConversation(id, scope));
     if (!r.ok) return toast.show(r.error, "error");
     setMessages(r.messages);
     setConversationId(id);
@@ -275,6 +298,11 @@ export function Chat({
         <Button size="icon" variant="ghost" onClick={newChat} aria-label="Nuova conversazione">
           <MessageSquarePlus className="size-5" />
         </Button>
+        {needAdam && (
+          <Link href={needAdam} className="press grid size-11 shrink-0 place-items-center rounded-2xl text-rouge-500 hover:bg-wine-50" aria-label="Ho bisogno di Adam" title="Ho bisogno di Adam">
+            <HeartHandshake className="size-5" />
+          </Link>
+        )}
       </div>
 
       {showModes && (
@@ -287,7 +315,7 @@ export function Chat({
               aria-checked={mode === m.value}
               title={m.hint}
               onClick={() => setMode(m.value)}
-              className={cn("press flex-1 rounded-xl py-1.5 text-xs font-extrabold", mode === m.value ? "bg-white text-wine-800 shadow-soft" : "text-wine-600")}
+              className={cn("press min-h-10 flex-1 rounded-xl py-2 text-sm font-extrabold", mode === m.value ? "bg-white text-wine-800 shadow-soft" : "text-wine-600")}
             >
               {m.label}
             </button>
@@ -386,7 +414,7 @@ export function Chat({
                         type="button"
                         onClick={async () => {
                           setMessages((ms) => ms.filter((x) => x.id !== m.id));
-                          if (!m.id.startsWith("tmp-")) await deleteAiMessage(m.id);
+                          if (!m.id.startsWith("tmp-")) await callAction(() => deleteAiMessage(m.id));
                         }}
                         className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-white"
                         aria-label="Elimina messaggio"
@@ -403,14 +431,25 @@ export function Chat({
       </div>
 
       {/* quick actions */}
-      {available && !streaming && (
-        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
-          {quickActions.map((q) => (
-            <button key={q} type="button" onClick={() => send(q)} className="press shrink-0 rounded-full border border-blush-200 bg-white/80 px-3.5 py-2 text-sm font-bold whitespace-nowrap text-wine-700">
-              {q}
-            </button>
+      {scope === "viola" && mode === "comfort" ? (
+        <nav aria-label="Cose che puoi fare adesso" className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
+          {COMFORT_LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className={cn("press inline-flex min-h-11 shrink-0 items-center rounded-full px-4 text-sm font-bold whitespace-nowrap", l.href === "/viola/adam" ? "bg-rouge-500 text-white" : "border border-blush-200 bg-white/80 text-wine-700")}>
+              {l.label}
+            </Link>
           ))}
-        </div>
+        </nav>
+      ) : (
+        available &&
+        !streaming && (
+          <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-2">
+            {quickActions.map((q) => (
+              <button key={q} type="button" onClick={() => send(q)} className="press min-h-11 shrink-0 rounded-full border border-blush-200 bg-white/80 px-4 text-sm font-bold whitespace-nowrap text-wine-700">
+                {q}
+              </button>
+            ))}
+          </div>
+        )
       )}
 
       {/* composer */}
@@ -508,7 +547,8 @@ export function Chat({
                   aria-label="Elimina conversazione"
                   className="grid size-9 place-items-center rounded-xl text-ink-muted hover:bg-wine-50"
                   onClick={async () => {
-                    await deleteConversation(c.id);
+                    const res = await callAction(() => deleteConversation(c.id));
+                    if (!res.ok) return toast.show(res.error, "error");
                     setHistory((h) => (h ?? []).filter((x) => x.id !== c.id));
                     if (c.id === conversationId) newChat();
                   }}

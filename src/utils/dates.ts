@@ -54,14 +54,27 @@ export function countdownParts(target: Date | string, now = new Date()): Countdo
   };
 }
 
-/** For yearly-recurring countdowns (birthdays, anniversaries): next occurrence. */
-export function nextOccurrence(target: Date | string, recurringYearly: boolean, now = new Date()) {
+export type Occurrence = { at: Date; isToday: boolean; past: boolean };
+
+/**
+ * When a countdown happens relative to `now`, in the couple's time zone.
+ * The whole calendar day of the date counts as "today" (so a birthday at
+ * 00:00 still says "È oggi" all day long instead of jumping to next year).
+ */
+export function occurrenceOf(target: Date | string, recurringYearly: boolean, now = new Date(), tz = DEFAULT_TZ): Occurrence {
   const t = new Date(target);
-  if (!recurringYearly || t.getTime() > now.getTime()) return t;
-  const next = new Date(t);
-  next.setFullYear(now.getFullYear());
-  if (next.getTime() <= now.getTime()) next.setFullYear(now.getFullYear() + 1);
-  return next;
+  const today = todayKey(tz, now);
+  if (!recurringYearly) {
+    const isToday = todayKey(tz, t) === today;
+    return { at: t, isToday, past: !isToday && t.getTime() < now.getTime() };
+  }
+  const thisYear = new Date(t);
+  thisYear.setFullYear(Number(today.slice(0, 4)));
+  if (todayKey(tz, thisYear) === today) return { at: thisYear, isToday: true, past: false };
+  if (thisYear.getTime() > now.getTime()) return { at: thisYear, isToday: false, past: false };
+  const next = new Date(thisYear);
+  next.setFullYear(thisYear.getFullYear() + 1);
+  return { at: next, isToday: false, past: false };
 }
 
 /** Great-circle distance in km. */
@@ -86,7 +99,7 @@ export function isoDaysAgo(days: number, now = new Date()) {
   return new Date(now.getTime() - days * 86400_000).toISOString();
 }
 
-/** YYYY-MM-DD keys for the last `days` days, oldest first. */
-export function lastDaysKeys(days: number, now = new Date()) {
-  return Array.from({ length: days }, (_, i) => new Date(now.getTime() - (days - 1 - i) * 86400_000).toISOString().slice(0, 10));
+/** YYYY-MM-DD keys (in the given time zone) for the last `days` days, oldest first. */
+export function lastDaysKeys(days: number, now = new Date(), tz = DEFAULT_TZ) {
+  return Array.from({ length: days }, (_, i) => todayKey(tz, new Date(now.getTime() - (days - 1 - i) * 86400_000)));
 }

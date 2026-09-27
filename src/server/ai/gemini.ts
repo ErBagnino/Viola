@@ -49,6 +49,13 @@ const isModelMissing = (e: unknown) => {
   const msg = e instanceof Error ? e.message : "";
   return status === 404 || /not found|is not supported|unknown model/i.test(msg);
 };
+/** Worth trying the next free model: it is missing, over its own quota, or overloaded. */
+const isRetryableOnOtherModel = (e: unknown) => {
+  if (isModelMissing(e)) return true;
+  const status = e instanceof ApiError ? e.status : (e as { status?: number })?.status;
+  const msg = e instanceof Error ? e.message : "";
+  return status === 429 || status === 503 || /RESOURCE_EXHAUSTED|UNAVAILABLE|overloaded/i.test(msg);
+};
 const isThinkingRejected = (e: unknown) => {
   const status = e instanceof ApiError ? e.status : (e as { status?: number })?.status;
   return status === 400 && /thinking/i.test(e instanceof Error ? e.message : "");
@@ -56,7 +63,10 @@ const isThinkingRejected = (e: unknown) => {
 
 /**
  * One streamed model turn. Tries the configured model, then the free
- * fallbacks (only on "model not found"). Never falls back to paid APIs.
+ * fallbacks when a model is missing, over quota or overloaded — but only
+ * before any text reached the user (no duplicated answers). Each model is
+ * tried at most once, so a failure can never turn into a retry loop.
+ * Never falls back to paid APIs.
  */
 export async function streamRound(opts: {
   models: string[];
@@ -70,7 +80,8 @@ export async function streamRound(opts: {
 }): Promise<StreamRound> {
   const ai = getClient();
   let lastError: unknown = null;
-  for (const model of opts.models.filter(Boolean)) {
+  let current: StreamRound | null = null;
+  for (const model of [...new Set(opts.models.filter(Boolean))]) {
     for (const withThinking of [true, false]) {
       try {
         const stream = await ai.models.generateContentStream({
@@ -86,6 +97,7 @@ export async function streamRound(opts: {
           },
         });
         const round: StreamRound = { parts: [], text: "", calls: [], usage: { input: 0, output: 0 } };
+        current = round;
         for await (const chunk of stream) {
           const parts = chunk.candidates?.[0]?.content?.parts ?? [];
           for (const p of parts) {
@@ -106,8 +118,11 @@ export async function streamRound(opts: {
       } catch (e) {
         if (opts.signal?.aborted) throw new AiError("error", "interrotto");
         lastError = e;
+        const started = Boolean(current?.parts.length);
+        current = null;
+        if (started) throw classify(e); // text already streamed: never restart the answer
         if (withThinking && isThinkingRejected(e)) continue; // retry the same model without thinking config
-        if (isModelMissing(e)) break; // try the next free model
+        if (isRetryableOnOtherModel(e)) break; // try the next free model
         throw classify(e);
       }
     }

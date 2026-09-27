@@ -103,17 +103,16 @@ export function Switch({
         aria-checked={checked}
         disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={cn(
-          "relative h-8 w-14 shrink-0 rounded-full transition-colors disabled:opacity-50",
-          checked ? "bg-wine-600" : "bg-wine-100",
-        )}
+        className="grid h-11 w-16 shrink-0 place-items-center disabled:opacity-50"
       >
-        <span
-          className={cn(
-            "absolute top-1 size-6 rounded-full bg-white shadow transition-all duration-200",
-            checked ? "left-7" : "left-1",
-          )}
-        />
+        <span className={cn("relative h-8 w-14 rounded-full transition-colors", checked ? "bg-wine-600" : "bg-wine-100")}>
+          <span
+            className={cn(
+              "absolute top-1 size-6 rounded-full bg-white shadow transition-all duration-200",
+              checked ? "left-7" : "left-1",
+            )}
+          />
+        </span>
       </button>
     </div>
   );
@@ -164,7 +163,7 @@ export function Chip({
       type="button"
       aria-pressed={active}
       className={cn(
-        "press inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-bold whitespace-nowrap transition",
+        "press inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-bold whitespace-nowrap transition",
         active ? "border-wine-600 bg-wine-600 text-white" : "border-blush-200 bg-white/70 text-wine-700 hover:bg-white",
         className,
       )}

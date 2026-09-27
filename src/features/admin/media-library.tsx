@@ -15,6 +15,7 @@ import { deleteResourceAction, updateResourceAction } from "./actions";
 import { AudioUploader, ImageUploader } from "./fields/uploaders";
 import { ResourceForm } from "./resource-form";
 import { RESOURCES } from "./resources";
+import { callAction } from "@/utils/call-action";
 
 export type LibraryItem = Record<string, unknown> & { id: string; kind: string; url: string; thumbUrl: string; size_bytes: number };
 
@@ -37,7 +38,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
       if (!edit) return;
       const payload: Record<string, unknown> = {};
       for (const k of Object.keys(def.schema.shape)) if (k in edit) payload[k] = edit[k];
-      const res = await updateResourceAction("media", edit.id, payload);
+      const res = await callAction(() => updateResourceAction("media", edit.id, payload));
       if (res.ok) {
         toast.show("Salvato ♡");
         setEdit(null);
@@ -48,7 +49,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
   const remove = () =>
     start(async () => {
       if (!edit) return;
-      const res = await deleteResourceAction("media", edit.id);
+      const res = await callAction(() => deleteResourceAction("media", edit.id));
       if (res.ok) {
         toast.show("Eliminato");
         setConfirmDel(false);

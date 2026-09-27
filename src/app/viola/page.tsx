@@ -7,6 +7,8 @@ import { getContact } from "@/server/contact";
 import { getDailySurprise, getNextCountdown, randomPhrase } from "@/server/viola-data";
 import { actionHref } from "@/features/actions/registry";
 import { ActionCard } from "@/features/home/action-card";
+import { DEFAULT_HOME_MODULES } from "@/features/content/fallbacks";
+import { COUNTDOWN_LEADS } from "@/features/content/constants";
 import { MoodPicker } from "@/features/mood/mood-picker";
 import { LiveCountdown } from "@/features/home/live-countdown";
 import { Sparkle, Star5 } from "@/components/decor/stars";
@@ -28,11 +30,20 @@ export default async function ViolaHome() {
     supabase.from("home_modules").select("*").order("position"),
     randomPhrase("home", "Un passo alla volta."),
   ]);
-  const list = (modules ?? []).filter((m) => m.is_enabled);
+  const configured = (modules ?? []).filter((m) => m.is_enabled);
+  // No home built yet → a sensible default one. And whatever Adam configures,
+  // "Ho bisogno di Adam" is always on the home, right after "Aiutami adesso".
+  const list = configured.length ? configured : DEFAULT_HOME_MODULES;
+  const reachesAdam = list.some((m) => (m.type === "widget" && m.widget === "need_adam") || (m.type === "action" && m.action === "need_adam"));
+  if (!reachesAdam) {
+    const fallback = DEFAULT_HOME_MODULES.find((m) => m.widget === "need_adam")!;
+    const at = list.findIndex((m) => m.widget === "help_now");
+    list.splice(at + 1, 0, fallback);
+  }
   const widgets = new Set(list.filter((m) => m.type === "widget").map((m) => m.widget));
   const [surprise, countdown] = await Promise.all([
     widgets.has("daily_surprise") ? getDailySurprise(general.timezone) : null,
-    widgets.has("countdown") ? getNextCountdown() : null,
+    widgets.has("countdown") ? getNextCountdown(general.timezone) : null,
   ]);
   const hour = hourIn(general.timezone);
 
@@ -96,7 +107,14 @@ export default async function ViolaHome() {
               <Icon name={countdown.icon ?? "hourglass"} className="size-4 text-base" /> {m.title}
             </p>
             <p className="mt-1 mb-3 font-display text-xl font-semibold">{countdown.title}</p>
-            <LiveCountdown target={countdown.target_at} recurring={countdown.recurring_yearly} compact />
+            <LiveCountdown
+              target={countdown.target_at}
+              recurring={countdown.recurring_yearly}
+              compact
+              tz={general.timezone}
+              lead={countdown.kind === "meeting" ? settings.texts.countdownMeetingLead : (COUNTDOWN_LEADS[countdown.kind] ?? null)}
+              todayText={settings.texts.countdownToday}
+            />
           </Link>
         );
       case "distance": {

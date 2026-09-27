@@ -6,10 +6,10 @@ import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pickAvoiding } from "@/utils/random";
 
-export function SmileCard({ phrases }: { phrases: string[] }) {
+export function SmileCard({ phrases, initialIndex = 0 }: { phrases: string[]; initialIndex?: number }) {
   const items = phrases.map((p, i) => ({ id: String(i), text: p }));
   const [recent, setRecent] = useState<string[]>([]);
-  const [cur, setCur] = useState(() => items[Math.floor(Math.random() * Math.max(1, items.length))] ?? null);
+  const [cur, setCur] = useState(() => items[initialIndex] ?? items[0] ?? null);
   if (!cur) return null;
   return (
     <div>

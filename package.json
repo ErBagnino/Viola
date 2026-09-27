@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "icons": "node scripts/generate-icons.mjs",
     "create-user": "node scripts/create-user.mjs",
-    "vapid": "node scripts/generate-vapid.mjs"
+    "vapid": "node scripts/generate-vapid.mjs",
+    "db:bundle": "node scripts/bundle-sql.mjs",
+    "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
@@ -43,5 +45,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

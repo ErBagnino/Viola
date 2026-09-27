@@ -5,6 +5,7 @@ import { useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { formatDate } from "@/utils/dates";
+import { useIsClient } from "@/hooks/use-is-client";
 
 export type Photo = {
   id: string;
@@ -19,6 +20,7 @@ export type Photo = {
 
 export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]; index: number | null; onChange: (i: number) => void; onClose: () => void }) {
   const open = index !== null;
+  const isClient = useIsClient();
   const go = useCallback(
     (d: number) => {
       if (index === null || !photos.length) return;
@@ -43,7 +45,7 @@ export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]
     };
   }, [open, go, onClose]);
 
-  if (typeof document === "undefined") return null;
+  if (!isClient) return null;
   const p = index !== null ? photos[index] : null;
 
   return createPortal(

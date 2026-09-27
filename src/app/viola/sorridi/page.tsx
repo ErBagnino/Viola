@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ActionCard } from "@/features/home/action-card";
 import { SmileCard } from "@/features/smile/smile-card";
 import { getPhrases } from "@/server/viola-data";
+import { newSeed, seededIndex } from "@/utils/random";
 
 export const metadata = { title: "Voglio sorridere" };
 
@@ -10,7 +11,7 @@ export default async function SorridiPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="Voglio sorridere" subtitle="Una cosa leggera, promesso." back="/viola" />
-      {phrases.length > 0 && <SmileCard phrases={phrases} />}
+      {phrases.length > 0 && <SmileCard phrases={phrases} initialIndex={seededIndex(newSeed(), phrases.length)} />}
       <div className="grid grid-cols-2 gap-3">
         <ActionCard href="/viola/ai?q=Fammi%20ridere" title="Fammi ridere" subtitle="Chiedilo ad Adam AI" icon="bot-heart" color="wine" />
         <ActionCard href="/viola/noi/dediche?caso=1" title="Una dedica" subtitle="Una a caso" icon="mail-heart" color="blush" />

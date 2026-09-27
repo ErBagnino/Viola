@@ -7,15 +7,8 @@ import { assertMember } from "@/server/auth";
 import { safeAction, UserError } from "@/server/action-result";
 import { getSettings } from "@/server/settings";
 import { notifyAdmin } from "@/server/notifications";
+import { MESSAGE_CATEGORIES } from "@/features/content/constants";
 
-export const MESSAGE_CATEGORIES = {
-  thought: "Un pensiero",
-  love: "Ti amo",
-  sad: "Sono giù",
-  need: "Ho bisogno",
-  happy: "Sono felice",
-  other: "Altro",
-} as const;
 
 const schema = z.object({
   body: z.string().trim().min(1, "Scrivi qualcosa ♡").max(5000),

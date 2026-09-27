@@ -126,3 +126,12 @@ export const HOME_WIDGETS: Record<string, string> = {
   countdown: "Countdown",
   distance: "Distanza",
 };
+
+export const MESSAGE_CATEGORIES = {
+  thought: "Un pensiero",
+  love: "Ti amo",
+  sad: "Sono giù",
+  need: "Ho bisogno",
+  happy: "Sono felice",
+  other: "Altro",
+} as const;

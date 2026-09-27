@@ -53,7 +53,10 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
         <li key={r.id} className={cn("paper rounded-4xl p-5", r.status === "new" && "ring-2 ring-rouge-400")}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-display text-lg font-semibold text-wine-900">
-              {formatDateTime(r.createdAt, tz)} <span className="text-sm font-normal text-ink-muted">· {relativeTime(r.createdAt)}</span>
+              {formatDateTime(r.createdAt, tz)}{" "}
+              <span className="text-sm font-normal text-ink-muted" suppressHydrationWarning>
+                · {relativeTime(r.createdAt)}
+              </span>
             </p>
             <span className={cn("rounded-full px-3 py-1 text-xs font-extrabold", STATUS[r.status]?.cls)}>{STATUS[r.status]?.label ?? r.status}</span>
           </div>

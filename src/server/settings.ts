@@ -9,12 +9,18 @@ import {
   type SettingsMap,
 } from "@/features/settings/schema";
 
-/** All settings visible to the current user, with defaults filled in. */
+/**
+ * All settings with defaults filled in, for SERVER use. Read with the service
+ * role when available so that server flows triggered by Viola (AI chat,
+ * notifications) use Adam's private settings too. Private groups are never
+ * sent to her browser: pages pass only the fields they need, and RLS keeps
+ * them unreadable from the client.
+ */
 export const getSettings = cache(async (): Promise<SettingsMap> => {
   const rows = new Map<string, unknown>();
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.from("app_settings").select("key, value");
+    const client = createAdminClient() ?? (await createClient());
+    const { data } = await client.from("app_settings").select("key, value");
     for (const r of data ?? []) rows.set(r.key, r.value);
   } catch {
     // Unconfigured / offline database: defaults only.

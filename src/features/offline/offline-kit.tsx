@@ -43,16 +43,28 @@ export function OfflineKit() {
   const [tab, setTab] = useState<"respira" | "54321" | "grounding" | "idee">("respira");
   const [breathing, setBreathing] = useState(false);
   const [idea, setIdea] = useState(COMFORT[0]);
+  // We are here because a page could not load: assume the app is unreachable
+  // until the server actually answers (the phone may be "online" while the
+  // server, or the connection quality, is not).
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    const on = () => setOnline(navigator.onLine);
-    on();
-    window.addEventListener("online", on);
-    window.addEventListener("offline", on);
+    let alive = true;
+    const check = async () => {
+      try {
+        const r = await fetch(`/manifest.webmanifest?ping=${Date.now()}`, { cache: "no-store" });
+        if (alive) setOnline(r.ok);
+      } catch {
+        if (alive) setOnline(false);
+      }
+    };
+    check();
+    const t = setInterval(check, 8000);
+    window.addEventListener("online", check);
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", on);
+      alive = false;
+      clearInterval(t);
+      window.removeEventListener("online", check);
     };
   }, []);
 

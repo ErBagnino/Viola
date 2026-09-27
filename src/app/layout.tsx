@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Fraunces, Nunito } from "next/font/google";
-import { ToastProvider } from "@/components/ui/toast";
+import { Providers } from "@/components/providers";
 import { ServiceWorkerRegister } from "@/features/pwa/service-worker-register";
 import { splashScreens } from "@/features/pwa/splash-screens";
 import { getSystemSettings } from "@/server/settings";
@@ -24,6 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
     referrer: "strict-origin-when-cross-origin",
     formatDetection: { telephone: false, email: false, address: false },
+    // Older iOS versions still look for this tag to open the PWA full screen.
+    other: { "apple-mobile-web-app-capable": "yes" },
     appleWebApp: {
       capable: true,
       title: general.shortName,
@@ -45,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="it" className={`${fraunces.variable} ${nunito.variable} ${caveat.variable}`}>
       <body>
-        <ToastProvider>{children}</ToastProvider>
+        <Providers>{children}</Providers>
         <ServiceWorkerRegister />
       </body>
     </html>

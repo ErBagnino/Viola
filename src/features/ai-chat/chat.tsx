@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Copy, History, ImagePlus, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
+import { ArrowUp, Copy, History, ImagePlus, Lightbulb, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/ui/markdown";
@@ -58,6 +58,7 @@ export function Chat({
   unavailableText,
   showModes,
   allowAttachments,
+  knownFacts,
 }: {
   scope: "viola" | "copilot";
   endpoint: string;
@@ -69,6 +70,8 @@ export function Chat({
   unavailableText: string;
   showModes?: boolean;
   allowAttachments?: boolean;
+  /** facts Adam taught the AI and chose to show to Viola */
+  knownFacts?: { key: string; value: string }[];
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -77,6 +80,7 @@ export function Chat({
   const [streaming, setStreaming] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [factsOpen, setFactsOpen] = useState(false);
   const [history, setHistory] = useState<ConversationSummary[] | null>(null);
   const [offline, setOffline] = useState(false);
   const [attaching, setAttaching] = useState(false);
@@ -260,6 +264,11 @@ export function Chat({
           <h1 className="truncate font-display text-xl leading-tight font-semibold text-wine-900">{profile.name}</h1>
           <p className="truncate text-xs text-ink-soft">{profile.subtitle}</p>
         </div>
+        {knownFacts && (
+          <Button size="icon" variant="ghost" onClick={() => setFactsOpen(true)} aria-label={`Cosa sa ${profile.name}`}>
+            <Lightbulb className="size-5" />
+          </Button>
+        )}
         <Button size="icon" variant="ghost" onClick={openHistory} aria-label="Conversazioni precedenti">
           <History className="size-5" />
         </Button>
@@ -460,6 +469,24 @@ export function Chat({
           </button>
         )}
       </form>
+
+      {knownFacts && (
+        <Sheet open={factsOpen} onClose={() => setFactsOpen(false)} title={`Cosa sa ${profile.name} di voi`}>
+          <p className="text-sm text-ink-soft">{profile.name} usa solo quello che Adam gli ha insegnato. Non inventa ricordi: se non sa una cosa, te lo dice.</p>
+          {knownFacts.length === 0 ? (
+            <p className="mt-4 text-ink-muted">Per ora niente di personale.</p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {knownFacts.map((f, i) => (
+                <li key={i} className="rounded-2xl bg-white px-4 py-3">
+                  <p className="text-xs font-extrabold tracking-widest text-wine-500 uppercase">{f.key}</p>
+                  <p className="text-wine-900">{f.value}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Sheet>
+      )}
 
       <Sheet open={historyOpen} onClose={() => setHistoryOpen(false)} title="Conversazioni">
         {!history ? (

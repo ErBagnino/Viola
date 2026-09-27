@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { useIsClient } from "@/hooks/use-is-client";
 
 /**
  * Bottom sheet on phones, centred dialog on larger screens.
@@ -29,6 +30,7 @@ export function Sheet({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
+  const isClient = useIsClient();
 
   useEffect(() => {
     if (!open) return;
@@ -66,7 +68,7 @@ export function Sheet({
     };
   }, [open, onClose, dismissible]);
 
-  if (typeof document === "undefined") return null;
+  if (!isClient) return null;
 
   return createPortal(
     <AnimatePresence>

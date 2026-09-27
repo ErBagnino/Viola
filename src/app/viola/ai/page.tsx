@@ -2,12 +2,18 @@ import { Chat } from "@/features/ai-chat/chat";
 import { getSettings } from "@/server/settings";
 import { getAiProfile } from "@/server/ai/profile";
 import { isAiConfigured } from "@/server/ai/gemini";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Adam AI" };
 
 export default async function AiPage({ searchParams }: PageProps<"/viola/ai">) {
   const [settings, sp] = await Promise.all([getSettings(), searchParams]);
-  const profile = await getAiProfile(settings);
+  const supabase = await createClient();
+  const [profile, { data: facts }] = await Promise.all([
+    getAiProfile(settings),
+    // RLS returns only facts that are enabled AND marked visible to Viola
+    supabase.from("ai_memory").select("key, value").eq("enabled", true).eq("visible_to_viola", true).order("category").limit(100),
+  ]);
   const available = settings.ai.enabled && isAiConfigured();
   const q = typeof sp.q === "string" ? sp.q.slice(0, 200) : undefined;
   return (
@@ -21,6 +27,7 @@ export default async function AiPage({ searchParams }: PageProps<"/viola/ai">) {
       available={available}
       unavailableText={settings.texts.aiOffline}
       showModes
+      knownFacts={facts ?? []}
     />
   );
 }

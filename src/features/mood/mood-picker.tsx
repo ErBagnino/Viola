@@ -98,7 +98,7 @@ export function MoodPicker({ title, compact }: { title: string; compact?: boolea
                   whileHover={{ y: -3 }}
                   disabled={pending}
                   onClick={() => pick(m.value)}
-                  className="grid aspect-square place-items-center rounded-2xl bg-white/80 text-[1.9rem] shadow-soft disabled:opacity-50"
+                  className="grid aspect-square max-h-20 w-full place-items-center rounded-2xl bg-white/80 text-[1.9rem] shadow-soft disabled:opacity-50 sm:aspect-auto sm:h-20"
                   aria-label={m.label}
                   title={m.label}
                 >

@@ -141,11 +141,19 @@ export type ResourceDef = {
   noCreate?: boolean;
   /** cross-field validation on the merged row (returns an error message) */
   check?: (row: Record<string, unknown>) => string | null;
+  /** where Viola sees this content (for "Guarda come la vede") */
+  viewHref?: string;
+  /** what the empty list says: why it matters, in one line */
+  emptyText?: string;
+  /** named starting values for "?nuovo=<preset>" quick actions */
+  presets?: Record<string, Record<string, unknown>>;
 };
 
 export const RESOURCES = {
   dedications: {
     key: "dedications",
+    viewHref: "/viola/noi/dediche",
+    emptyText: "Le dediche sono le lettere che legge quando è triste, ha paura o le manchi. Scrivine una: bastano poche righe vere.",
     slug: "dediche",
     table: "dedications",
     label: "Dediche",
@@ -191,6 +199,8 @@ export const RESOURCES = {
   },
   memories: {
     key: "memories",
+    viewHref: "/viola/noi/ricordi",
+    emptyText: "I ricordi diventano la vostra linea del tempo in Noi (e il gioco \"Indovina il ricordo\", se hanno una foto).",
     slug: "ricordi",
     table: "memories",
     label: "Ricordi",
@@ -233,6 +243,7 @@ export const RESOURCES = {
   },
   comfort_actions: {
     key: "comfort_actions",
+    viewHref: "/viola/calma/aiutami",
     slug: "comfort",
     table: "comfort_actions",
     label: "Comfort actions",
@@ -282,6 +293,7 @@ export const RESOURCES = {
   },
   breathing_presets: {
     key: "breathing_presets",
+    viewHref: "/viola/calma/respira",
     slug: "respirazione",
     table: "breathing_presets",
     label: "Respirazione",
@@ -379,6 +391,7 @@ export const RESOURCES = {
   },
   grounding_exercises: {
     key: "grounding_exercises",
+    viewHref: "/viola/calma/grounding",
     slug: "grounding",
     table: "grounding_exercises",
     label: "Grounding",
@@ -418,6 +431,13 @@ export const RESOURCES = {
   },
   countdowns: {
     key: "countdowns",
+    viewHref: "/viola/noi/countdown",
+    emptyText: "Aggiungi quando vi rivedrete: in home vede quanto manca, giorno per giorno.",
+    presets: {
+      meeting: { kind: "meeting", title: "Ci rivediamo ♡", icon: "plane", recurring_yearly: false, show_on_home: true },
+      birthday: { kind: "birthday", title: "Il compleanno di Viola", icon: "cake", recurring_yearly: true, show_on_home: true },
+      anniversary: { kind: "anniversary", title: "Il nostro anniversario", icon: "heart", recurring_yearly: true, show_on_home: true },
+    },
     slug: "countdown",
     table: "countdowns",
     label: "Countdown",
@@ -459,6 +479,8 @@ export const RESOURCES = {
   },
   time_capsules: {
     key: "time_capsules",
+    viewHref: "/viola/noi/capsule",
+    emptyText: "Una lettera che si apre solo in una data precisa. Perfetta per compleanni e anniversari.",
     slug: "capsule",
     table: "time_capsules",
     label: "Capsule del tempo",
@@ -491,6 +513,8 @@ export const RESOURCES = {
   },
   open_when_cards: {
     key: "open_when_cards",
+    viewHref: "/viola/noi/aprimi",
+    emptyText: "\"Aprimi quando…\": buste da aprire nei momenti giusti.",
     slug: "aprimi",
     table: "open_when_cards",
     label: "Aprimi quando…",
@@ -531,6 +555,8 @@ export const RESOURCES = {
   },
   daily_surprises: {
     key: "daily_surprises",
+    viewHref: "/viola/oggi",
+    emptyText: "Ogni giorno le compare una piccola sorpresa: una frase, una foto, un ricordo.",
     slug: "sorprese",
     table: "daily_surprises",
     label: "Una cosa per te",
@@ -572,6 +598,8 @@ export const RESOURCES = {
   },
   home_modules: {
     key: "home_modules",
+    viewHref: "/viola",
+    emptyText: "Senza moduli la home usa quelli predefiniti: funziona già. Qui puoi deciderli tu.",
     slug: "home",
     table: "home_modules",
     label: "Home builder",
@@ -634,6 +662,7 @@ export const RESOURCES = {
   },
   phrases: {
     key: "phrases",
+    viewHref: "/viola",
     slug: "frasi",
     table: "phrases",
     label: "Frasi",
@@ -666,6 +695,8 @@ export const RESOURCES = {
   },
   quiz_questions: {
     key: "quiz_questions",
+    viewHref: "/viola/giochi/quiz",
+    emptyText: "Scrivi qualche domanda su di te: il gioco \"Quanto mi conosci?\" compare quando ce n'è almeno una attiva.",
     slug: "quiz",
     table: "quiz_questions",
     label: "Quiz \"Quanto mi conosci?\"",
@@ -700,6 +731,8 @@ export const RESOURCES = {
   },
   audio_items: {
     key: "audio_items",
+    viewHref: "/viola/audio",
+    emptyText: "Un tuo vocale: la tua voce quando non riesce a dormire o le manchi.",
     slug: "audio",
     table: "audio_items",
     label: "Audio",
@@ -734,6 +767,8 @@ export const RESOURCES = {
   },
   ai_memory: {
     key: "ai_memory",
+    viewHref: "/viola/ai",
+    emptyText: "Cose vere che Adam AI deve sapere (soprannomi, posti, abitudini). Così non inventa nulla.",
     slug: "ai-memoria",
     table: "ai_memory",
     label: "Memoria di Adam AI",
@@ -849,4 +884,12 @@ export function defaultsFor(def: ResourceDef): Record<string, unknown> {
     if (r.success && r.data !== undefined) out[k] = r.data;
   }
   return out;
+}
+
+/** Starting values for "?nuovo=…": a named preset, or a value of the badge field (e.g. a category). */
+export function newValuesFor(def: ResourceDef, preset: string | null | undefined): Record<string, unknown> {
+  if (!preset || preset === "1") return {};
+  if (def.presets && Object.hasOwn(def.presets, preset)) return def.presets[preset];
+  if (def.badgeField && def.badgeOptions?.some((o) => o.value === preset)) return { [def.badgeField]: preset };
+  return {};
 }

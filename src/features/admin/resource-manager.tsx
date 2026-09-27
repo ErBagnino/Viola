@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { useState, useTransition } from "react";
-import { ArrowDown, ArrowUp, Copy, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { ArrowDown, ArrowUp, Copy, Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Chip, Input } from "@/components/ui/fields";
 import { Sheet } from "@/components/ui/sheet";
@@ -14,7 +15,8 @@ import { formatDate, formatDateTime } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 import { createResourceAction, deleteResourceAction, reorderResourceAction, updateResourceAction } from "./actions";
 import { ResourceForm } from "./resource-form";
-import { defaultsFor, getResource, type Option } from "./resources";
+import { ContentPreview, PREVIEWABLE, type PreviewContext } from "./content-preview";
+import { defaultsFor, getResource, newValuesFor, type Option } from "./resources";
 import { callAction } from "@/utils/call-action";
 
 type Row = Record<string, unknown> & { id: string };
@@ -37,6 +39,8 @@ export function ResourceManager({
   thumbs = {},
   extraOptions,
   lockedDefaults,
+  initialNew,
+  preview,
 }: {
   resourceKey: string;
   rows: Row[];
@@ -44,6 +48,10 @@ export function ResourceManager({
   extraOptions?: Record<string, Option[]>;
   /** values forced on new records (e.g. phrases filtered by kind) */
   lockedDefaults?: Record<string, unknown>;
+  /** "?nuovo=…" quick action: open the new-item sheet straight away */
+  initialNew?: string | null;
+  /** names/texts for the "Così la vede Viola" preview */
+  preview?: PreviewContext;
 }) {
   const def = getResource(resourceKey)!;
   const router = useRouter();
@@ -51,7 +59,16 @@ export function ResourceManager({
   const [pending, start] = useTransition();
   const [q, setQ] = useState("");
   const [badge, setBadge] = useState<string | null>(null);
-  const [editing, setEditing] = useState<{ id: string | null; values: Record<string, unknown> } | null>(null);
+  const [editing, setEditing] = useState<{ id: string | null; values: Record<string, unknown> } | null>(() =>
+    initialNew && !def.noCreate ? { id: null, values: { ...defaultsFor(def), ...newValuesFor(def, initialNew), ...(lockedDefaults ?? {}) } } : null,
+  );
+  const [tab, setTab] = useState<"edit" | "preview">("edit");
+  const canPreview = Boolean(preview && PREVIEWABLE.has(def.key));
+
+  // "?nuovo=…" is a one-shot: drop it so a reload does not reopen the sheet.
+  useEffect(() => {
+    if (initialNew && typeof window !== "undefined" && window.location.search.includes("nuovo=")) window.history.replaceState(null, "", window.location.pathname);
+  }, [initialNew]);
   const [confirm, setConfirm] = useState<Row | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -66,10 +83,12 @@ export function ResourceManager({
 
   const openNew = () => {
     setErrors({});
+    setTab("edit");
     setEditing({ id: null, values: { ...defaultsFor(def), ...(lockedDefaults ?? {}) } });
   };
   const openEdit = (r: Row) => {
     setErrors({});
+    setTab("edit");
     setEditing({ id: r.id, values: { ...r } });
   };
 
@@ -144,6 +163,11 @@ export function ResourceManager({
           <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-muted" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca…" className="h-11 pl-10" aria-label="Cerca" />
         </div>
+        {def.viewHref && (
+          <Link href={def.viewHref} className="press inline-flex h-11 items-center gap-1.5 rounded-2xl px-3 text-sm font-bold text-vio-700 hover:bg-tint-50">
+            <Eye className="size-4" /> Come lo vede lei
+          </Link>
+        )}
       </div>
       {badges.length > 1 && (
         <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
@@ -159,7 +183,22 @@ export function ResourceManager({
       )}
 
       <div className="mt-4 space-y-2.5">
-        {list.length === 0 && <EmptyState title="Ancora niente qui" text={def.noCreate ? "Carica un file per iniziare." : "Tocca \"Nuovo\" per aggiungere il primo."} />}
+        {list.length === 0 &&
+          (rows.length > 0 ? (
+            <EmptyState title="Nessun risultato" text="Prova a cercare un'altra parola o togli il filtro." />
+          ) : (
+            <EmptyState
+              title="Ancora niente qui"
+              text={def.emptyText ?? (def.noCreate ? "Carica un file per iniziare." : "Aggiungi il primo: ci vuole un minuto.")}
+              action={
+                !def.noCreate && (
+                  <Button onClick={openNew}>
+                    <Plus className="size-4" /> Aggiungi il primo
+                  </Button>
+                )
+              }
+            />
+          ))}
         <AnimatePresence initial={false}>
           {list.map((r) => {
             const idx = rows.findIndex((x) => x.id === r.id);
@@ -191,6 +230,7 @@ export function ResourceManager({
                         variant="ghost"
                         onClick={() => {
                           setErrors({});
+                          setTab("edit");
                           const copy: Record<string, unknown> = { ...r };
                           delete copy.id;
                           if (typeof copy[def.titleField] === "string") copy[def.titleField] = `${copy[def.titleField]} (copia)`;
@@ -245,7 +285,27 @@ export function ResourceManager({
               save();
             }}
           >
-            <ResourceForm fields={formFields} values={editing.values} onChange={(p) => setEditing((ed) => (ed ? { ...ed, values: { ...ed.values, ...p } } : ed))} extraOptions={extraOptions} errors={errors} />
+            {canPreview && (
+              <div className="mb-4 grid grid-cols-2 gap-1 rounded-2xl bg-tint-50 p-1" role="tablist" aria-label="Modifica o anteprima">
+                {(["edit", "preview"] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t}
+                    onClick={() => setTab(t)}
+                    className={cn("h-10 rounded-xl text-sm font-extrabold transition-colors", tab === t ? "bg-surface text-vio-900 shadow-soft" : "text-ink-soft")}
+                  >
+                    {t === "edit" ? "Modifica" : `Come la vede ${preview!.violaName}`}
+                  </button>
+                ))}
+              </div>
+            )}
+            {canPreview && tab === "preview" ? (
+              <ContentPreview resourceKey={def.key} values={editing.values} ctx={preview!} />
+            ) : (
+              <ResourceForm fields={formFields} values={editing.values} onChange={(p) => setEditing((ed) => (ed ? { ...ed, values: { ...ed.values, ...p } } : ed))} extraOptions={extraOptions} errors={errors} />
+            )}
             <div className="sticky -bottom-8 mt-6 flex gap-3 bg-cream-50 pt-3 pb-2">
               <Button variant="soft" className="flex-1" onClick={() => setEditing(null)}>
                 Annulla

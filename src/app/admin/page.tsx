@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Bell, Camera, MailPlus, Wand2 } from "lucide-react";
+import { ArrowRight, Bell, Eye, Wand2 } from "lucide-react";
 import { AdminHeader } from "@/components/layout/admin-header";
 import { Icon } from "@/components/ui/icon";
 import { createClient } from "@/lib/supabase/server";
@@ -10,7 +10,8 @@ import { getHeartState } from "@/server/hearts";
 import { HeartExchange } from "@/features/hearts/heart-exchange";
 import { NextSteps, ReadinessHero } from "@/features/readiness/readiness-hero";
 import { getReadiness } from "@/server/readiness";
-import { MOODS } from "@/features/content/constants";
+import { describeAudit } from "@/features/admin/audit-labels";
+import { MOODS, REQUEST_STATUS } from "@/features/content/constants";
 import { formatDateTime, relativeTime, todayKey } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 
@@ -25,7 +26,7 @@ export default async function AdminDashboard() {
   const tz = settings.general.timezone;
   const viola = settings.general.violaName;
 
-  const [reqNew, reqRecent, msgUnread, msgRecent, moods, photos, dedications, memories, usage, activity, status] = await Promise.all([
+  const [reqNew, reqRecent, msgUnread, msgRecent, moods, photos, dedications, memories, usage, activity, status, fixes] = await Promise.all([
     supabase.from("adam_requests").select("*").eq("status", "new").order("created_at", { ascending: false }),
     supabase.from("adam_requests").select("*").order("created_at", { ascending: false }).limit(5),
     supabase.from("messages").select("id", { count: "exact", head: true }).is("read_at", null),
@@ -37,6 +38,7 @@ export default async function AdminDashboard() {
     supabase.from("ai_usage_daily").select("*").eq("day", todayKey(tz)),
     supabase.from("activity_events").select("*").order("created_at", { ascending: false }).limit(6),
     getNotificationStatus(settings, admin.id),
+    supabase.from("admin_audit_logs").select("id, action, target_table, target_id, before, after, created_at").neq("action", "message_read").order("created_at", { ascending: false }).limit(6),
   ]);
   const [hearts, readiness] = await Promise.all([getHeartState(admin.id), getReadiness(admin.id, settings)]);
 
@@ -101,18 +103,34 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-4">
-        {[
-          { href: "/admin/foto", label: "Carica foto", icon: Camera },
-          { href: "/admin/dediche", label: "Nuova dedica", icon: MailPlus },
-          { href: "/admin/copilot", label: "AI Copilot", icon: Wand2 },
-          { href: "/viola", label: "Guarda come Viola", icon: ArrowRight },
-        ].map((a) => (
-          <Link key={a.href} href={a.href} className="press flex items-center gap-2 rounded-2xl bg-wine-700 px-4 py-3 text-sm font-extrabold text-white shadow-soft">
-            <a.icon className="size-4" /> {a.label}
+      <section aria-labelledby="quick">
+        <h2 id="quick" className="sr-only">
+          Azioni rapide
+        </h2>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+          {[
+            { href: "/admin/dediche?nuovo=1", label: "Dedica", icon: "mail-heart" },
+            { href: "/admin/ricordi?nuovo=1", label: "Ricordo", icon: "book-heart" },
+            { href: "/admin/foto", label: "Foto", icon: "camera" },
+            { href: "/admin/countdown?nuovo=1", label: "Countdown", icon: "hourglass" },
+            { href: "/admin/sorprese?nuovo=1", label: "Sorpresa", icon: "gift" },
+            { href: "/admin/audio?nuovo=1", label: "Audio", icon: "mic" },
+          ].map((a) => (
+            <Link key={a.href} href={a.href} className="press flex flex-col items-center gap-1 rounded-2xl bg-wine-700 px-2 py-3 text-sm font-extrabold text-white shadow-soft">
+              <Icon name={a.icon} className="size-5 text-lg" />
+              <span>+ {a.label}</span>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <Link href="/viola" className="press flex items-center justify-center gap-2 rounded-2xl bg-surface px-4 py-3 text-sm font-extrabold text-vio-800 ring-1 ring-line">
+            <Eye className="size-4" /> Vedi come Viola
           </Link>
-        ))}
-      </div>
+          <Link href="/admin/copilot" className="press flex items-center justify-center gap-2 rounded-2xl bg-surface px-4 py-3 text-sm font-extrabold text-vio-800 ring-1 ring-line">
+            <Wand2 className="size-4" /> AI Copilot
+          </Link>
+        </div>
+      </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="paper rounded-4xl p-5">
@@ -126,7 +144,7 @@ export default async function AdminDashboard() {
                   <span className="min-w-0 truncate">
                     <b>{formatDateTime(r.created_at, tz)}</b> {r.message ? `· ${r.message}` : ""}
                   </span>
-                  <span className="shrink-0 rounded-full bg-lilac-100 px-2 py-0.5 text-[11px] font-extrabold text-lilac-600 uppercase">{r.status}</span>
+                  <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-extrabold", REQUEST_STATUS[r.status]?.cls)}>{REQUEST_STATUS[r.status]?.label ?? r.status}</span>
                 </li>
               ))}
             </ul>
@@ -141,7 +159,7 @@ export default async function AdminDashboard() {
               {msgRecent.data!.map((m) => (
                 <li key={m.id} className="rounded-2xl bg-surface/70 px-3 py-2 text-sm">
                   <span className="text-xs font-bold text-ink-muted">{formatDateTime(m.created_at, tz)}</span>
-                  {!m.read_at && <span className="ml-2 rounded-full bg-rouge-500 px-1.5 text-[10px] font-extrabold text-white">NUOVO</span>}
+                  {!m.read_at && <span className="ml-2 rounded-full bg-rouge-500 px-1.5 text-[10px] font-extrabold text-white">nuovo</span>}
                   <p className="line-clamp-2 text-vio-900">{m.body}</p>
                 </li>
               ))}
@@ -159,6 +177,38 @@ export default async function AdminDashboard() {
               </span>
             ))}
           </div>
+        </section>
+        <section className="paper rounded-4xl p-5">
+          <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Ultime cose che hai sistemato</h2>
+          {(fixes.data ?? []).length === 0 ? (
+            <p className="text-sm text-ink-muted">Ancora niente: quando aggiungi o modifichi qualcosa, lo trovi qui.</p>
+          ) : (
+            <ul className="space-y-1.5 text-sm">
+              {fixes.data!.map((a) => {
+                const d = describeAudit(a);
+                const body = (
+                  <>
+                    <span className="min-w-0 truncate font-bold text-vio-900">{d.text}</span>
+                    <span className="shrink-0 text-ink-muted">{relativeTime(a.created_at)}</span>
+                  </>
+                );
+                return (
+                  <li key={a.id}>
+                    {d.href ? (
+                      <Link href={d.href} className="flex justify-between gap-2 hover:underline">
+                        {body}
+                      </Link>
+                    ) : (
+                      <span className="flex justify-between gap-2">{body}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <Link href="/admin/registro" className="mt-3 inline-block text-xs font-bold text-vio-600 hover:underline">
+            Tutto il registro →
+          </Link>
         </section>
         <section className="paper rounded-4xl p-5">
           <h2 className="mb-3 font-display text-lg font-semibold text-vio-900">Attività recente</h2>

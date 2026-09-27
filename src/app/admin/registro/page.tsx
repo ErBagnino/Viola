@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/server/settings";
 import { formatDateTime } from "@/utils/dates";
 import Link from "next/link";
+import { describeAudit } from "@/features/admin/audit-labels";
 
 export const metadata = { title: "Registro" };
 
@@ -26,7 +27,7 @@ export default async function RegistroPage({ searchParams }: PageProps<"/admin/r
     rows = (data ?? []).map((a) => ({ id: a.id, when: a.created_at, title: a.type.replace(/_/g, " "), detail: JSON.stringify(a.payload).slice(0, 200) }));
   } else {
     const { data } = await supabase.from("admin_audit_logs").select("*").order("created_at", { ascending: false }).limit(150);
-    rows = (data ?? []).map((a) => ({ id: a.id, when: a.created_at, title: `${a.action}${a.target_table ? ` · ${a.target_table}` : ""}${a.target_id ? ` · ${a.target_id.slice(0, 8)}` : ""}`, detail: a.after ? JSON.stringify(a.after).slice(0, 220) : a.before ? `prima: ${JSON.stringify(a.before).slice(0, 200)}` : "" }));
+    rows = (data ?? []).map((a) => ({ id: a.id, when: a.created_at, title: describeAudit(a).text, detail: a.after ? JSON.stringify(a.after).slice(0, 220) : a.before ? `prima: ${JSON.stringify(a.before).slice(0, 200)}` : "" }));
   }
   return (
     <div>

@@ -55,3 +55,28 @@ describe("admin resource registry", () => {
     expect(data).toMatchObject({ breathing_enabled: true, ai_avatar_enabled: false });
   });
 });
+
+describe("quick actions (?nuovo=…)", async () => {
+  const { RESOURCES, newValuesFor } = await import("@/features/admin/resources");
+  type ResourceDef = import("@/features/admin/resources").ResourceDef;
+  const { describeAudit } = await import("@/features/admin/audit-labels");
+
+  it("named presets and badge values prefill the form; anything else is ignored", () => {
+    expect(newValuesFor(RESOURCES.countdowns, "meeting")).toMatchObject({ kind: "meeting", recurring_yearly: false });
+    expect(newValuesFor(RESOURCES.countdowns, "birthday")).toMatchObject({ kind: "birthday", recurring_yearly: true });
+    expect(newValuesFor(RESOURCES.dedications, "sad")).toEqual({ category: "sad" });
+    expect(newValuesFor(RESOURCES.dedications, "1")).toEqual({});
+    expect(newValuesFor(RESOURCES.dedications, "is_published")).toEqual({});
+    expect(newValuesFor(RESOURCES.dedications, "__proto__")).toEqual({});
+    expect(newValuesFor(RESOURCES.countdowns, "__proto__")).toEqual({});
+    expect(newValuesFor(RESOURCES.countdowns, "toString")).toEqual({});
+    for (const def of Object.values(RESOURCES) as ResourceDef[])
+      for (const values of Object.values(def.presets ?? {})) expect(def.schema.safeParse({ ...values, title: "x", target_at: "2026-10-10T10:00:00Z" }).success).toBe(true);
+  });
+
+  it("the audit log speaks Italian", () => {
+    expect(describeAudit({ action: "create", target_table: "dedications", target_id: "x", before: null, after: { title: "Per te" } }).text).toBe("Hai aggiunto dedica: “Per te”");
+    expect(describeAudit({ action: "settings", target_table: "app_settings", target_id: "contact", before: null, after: {} }).text).toBe("Hai cambiato le impostazioni: Contatti");
+    expect(describeAudit({ action: "readiness.done", target_table: "readiness_checks", target_id: "install-adam", before: null, after: null }).text).toBe("Hai spuntato “Installa Vio ♡ sul tuo telefono”");
+  });
+});

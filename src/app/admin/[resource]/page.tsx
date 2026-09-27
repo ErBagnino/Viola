@@ -4,17 +4,33 @@ import { ResourceManager } from "@/features/admin/resource-manager";
 import { resourceBySlug } from "@/features/admin/resources";
 import { listRows } from "@/server/admin/crud";
 import { adminThumbs } from "@/server/admin/thumbs";
+import { getSettings } from "@/server/settings";
 
-export default async function ResourcePage({ params }: PageProps<"/admin/[resource]">) {
-  const { resource } = await params;
+export default async function ResourcePage({ params, searchParams }: PageProps<"/admin/[resource]">) {
+  const [{ resource }, { nuovo }] = await Promise.all([params, searchParams]);
   const def = resourceBySlug(resource);
   if (!def || def.key === "media") notFound();
-  const rows = await listRows(def.key);
+  const [rows, settings] = await Promise.all([listRows(def.key), getSettings()]);
   const thumbs = await adminThumbs(rows);
+  const { general, texts } = settings;
   return (
     <div>
       <AdminHeader title={def.label} description={def.description} icon={def.icon} />
-      <ResourceManager resourceKey={def.key} rows={rows} thumbs={thumbs} />
+      <ResourceManager
+        resourceKey={def.key}
+        rows={rows}
+        thumbs={thumbs}
+        initialNew={typeof nuovo === "string" ? nuovo.slice(0, 30) : null}
+        preview={{
+          adamName: general.adamName,
+          violaName: general.violaName,
+          signature: general.signature,
+          timezone: general.timezone,
+          meetingLead: texts.countdownMeetingLead,
+          todayText: texts.countdownToday,
+          daAdam: general.showDaAdam ? "Da Adam ♡" : "",
+        }}
+      />
     </div>
   );
 }

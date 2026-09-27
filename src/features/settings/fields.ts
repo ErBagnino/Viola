@@ -49,6 +49,7 @@ export const SETTINGS_FORMS: Partial<Record<SettingsKey, { title: string; descri
       { name: "needAdamButton", label: "Testo del grande pulsante", type: "text", half: true },
       { name: "needAdamPlaceholder", label: "Suggerimento messaggio", type: "text" },
       { name: "needAdamSent", label: "Conferma quando la notifica è arrivata", type: "text" },
+      { name: "quickReplies", label: "Risposte rapide (le invii con un tocco)", type: "list", hint: "Compaiono in \"Ho bisogno di Adam\" nel tuo pannello" },
       { name: "needAdamFallback", label: "Messaggio se nessuna notifica è partita", type: "text" },
       { name: "quizPerfect", label: "Quiz: tutte giuste", type: "text" },
       { name: "quizGood", label: "Quiz: quasi tutte", type: "text", half: true },

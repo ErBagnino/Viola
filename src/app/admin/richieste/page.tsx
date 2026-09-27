@@ -25,11 +25,11 @@ export default async function RichiestePage() {
   }));
   return (
     <div className="space-y-5">
-      <AdminHeader title="HO BISOGNO DI ADAM" description={`Le richieste di ${settings.general.violaName}, con ora, messaggio e canali di notifica.`} icon="heart-handshake" />
+      <AdminHeader title="Ho bisogno di Adam" description={`Le richieste di ${settings.general.violaName}, con ora, messaggio e canali di notifica.`} icon="heart-handshake" />
       <div className="paper rounded-4xl p-4">
         <PushToggle label="Ricevi le notifiche su questo dispositivo" />
       </div>
-      <RequestsList items={items} tz={settings.general.timezone} violaName={settings.general.violaName} />
+      <RequestsList items={items} tz={settings.general.timezone} violaName={settings.general.violaName} quickReplies={settings.texts.quickReplies} />
     </div>
   );
 }

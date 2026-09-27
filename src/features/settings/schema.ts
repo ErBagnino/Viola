@@ -72,6 +72,8 @@ export const textsSchema = z.object({
   needAdamButton: text(60, "HO BISOGNO DI ADAM ♡"),
   needAdamPlaceholder: text(120, "Vuoi aggiungere qualcosa? (facoltativo)"),
   needAdamSent: text(200, "Adam è stato avvisato. ♡ Arriva appena può."),
+  /** one-tap answers in Adam's "Ho bisogno di Adam" inbox */
+  quickReplies: list(120, ["Arrivo ♡", "Ti chiamo tra 5 minuti ♡", "Sono qui. Respira con me ♡", "Ti scrivo su WhatsApp adesso ♡"]),
   needAdamFallback: text(200, "Ho salvato la tua richiesta. Ora scrivigli direttamente. ♡"),
   hugTitle: text(80, "Voglio un abbraccio"),
   quizPerfect: text(160, "Mi conosci meglio di chiunque ♡"),

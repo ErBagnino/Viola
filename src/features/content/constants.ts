@@ -147,3 +147,11 @@ export const MESSAGE_CATEGORIES = {
 
 /** Pairs in the memory game (photos first, emoji for the rest). */
 export const MEMORY_PAIRS = 6;
+
+/** "Ho bisogno di Adam" request states, as Adam reads them. */
+export const REQUEST_STATUS: Record<string, { label: string; cls: string }> = {
+  new: { label: "Nuova", cls: "bg-rouge-500 text-white" },
+  seen: { label: "Vista", cls: "bg-lilac-200 text-lilac-600" },
+  responded: { label: "Hai risposto", cls: "bg-green-100 text-green-800" },
+  closed: { label: "Chiusa", cls: "bg-cream-200 text-ink-soft" },
+};

@@ -19,9 +19,11 @@ import { callAction } from "@/utils/call-action";
 
 export type LibraryItem = Record<string, unknown> & { id: string; kind: string; url: string; thumbUrl: string; size_bytes: number };
 
-export function MediaLibrary({ items, categories }: { items: LibraryItem[]; categories: string[] }) {
+export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola" }: { items: LibraryItem[]; categories: string[]; usage?: Record<string, string[]>; violaName?: string }) {
   const [tab, setTab] = useState<"image" | "audio">("image");
   const [cat, setCat] = useState<string | null>(null);
+  const [only, setOnly] = useState<"unused" | "private" | null>(null);
+  const usedIn = (m: LibraryItem) => usage[m.id] ?? [];
   const [edit, setEdit] = useState<LibraryItem | null>(null);
   const [confirmDel, setConfirmDel] = useState(false);
   const [meta, setMeta] = useState({ category: "noi", contexts: ["gallery", "breathing", "home", "surprises", "memories", "dedications"], include_in_random: true, visibility: "shared" as "shared" | "private" });
@@ -30,7 +32,18 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
   const router = useRouter();
   const def = RESOURCES.media;
 
-  const list = useMemo(() => items.filter((m) => m.kind === tab && (!cat || m.category === cat)), [items, tab, cat]);
+  const list = useMemo(
+    () =>
+      items.filter(
+        (m) =>
+          m.kind === tab &&
+          (!cat || m.category === cat) &&
+          (only === null || (only === "unused" ? !(usage[m.id] ?? []).length : m.visibility === "private")),
+      ),
+    [items, tab, cat, only, usage],
+  );
+  const unusedCount = items.filter((m) => m.kind === tab && !(usage[m.id] ?? []).length).length;
+  const privateCount = items.filter((m) => m.kind === tab && m.visibility === "private").length;
   const suggestions = Array.from(new Set([...MEDIA_CATEGORY_SUGGESTIONS, ...categories]));
 
   const save = () =>
@@ -111,21 +124,35 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
         </section>
       )}
 
-      {tab === "image" && categories.length > 1 && (
-        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          <Chip active={cat === null} onClick={() => setCat(null)}>
-            Tutte
+      <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="group" aria-label="Filtri">
+        <Chip active={cat === null && only === null} onClick={() => (setCat(null), setOnly(null))}>
+          Tutte
+        </Chip>
+        {unusedCount > 0 && (
+          <Chip active={only === "unused"} onClick={() => setOnly(only === "unused" ? null : "unused")}>
+            Non usate ({unusedCount})
           </Chip>
-          {categories.map((c) => (
-            <Chip key={c} active={cat === c} onClick={() => setCat(c)}>
+        )}
+        {privateCount > 0 && (
+          <Chip active={only === "private"} onClick={() => setOnly(only === "private" ? null : "private")}>
+            Private ({privateCount})
+          </Chip>
+        )}
+        {tab === "image" &&
+          categories.length > 1 &&
+          categories.map((c) => (
+            <Chip key={c} active={cat === c} onClick={() => setCat(cat === c ? null : c)}>
               {c}
             </Chip>
           ))}
-        </div>
-      )}
+      </div>
 
       {list.length === 0 ? (
-        <EmptyState title={tab === "image" ? "Nessuna foto ancora" : "Nessun audio ancora"} text="Caricane qui sopra ♡" />
+        only === "unused" ? (
+          <EmptyState title="Tutto è usato da qualche parte ♡" text="Nessun file dimenticato." />
+        ) : (
+          <EmptyState title={tab === "image" ? "Nessuna foto ancora" : "Nessun audio ancora"} text="Caricane qui sopra ♡" />
+        )
       ) : tab === "image" ? (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {list.map((m) => (
@@ -136,6 +163,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
                 {m.visibility === "private" && <Lock className="size-5 rounded-full bg-black/60 p-1 text-white" />}
                 {Boolean(m.breathing_enabled) && <Wind className="size-5 rounded-full bg-black/60 p-1 text-white" />}
               </span>
+              {usedIn(m).length === 0 && <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white">non usata</span>}
               {typeof m.title === "string" && m.title && <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 px-2 pt-4 pb-1 text-left text-[11px] font-bold text-white">{m.title}</span>}
             </button>
           ))}
@@ -147,6 +175,7 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
               <Music className="size-5 shrink-0 text-vio-500" />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-vio-900">{String(m.title ?? "Audio")}</p>
+                <p className="truncate text-xs text-ink-muted">{usedIn(m).length ? `Usato in: ${usedIn(m).join(", ")}` : "Non ancora usato"}</p>
                 <audio src={m.url} controls preload="none" className="mt-1 h-9 w-full" />
               </div>
               <Button size="sm" variant="soft" onClick={() => setEdit({ ...m })}>
@@ -166,6 +195,22 @@ export function MediaLibrary({ items, categories }: { items: LibraryItem[]; cate
             ) : (
               <audio src={edit.url} controls className="w-full" />
             )}
+            <div className="rounded-2xl bg-tint-50 p-3">
+              <p className="text-xs font-extrabold tracking-wider text-ink-muted uppercase">Dove la vede {violaName}</p>
+              {edit.visibility === "private" ? (
+                <p className="mt-1 text-sm font-bold text-vio-800">Da nessuna parte: è privata (la vedi solo tu).</p>
+              ) : usedIn(edit).length ? (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {usedIn(edit).map((u) => (
+                    <span key={u} className="rounded-full bg-surface px-2.5 py-1 text-xs font-bold text-vio-800 ring-1 ring-line">
+                      {u}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-ink-soft">Ancora da nessuna parte. Scegli sotto dove può comparire, o usala in una dedica o in un ricordo.</p>
+              )}
+            </div>
             <p className="text-xs text-ink-muted">
               {Math.round(edit.size_bytes / 1024)} KB{edit.width ? ` · ${String(edit.width)}×${String(edit.height)}` : ""} · caricata il {formatDate(String(edit.created_at))}
             </p>

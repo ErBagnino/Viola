@@ -11,6 +11,7 @@ import { cn } from "@/utils/cn";
 import { formatDateTime, relativeTime } from "@/utils/dates";
 import { respondToRequest, setRequestStatus } from "./inbox-actions";
 import { callAction } from "@/utils/call-action";
+import { REQUEST_STATUS } from "@/features/content/constants";
 
 export type RequestView = {
   id: string;
@@ -23,14 +24,10 @@ export type RequestView = {
   events: { channel: string; status: string; detail: string | null }[];
 };
 
-const STATUS: Record<string, { label: string; cls: string }> = {
-  new: { label: "NEW", cls: "bg-rouge-500 text-white" },
-  seen: { label: "SEEN", cls: "bg-lilac-200 text-lilac-600" },
-  responded: { label: "RESPONDED", cls: "bg-green-100 text-green-800" },
-  closed: { label: "CLOSED", cls: "bg-cream-200 text-ink-soft" },
-};
+const STATUS = REQUEST_STATUS;
+const CHANNEL: Record<string, string> = { telegram: "Telegram", webpush: "Notifica push", whatsapp: "WhatsApp", none: "Avviso automatico" };
 
-export function RequestsList({ items, tz, violaName }: { items: RequestView[]; tz: string; violaName: string }) {
+export function RequestsList({ items, tz, violaName, quickReplies = [] }: { items: RequestView[]; tz: string; violaName: string; quickReplies?: string[] }) {
   const [pending, start] = useTransition();
   const [replying, setReplying] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -66,13 +63,22 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
             {r.events.length === 0 && <span className="rounded-full bg-cream-200 px-2.5 py-1 font-bold text-ink-soft">nessuna notifica registrata</span>}
             {r.events.map((e, i) => (
               <span key={i} className={cn("rounded-full px-2.5 py-1 font-bold", e.status === "sent" ? "bg-green-100 text-green-800" : "bg-blush-100 text-vio-800")} title={e.detail ?? ""}>
-                {e.channel}: {e.status === "sent" ? "inviata ✓" : `fallita${e.detail ? ` (${e.detail.slice(0, 40)})` : ""}`}
+                {CHANNEL[e.channel] ?? e.channel}: {e.status === "sent" ? "arrivata ✓" : e.status === "skipped" || e.status === "not_configured" ? "non attiva" : `non arrivata${e.detail ? ` (${e.detail.slice(0, 40)})` : ""}`}
               </span>
             ))}
           </div>
           {r.response && <p className="mt-3 rounded-2xl bg-surface/80 px-3 py-2 text-sm text-vio-800">La tua risposta: {r.response}</p>}
           {replying === r.id ? (
             <div className="mt-3 space-y-2">
+              {quickReplies.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {quickReplies.map((q) => (
+                    <button key={q} type="button" onClick={() => setText(q)} className="press rounded-full bg-blush-100 px-3 py-1.5 text-xs font-bold text-vio-800">
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              )}
               <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={`Scrivi a ${violaName}… (riceverà una notifica se l'ha abilitata)`} />
               <div className="flex gap-2">
                 <Button size="sm" variant="soft" onClick={() => setReplying(null)}>
@@ -98,13 +104,31 @@ export function RequestsList({ items, tz, violaName }: { items: RequestView[]; t
             </div>
           ) : (
             <div className="mt-4 flex flex-wrap gap-2">
+              {r.status !== "closed" && r.status !== "responded" && quickReplies.length > 0 && (
+                <div className="w-full">
+                  <p className="mb-1.5 text-xs font-extrabold tracking-wider text-ink-muted uppercase">Rispondi con un tocco</p>
+                  <div className="flex flex-wrap gap-1.5" role="group" aria-label="Risposte rapide">
+                    {quickReplies.slice(0, 4).map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        disabled={pending}
+                        onClick={() => run(() => respondToRequest(r.id, q), `Inviato a ${violaName}: ${q}`)}
+                        className="press min-h-10 rounded-full bg-blush-100 px-3.5 py-2 text-sm font-bold text-vio-800 ring-1 ring-blush-200 disabled:opacity-60"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {r.status === "new" && (
                 <Button size="sm" variant="soft" onClick={() => run(() => setRequestStatus(r.id, "seen"))} loading={pending}>
                   <Eye className="size-4" /> Segna come vista
                 </Button>
               )}
               <Button size="sm" onClick={() => setReplying(r.id)}>
-                <MessageCircleReply className="size-4" /> Rispondi
+                <MessageCircleReply className="size-4" /> {quickReplies.length ? "Scrivi tu" : "Rispondi"}
               </Button>
               {r.status !== "closed" ? (
                 <Button size="sm" variant="ghost" onClick={() => run(() => setRequestStatus(r.id, "closed"))}>

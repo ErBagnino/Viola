@@ -30,6 +30,6 @@ export async function mediaPreview(id: string) {
     const supabase = await createClient();
     const { data } = await supabase.from("media").select("*").eq("id", id).maybeSingle();
     const [m] = await signMedia(supabase, [data]);
-    return { item: m ? { id: m.id, kind: m.kind, url: m.url, thumbUrl: m.thumbUrl, title: m.title } : null };
+    return { item: m ? { id: m.id, kind: m.kind, url: m.url, thumbUrl: m.thumbUrl, title: m.title, shared: data?.visibility === "shared" } : null };
   });
 }

@@ -70,7 +70,7 @@ export function OfflineKit() {
           <p className="text-sm text-ink-soft">{online ? "Puoi tornare all'app." : "Queste cose funzionano anche senza internet."}</p>
         </div>
         {online && (
-          <Link href="/viola" className="ml-auto rounded-full bg-wine-700 px-4 py-2 text-sm font-bold text-white">
+          <Link href="/viola" className="ml-auto inline-flex min-h-11 shrink-0 items-center rounded-full bg-wine-700 px-4 text-sm font-bold text-white">
             Entra
           </Link>
         )}
@@ -81,7 +81,7 @@ export function OfflineKit() {
         onChange={setTab}
         options={[
           { value: "respira", label: "Respira" },
-          { value: "54321", label: "5-4-3-2-1" },
+          { value: "54321", label: "5‑4‑3‑2‑1" },
           { value: "grounding", label: "Piedi a terra" },
           { value: "idee", label: "Idee" },
         ]}

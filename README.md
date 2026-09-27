@@ -6,6 +6,8 @@ Web app personale e privata (PWA installabile su iPhone e Android) per due perso
 
 > Non è una terapia e non sostituisce professionisti. In pericolo: **112**.
 
+👉 **Hai già l'app online con un database creato prima del 28/09/2026?** Esegui una volta `supabase/update.sql` nello SQL Editor di Supabase ([SETUP.md, passo 5](./SETUP.md#5-migrations)).
+
 👉 **Per metterla online segui [SETUP.md](./SETUP.md)** (passo dopo passo, tutto gratuito). Descrizione completa del progetto: [PROGETTO.md](./PROGETTO.md).
 
 ---
@@ -13,13 +15,15 @@ Web app personale e privata (PWA installabile su iPhone e Android) per due perso
 ## Cosa c'è dentro
 
 ### Area di Viola (`/viola`)
-- **Home configurabile**: saluto, frase casuale, "Aiutami adesso", "Come ti senti?", card "Di cosa hai bisogno?", sorpresa del giorno, countdown, distanza. Ordine, testi, icone e colori decisi da Adam.
+- **Home configurabile**: saluto, frase casuale, "Aiutami adesso", "Come ti senti?", **Cuore a distanza**, card "Di cosa hai bisogno?", sorpresa del giorno, countdown, distanza. Ordine, testi, icone e colori decisi da Adam. "Ho bisogno di Adam" è **sempre** raggiungibile (in home e in alto a destra in ogni pagina), anche se Adam non lo mette tra i moduli; senza moduli c'è una home di partenza.
+- **Momenti speciali**: nel giorno di un compleanno, anniversario o incontro (i countdown di Adam) la home si apre con una card dedicata e una piccola festa di cuori. I countdown dicono "Mancano 12 giorni per rivederti" e, il giorno stesso, "È oggi. ♡".
 - **Calma**: 8 modalità visive (cuore, fiore, onda, stella, respiro visivo, orbita, particelle, cerchio luminoso) con timer 1/2/5 min/libero; **respirazione guidata** con preset configurabili, forma che cresce/si ferma/si riduce, **foto di Adam che da sfocata diventa nitida** e frasi ("Respira con me."); grounding passo-passo; **5-4-3-2-1** interattivo; percorso **"Ho paura"** a schermo intero; **"Aiutami adesso"** (motore casuale pesato, senza ripetizioni immediate).
 - **HO BISOGNO DI ADAM**: crea la richiesta, avvisa Adam (Telegram → Web Push), mostra sempre WhatsApp e "Chiama Adam". Stati NEW / SEEN / RESPONDED / CLOSED e risposta di Adam.
-- **Noi**: galleria (polaroid, mosaico, timeline, grande + lightbox), "Fammi vedere noi", ricordi, dediche "Per te ♡", buste "Aprimi quando…", countdown, distanza Torino ↔ Rosolina (senza GPS), capsule del tempo (il testo resta segreto fino alla data, garantito dal database), la voce di Adam (audio).
-- **Adam AI** (Gemini): chat vera per qualsiasi domanda, modalità General / Personal / Comfort, azioni rapide, streaming, stop, rigenera, copia, elimina, cronologia, Markdown, e **strumenti dell'app** (avvia respirazione, mostra una foto, una dedica, un ricordo, WhatsApp…).
-- **Altro**: umore (senza diagnosi), diario privato/condiviso, scrivi ad Adam, giochi (memory con le foto, trova il cuore, puzzle, quiz "quanto mi conosci?", acchiappa i cuori, termometro, domande, roulette), sorprendimi, una cosa per te, abbraccio, buongiorno, buonanotte, notifiche, cancella i miei dati.
-- **Onboarding** mostrato una sola volta; **offline**: respirazione, 5-4-3-2-1, grounding e idee di conforto funzionano senza rete.
+- **Noi**: **Cuore a distanza** (un tocco = "ti penso"; Adam lo vede e può rimandarne uno), "Insieme da N giorni ♡" (facoltativo), galleria (polaroid, mosaico, timeline, grande + lightbox), "Fammi vedere noi", ricordi (con "Sei qui ♡" e la prossima data), dediche "Per te ♡", buste "Aprimi quando…" (con "Scegli tu per me"), countdown, distanza Torino ↔ Rosolina (senza GPS), capsule del tempo (il testo resta segreto fino alla data, garantito dal database), la voce di Adam (audio).
+- **Adam AI** (Gemini): chat vera per qualsiasi domanda, modalità Generale / Personale / **Conforto** (risposte brevissime e scorciatoie dirette: respira, grounding, 5-4-3-2-1, una foto, un ricordo, scrivi ad Adam), streaming, stop, rigenera, copia, elimina, cronologia, Markdown, e **strumenti dell'app** (avvia respirazione, mostra una foto, una dedica, un ricordo, WhatsApp…).
+- **Altro**: umore (senza diagnosi), diario privato/condiviso, scrivi ad Adam, giochi (memory con le foto, trova il cuore, puzzle, quiz "quanto mi conosci?", acchiappa i cuori, termometro, domande, roulette, **indovina il ricordo**), sorprendimi, una cosa per te, abbraccio, buongiorno, buonanotte, notifiche, **La tua privacy** (chi vede cosa, in parole semplici, e l'interruttore "Adam può vedere quando uso esercizi e giochi"), cancella i miei dati. E qualche piccolo segreto da scoprire.
+- **Onboarding** mostrato una sola volta; **offline**: respirazione, 5-4-3-2-1, grounding e idee di conforto funzionano senza rete, e "Chiama Adam / Scrivi ad Adam" restano disponibili anche offline o se l'app va in errore.
+- **Tema chiaro e scuro automatici** (segue il telefono), nello stile dell'icona: nero, rosso e bianco.
 
 ### Dashboard di Adam (`/admin`)
 Panoramica con "♡ Viola ha bisogno di te", richieste, inbox messaggi e diario condiviso, umore, **home builder**, dediche, foto e audio (upload multiplo drag & drop), ricordi, open when, countdown, capsule, sorprese, frasi, quiz, comfort, respirazione (+ foto del respiro), grounding, **profilo e personalità di Adam AI**, memoria dell'AI, **AI Copilot** (crea/modifica contenuti a parole, con conferma per eliminazioni e disattivazioni), **Notification Center** (stato, test, chat ID Telegram guidato), impostazioni (tutti i testi), **Cost Control**, import/export JSON, registro (audit, strumenti AI, attività).
@@ -91,7 +95,8 @@ tests/            unit test + test RLS sulle migrazioni reali
 ## Sicurezza
 
 - **RLS su ogni tabella**, niente "allow all": `anon` non legge nulla; account "pending" non vedono nulla; Viola legge solo contenuti pubblicati e i propri dati; **il diario privato e l'umore non condiviso sono invisibili anche all'admin**; conversazioni AI private al proprietario; capsule del tempo illeggibili prima della data; audit log solo in aggiunta.
-- Ruoli assegnabili solo via `app_metadata` (service role) o SQL: un utente non può promuoversi.
+- Ruoli assegnabili solo via `app_metadata` (service role) o SQL: un utente non può promuoversi. Le funzioni del database non sono eseguibili da chi non ha fatto l'accesso.
+- Nessuna pagina indicizzabile (`robots.txt`, `X-Robots-Tag: noindex`, meta robots).
 - `/admin` protetto lato server (layout + ogni server action/API verifica il ruolo). Nessuna password o chiave nel frontend: i segreti stanno solo nelle variabili d'ambiente server.
 - Upload: MIME verificato dai **magic bytes**, estensione, dimensione, bucket con limiti propri, **ri-codifica con sharp** (WebP, rimuove EXIF/GPS), URL firmati temporanei.
 - AI: niente SQL/file/codice arbitrari, solo strumenti espliciti validati con Zod; eliminazioni e disattivazioni richiedono conferma; log degli strumenti senza segreti; limiti giornalieri, al minuto e budget di token.
@@ -115,13 +120,13 @@ Database locale (opzionale, richiede Docker): `npx supabase start` applica migra
 | `npm run create-user -- --email … --password … --role admin\|user` | crea/aggiorna un account e il ruolo |
 | `npm run vapid` | genera le chiavi Web Push |
 | `npm run icons` | rigenera icone, favicon e splash iOS da `scripts/icon-svg.mjs` |
-| `npm run db:bundle` | rigenera `supabase/setup.sql` |
+| `npm run db:bundle` | rigenera `supabase/setup.sql` (progetti nuovi) e `supabase/update.sql` (aggiornamento dei progetti già installati) |
 
 ## Test
 
 `npm test` esegue:
 - **unit**: motore casuale, ciclo di respirazione, date/countdown/distanza, azioni e link sicuri, impostazioni, registro admin (incluso il bug "update parziale che resetta i default"), riconoscimento file, elaborazione foto (EXIF rimosso), catena di notifiche e provider Telegram (il token non finisce mai nei log), prompt dell'AI (niente segreti, niente fatti inventati), elenco strumenti AI, moduli server action;
-- **integrazione RLS**: le **migrazioni reali** vengono applicate a un Postgres embedded (PGlite) e ogni permesso di Viola, Adam, utenti in attesa e anonimi viene verificato.
+- **integrazione RLS**: le **migrazioni reali** vengono applicate a un Postgres embedded (PGlite) e ogni permesso di Viola, Adam, utenti in attesa e anonimi viene verificato, compresi i tentativi di attacco (scrivere a nome d'altri, cambiare lo stato delle richieste, leggere impostazioni o foto private, chiamare funzioni da anonimo, cuori falsificati).
 
 ## Icona
 

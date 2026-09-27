@@ -27,7 +27,9 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role, display_name, nickname, onboarded_at, share_activity")
+    // "*" on purpose: works both before and after supabase/update.sql adds
+    // share_activity, so a deploy never breaks an older database.
+    .select("*")
     .eq("id", claims.sub)
     .maybeSingle();
   // A failed lookup (database paused or unreachable) is not the same as

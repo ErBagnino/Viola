@@ -14,7 +14,7 @@ Tempo totale: circa **45–60 minuti**. Costo: **€0**. Non serve nessuna carta
 2. [Scaricare il progetto e `npm install`](#2-scaricare-il-progetto-e-npm-install)
 3. [Creare il progetto Supabase](#3-creare-il-progetto-supabase)
 4. [Creare il database](#4-creare-il-database)
-5. [Migrations (cosa sono e come aggiornarle)](#5-migrations)
+5. [Migrations e aggiornamenti del database (`update.sql`)](#5-migrations)
 6. [Auth: chiudere le registrazioni](#6-auth-chiudere-le-registrazioni)
 7. [Storage (foto e audio)](#7-storage-foto-e-audio)
 8. [Creare gli utenti Adam e Viola](#8-creare-gli-utenti-adam-e-viola)
@@ -104,9 +104,21 @@ Questo crea in un colpo solo: tutte le tabelle, la sicurezza (RLS) su ogni tabel
 
 I file in `supabase/migrations/` sono la "storia" del database. `supabase/setup.sql` è la loro somma, pronta da incollare.
 
-- Se in futuro aggiorni l'app e compare una **nuova** migration (es. `20270101…_qualcosa.sql`), apri solo quel file e incollalo nello SQL Editor.
+### Hai già eseguito `setup.sql` in passato? Aggiorna il database
+
+Se il database l'hai creato con una versione precedente dell'app (prima del 28 settembre 2026), esegui **una volta** anche **`supabase/update.sql`**:
+
+1. Supabase → **SQL Editor** → **New query**.
+2. Copia tutto `supabase/update.sql` (da GitHub: pulsante "Raw"), incollalo e premi **Run**.
+3. Deve comparire "Success". Si può rieseguire senza problemi: non cancella nulla.
+
+Aggiunge: una protezione in più sulle funzioni del database, l'interruttore privacy di Viola ("Adam può vedere quando uso esercizi e giochi") e il **Cuore a distanza**. Senza questo passo quelle funzioni danno un errore gentile, il resto dell'app funziona.
+
+> Su un progetto **nuovo** non serve: `setup.sql` contiene già tutto.
+
+- Per aggiornamenti futuri: `update.sql` contiene sempre tutte le migration successive alla prima versione, ed è sempre sicuro da rieseguire.
 - (Per sviluppatori) con il CLI di Supabase: `supabase link` e poi `supabase db push`.
-- Dopo aver modificato migration o seed, rigenera il file unico con `npm run db:bundle`.
+- Dopo aver modificato migration o seed, rigenera i file con `npm run db:bundle` (aggiorna `setup.sql` e `update.sql`).
 
 ## 6. Auth: chiudere le registrazioni
 
@@ -380,5 +392,11 @@ Su **Android** (Chrome): menu ⋮ → **Installa app** / "Aggiungi a schermata H
 | Web Push su iPhone non si attiva | L'app deve essere aperta dall'icona sulla Home (passo 25), iOS 16.4+. Controlla anche Impostazioni iPhone → Notifiche → Vio. |
 | Le foto non si caricano | Max 10 MB, solo JPEG/PNG/WEBP. Le foto dell'iPhone vengono convertite in automatico. |
 | L'app non si apre dopo giorni di inattività | Il progetto Supabase è in pausa: Supabase → Restore. Controlla il Cron (passo 22). |
+| Accesso: "Email o password non corrette" | Controlla con l'occhio accanto alla password che l'iPhone non abbia cambiato lettere. Se l'utente è stato creato dalla dashboard, deve avere "Auto Confirm User". |
+| Accesso: "La chiave di Supabase non è valida" | In `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` va la chiave **publishable** (o anon), non la secret. Poi Redeploy. |
+| Accesso: "Non riesco a collegarmi a Supabase" | `NEXT_PUBLIC_SUPABASE_URL` deve essere `https://xxxx.supabase.co`; controlla anche che il progetto non sia in pausa. Poi Redeploy. |
+| Accesso: "Il database non è pronto" | Esegui `supabase/setup.sql` (passo 4). |
+| "Cuore a distanza" o l'interruttore privacy danno errore | Esegui `supabase/update.sql` (passo 5). |
+| Dopo un aggiornamento l'app installata sembra vecchia | Chiudila del tutto e riaprila: ogni deploy installa un nuovo service worker e svuota le cache vecchie. |
 
 Buon lavoro, e buona casa a voi due. ♡

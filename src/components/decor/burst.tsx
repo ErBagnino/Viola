@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /** A little celebration of hearts — used when something is completed. */
 export function HeartBurst({ show, count = 14 }: { show: boolean; count?: number }) {

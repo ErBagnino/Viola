@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /** Two cities, an animated dashed line and hearts travelling between them (no GPS). */
 export function DistanceMap({ from, to, km, fromLabel, toLabel }: { from: string; to: string; km: number; fromLabel?: string; toLabel?: string }) {

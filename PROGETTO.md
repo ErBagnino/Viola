@@ -49,7 +49,10 @@ In ordine di priorità: **sicurezza > costo zero > semplicità > esperienza d'us
 Navigazione a schede in basso: **Home · Calma · Noi · Adam AI · Altro**.
 
 ### Home (`/viola`)
-Composta da **moduli configurabili** (ordine, testi, icone, colori, visibilità decisi da Adam in "Home builder"): saluto, frase casuale, pulsante **"Aiutami adesso"**, **"Come ti senti?"** (umore), card **"Di cosa hai bisogno?"** (Voglio calmarmi / parlare / distrarmi / sorridere…), **sorpresa del giorno**, **countdown**, **distanza**, pulsante **"Ho bisogno di Adam"**.
+Composta da **moduli configurabili** (ordine, testi, icone, colori, visibilità decisi da Adam in "Home builder"): saluto, frase casuale, pulsante **"Aiutami adesso"**, **"Come ti senti?"** (umore), **Cuore a distanza**, card **"Di cosa hai bisogno?"** (Voglio calmarmi / parlare / distrarmi / sorridere…), **sorpresa del giorno**, **countdown**, **distanza**, pulsante **"Ho bisogno di Adam"**.
+- **Garanzie**: "Ho bisogno di Adam" c'è **sempre** (se Adam lo toglie dai moduli viene rimesso dopo "Aiutami adesso"; in più c'è un cuore in alto a destra in ogni pagina di Viola). Senza moduli configurati si vede una home di partenza (`src/features/content/fallbacks.ts`).
+- **Momenti speciali**: il giorno di un countdown (compleanno, anniversario, incontro) la home si apre con una card "Oggi" e una festa di cuori (una volta al giorno).
+- Piccoli **easter egg**: 7 tocchi sul saluto mostrano un messaggio segreto (modificabile), alle 11:11 e 23:11 appare "esprimi un desiderio", 5 tocchi sul fiore della schermata di accesso.
 
 ### Calma (`/viola/calma`)
 - **Respira** (`/calma/respira`): respirazione guidata con **preset configurabili** (Respiro calmo, lento, a quadrato, lungo, della buonanotte…), una forma che cresce / si ferma / si riduce, frasi ("Respira con me.") e **foto di Adam che da sfocata diventa nitida** durante l'esercizio.
@@ -57,7 +60,7 @@ Composta da **moduli configurabili** (ordine, testi, icone, colori, visibilità 
 - **Grounding** (`/calma/grounding` e `/calma/grounding/[slug]`): esercizi passo-passo (piedi a terra, mani, la stanza…).
 - **5-4-3-2-1** (`/calma/54321`): gioco dei sensi interattivo.
 - **Ho paura** (`/calma/paura`): percorso a schermo intero, una cosa alla volta, con passi modificabili dall'admin e nota di sicurezza (112).
-- **Aiutami adesso** (`/calma/aiutami`): motore casuale **pesato** di "comfort actions" (20 iniziali), senza ripetere subito la stessa.
+- **Aiutami adesso** (`/calma/aiutami`): motore casuale **pesato** di "comfort actions" (20 iniziali), senza ripetere subito la stessa. Se non ce n'è nessuna, usa idee di conforto incorporate: non è mai una schermata vuota.
 
 ### Ho bisogno di Adam (`/viola/adam`)
 Il cuore dell'app. Viola preme il cuore (con un messaggio opzionale):
@@ -69,10 +72,12 @@ Anti-spam: al massimo 4 avvisi automatici ogni 10 minuti (i contatti diretti res
 
 ### Noi (`/viola/noi`)
 - **Foto** (`/noi/foto`): galleria con viste polaroid, mosaico, timeline, grande + lightbox. **"Fammi vedere noi"** (`/noi/foto/random`): una foto a caso con una frase.
-- **Ricordi** (`/noi/ricordi`): timeline dei momenti della coppia.
+- **Cuore a distanza** (in cima a Noi, in home e nella dashboard di Adam): un tocco manda un cuore; l'altro lo vede e può rimandarne uno. Notifica leggera al massimo ogni 10 minuti.
+- **"Insieme da N giorni ♡"**: sottotitolo di Noi, se Adam imposta la data in Impostazioni → Generale.
+- **Ricordi** (`/noi/ricordi`): timeline dei momenti della coppia, con **"Sei qui ♡"** e sopra la prossima data importante.
 - **Dediche** "Per te ♡" (`/noi/dediche`): messaggi di Adam per categoria (quando sei triste, quando mi manchi…), anche programmabili nel tempo.
-- **Aprimi quando…** (`/noi/aprimi`): buste da aprire in un certo stato d'animo, con animazione.
-- **Countdown** (`/noi/countdown`): quanto manca alle date importanti (prossimo incontro, anniversari…).
+- **Aprimi quando…** (`/noi/aprimi`): buste da aprire in un certo stato d'animo, con animazione; **"Scegli tu per me"** apre quella aperta meno volte.
+- **Countdown** (`/noi/countdown`): quanto manca alle date importanti, con frasi calde ("Mancano 12 giorni per rivederti", "È oggi. ♡"); tutto il giorno della data conta come "oggi" (fuso di Roma).
 - **Distanza** (`/noi/distanza`): Torino ↔ Rosolina calcolata da coordinate configurate, **senza GPS**.
 - **Capsule del tempo** (`/noi/capsule`): messaggi il cui testo resta **segreto fino alla data di apertura** (garantito dal database, non solo dall'interfaccia).
 - **La voce di Adam** (`/viola/audio`): vocali e canzoni caricate da Adam.
@@ -86,12 +91,16 @@ Chat con un assistente basato su **Gemini** (dettagli in §7).
 - **Scrivi ad Adam** (`/viola/scrivi`): messaggi per categoria (Un pensiero, Ti amo, Sono giù, Ho bisogno, Sono felice…); Adam li legge e risponde dall'inbox.
 - **Voglio parlare** (`/viola/parliamo`), **Voglio distrarmi** (`/viola/distraiti`), **Voglio sorridere** (`/viola/sorridi`).
 - **Sorprendimi** (`/viola/sorpresa`) e **Una cosa per te** (`/viola/oggi`, la sorpresa del giorno).
-- **Giochi** (`/viola/giochi`): memory con le loro foto, trova il cuore, puzzle, quiz "quanto mi conosci?", acchiappa i cuori (riflessi), termometro, domande, roulette.
+- **Giochi** (`/viola/giochi`): memory con le loro foto, trova il cuore, puzzle, quiz "quanto mi conosci?" (frasi finali modificabili), acchiappa i cuori (riflessi), termometro, domande, roulette, **indovina il ricordo** (foto sfocata + "Ti ricordi dov'eravamo?", poi si svela).
 - **Abbraccio** (`/viola/abbraccio`), **Buongiorno** (`/viola/buongiorno`), **Buonanotte** (`/viola/buonanotte`).
-- **Notifiche** (attiva/disattiva Web Push) e **Cancella i miei dati** (privacy).
+- **Notifiche** (attiva/disattiva Web Push).
+- **La tua privacy** (`/viola/privacy`): chi vede cosa, in parole semplici (cosa resta solo suo, cosa vede Adam, cosa sa Adam AI — comprese quante informazioni nascoste ha —, nota su Gemini), interruttore **"Adam può vedere quando uso esercizi e giochi"** e **Cancella i miei dati**.
 
 ### Offline
-Respirazione, 5-4-3-2-1, grounding e idee di conforto funzionano **senza connessione** (service worker con pagine precaricate e pagina `/offline`).
+Respirazione, 5-4-3-2-1, grounding e idee di conforto funzionano **senza connessione** (service worker con pagine precaricate e pagina `/offline`). I contatti diretti di Adam (telefono / WhatsApp) vengono ricordati sul telefono, così "Chiama Adam" compare anche offline e nelle schermate d'errore.
+
+### Tema e stile
+Tema **chiaro e scuro automatici** (seguono il telefono), con la palette dell'icona: carta bianca / nero, vino profondo e rosso dell'icona, tinte leggere. Le schermate immersive (paura, abbraccio, notte) hanno colori fissi; le "polaroid" restano bianche in entrambi i temi.
 
 ---
 
@@ -101,7 +110,7 @@ Protetta lato server (layout + ogni azione/API verifica il ruolo `admin`). Sezio
 
 | Area | Cosa fa |
 |---|---|
-| **Dashboard** | panoramica: "♡ Viola ha bisogno di te", richieste aperte, ultimi messaggi, umore, attività |
+| **Dashboard** | panoramica: "♡ Viola ha bisogno di te", **Cuore a distanza**, richieste aperte, ultimi messaggi, umore, attività |
 | **Ho bisogno di Adam** | lista richieste, "visto", rispondi, chiudi; esito di ogni canale di notifica |
 | **Messaggi** | inbox dei messaggi di Viola + pagine di diario **condivise** |
 | **Umore** | storico dell'umore condiviso |
@@ -125,7 +134,7 @@ Ogni contenuto ha: crea, modifica, duplica, elimina (con conferma), attiva/disat
 
 ### Adam AI (per Viola)
 - Chat vera per qualsiasi domanda, con **streaming**, stop, rigenera, copia, elimina, cronologia delle conversazioni, Markdown.
-- **Modalità**: *General* (assistente generico), *Personal* (conosce il contesto della coppia), *Comfort* (per i momenti difficili: frasi brevi, calma, strumenti dell'app).
+- **Modalità**: *Generale* (assistente generico), *Personale* (conosce il contesto della coppia), *Conforto* (per i momenti difficili: massimo 2-3 frasi, prima accoglie e poi propone UNA cosa concreta; sotto la chat compaiono scorciatoie dirette — Respira con me, Facciamo grounding, 5-4-3-2-1, Fammi vedere una foto, Apriamo un ricordo, Scrivi ad Adam, Ho bisogno di Adam — che funzionano anche se l'AI non risponde).
 - **Strumenti dell'app** (function calling) — l'AI può proporre azioni che diventano pulsanti nella chat:
   `start_breathing`, `start_grounding`, `start_panic_flow`, `start_5_4_3_2_1`, `show_random_photo`, `show_random_memory`, `show_random_dedication`, `show_open_when`, `show_surprise`, `open_gallery`, `open_countdown`, `start_distraction`, `open_whatsapp_adam`.
 - **Memoria**: solo i fatti inseriti da Adam in "Memoria AI" (nella modalità General solo il soprannome). L'AI non inventa ricordi.
@@ -140,7 +149,7 @@ Ogni contenuto ha: crea, modifica, duplica, elimina (con conferma), attiva/disat
 - Può ricevere allegati (foto) dall'admin.
 
 ### Modelli e limiti
-- Modello di default `gemini-flash-latest`, fallback `gemini-flash-lite-latest` (solo se il primo non esiste). Modificabili dall'admin, con un verificatore dei modelli disponibili.
+- Modello di default `gemini-flash-latest`, fallback gratuito `gemini-flash-lite-latest`: si passa al successivo se il modello non esiste, ha finito la sua quota gratuita o è sovraccarico — solo prima che arrivi testo (niente risposte doppie) e ogni modello al massimo una volta. Timeout di 50 secondi. Modificabili dall'admin, con un verificatore dei modelli disponibili.
 - Limiti propri dell'app (più bassi di quelli di Google, modificabili): 60 messaggi/giorno per Viola, 6 al minuto, 1024 token di risposta, 80 richieste/giorno per il Copilot. Superati i limiti, l'AI "si prende una pausa": **non si paga mai**.
 - ⚠️ Sul piano gratuito Google può usare le conversazioni per migliorare i suoi servizi.
 
@@ -154,7 +163,7 @@ Catena di canali gratuiti, configurabile in modalità **fallback** (si ferma al 
 2. **Web Push** (standard del browser, chiavi VAPID) → notifiche sul telefono di chi le ha attivate. È l'unico modo per notificare **Viola** (es. quando Adam risponde). Su iPhone funziona solo con l'app **aggiunta alla schermata Home**.
 3. **WhatsApp / telefono** → non è una notifica automatica ma un link (`wa.me`, `tel:`) sempre visibile a Viola: il fallback umano.
 
-Ogni tentativo è registrato in `notification_events` (canale, esito). Le iscrizioni push scadute vengono rimosse automaticamente.
+Ogni tentativo è registrato in `notification_events` (canale, esito). Le iscrizioni push scadute vengono rimosse automaticamente. Gli avvisi **urgenti** ("Ho bisogno di Adam") su Telegram fanno **un solo** nuovo tentativo in caso di errore temporaneo (rete, 429, 5xx); mai su errori di configurazione. Timeout di 8 secondi per canale. Il "cuore" manda un avviso leggero al massimo ogni 10 minuti (disattivabile).
 
 ---
 
@@ -162,7 +171,7 @@ Ogni tentativo è registrato in `notification_events` (canale, esito). Le iscriz
 
 - Installabile su iPhone (Safari → Condividi → "Aggiungi alla schermata Home") e Android. Manifest dinamico (il nome dell'app segue le impostazioni), splash screen iOS, icone maskable.
 - **Icona originale**: una **viola** (il fiore) con cinque petali fatti di **cuori**, rossa (#DA0E14) su nero, con una stellina bianca e piccoli brillantini. Ispirata all'estetica di un'immagine di riferimento amata da Viola (nero pieno, simbolo rosso a linea, stelline Y2K) ma non copiata. Tutto è generato da un solo SVG (`scripts/icon-svg.mjs`, `npm run icons`).
-- **Service worker** scritto a mano (`public/sw.js`): precache della pagina offline e delle pagine di calma, cache-first per i file statici, network-first per le pagine, notifiche push, pulizia della cache privata al logout.
+- **Service worker** scritto a mano (`public/sw.js`), registrato come `/sw.js?v=<id del build>`: ogni deploy installa la versione nuova, riscarica il kit offline e **cancella le cache vecchie** (nessuna versione vecchia bloccata sul telefono). Precache della pagina offline e delle pagine di calma, cache-first per i file statici, network-first per le pagine, notifiche push, pulizia della cache privata al logout.
 
 ---
 
@@ -219,7 +228,8 @@ tests/            unit + integrazione RLS
 | Utenti e config | `profiles`, `app_settings` |
 | Media | `media` (foto/audio, con "contesti": galleria, respiro, avatar AI…) |
 | Contenuti di Adam | `dedications`, `memories`, `comfort_actions`, `breathing_presets`, `breathing_media`, `grounding_exercises`, `countdowns`, `time_capsules`, `open_when_cards`, `daily_surprises`, `home_modules`, `phrases`, `quiz_questions`, `audio_items` |
-| Dati di Viola | `messages`, `journal_entries`, `mood_entries`, `adam_requests`, `activity_events` |
+| Dati di Viola | `messages`, `journal_entries`, `mood_entries`, `adam_requests`, `activity_events` (registrati solo se `profiles.share_activity`) |
+| Cuore a distanza | `hearts` (chi l'ha mandato, quando, se è stato visto) |
 | Notifiche | `notification_subscriptions`, `notification_events` |
 | AI | `ai_conversations`, `ai_messages`, `ai_memory`, `ai_tool_logs`, `ai_usage_daily` |
 | Audit | `admin_audit_logs` |
@@ -230,6 +240,8 @@ tests/            unit + integrazione RLS
 - Adam (admin) gestisce i contenuti; vede diario e umore **solo se condivisi**; **non** vede le conversazioni AI di Viola.
 - Colonne modificabili limitate per tipo di utente (es. Viola su `adam_requests` può scrivere solo il messaggio; Adam solo stato e risposta).
 - Audit log solo in aggiunta.
+- `hearts`: si mandano solo a proprio nome, si segnano come visti solo quelli ricevuti, si cancellano solo i propri.
+- Nessuna funzione del database è eseguibile da `anon` (migration `20260928000001_hardening`).
 - Funzioni SQL: `is_admin()`, `is_member()`, `app_role()`, trigger `handle_new_user` (crea il profilo, ruolo da `app_metadata` altrimenti `pending`), RPC `list_time_capsules`, `mark_capsule_opened`, `mark_open_when_opened`, `increment_ai_usage`, `admin_usage_stats`.
 
 ### Storage
@@ -310,12 +322,12 @@ npm run dev                     # http://localhost:3000
 | `npm run create-user -- --email … --password … --role admin\|user` | crea/aggiorna un account |
 | `npm run vapid` | genera le chiavi Web Push |
 | `npm run icons` | rigenera icone, favicon, splash |
-| `npm run db:bundle` | rigenera `supabase/setup.sql` dalle migrazioni + seed |
+| `npm run db:bundle` | rigenera `supabase/setup.sql` (migrazioni + seed, progetti nuovi) e `supabase/update.sql` (solo le migrazioni successive alla prima versione, per i progetti già installati; sempre rieseguibile) |
 | `npx supabase start` | database locale (richiede Docker) |
 
-**Test automatici** (`npm test`, ~90 test): motore casuale, ciclo di respirazione, date/countdown/distanza, link sicuri, impostazioni, registro admin, riconoscimento file, elaborazione foto (EXIF rimosso), catena notifiche e Telegram (il token non finisce nei log), prompt AI (niente segreti), strumenti AI, messaggi d'errore del login, moduli server action, sincronizzazione di `setup.sql`, e **RLS**: le migrazioni reali vengono applicate a un Postgres embedded (PGlite) e ogni permesso di Viola, Adam, utenti in attesa e anonimi viene verificato.
+**Test automatici** (`npm test`, 106 test): motore casuale, ciclo di respirazione, date/countdown/distanza, link sicuri, impostazioni, registro admin, riconoscimento file, elaborazione foto (EXIF rimosso), catena notifiche e Telegram (il token non finisce nei log), prompt AI (niente segreti), strumenti AI, messaggi d'errore del login, moduli server action, sincronizzazione di `setup.sql`, e **RLS**: le migrazioni reali vengono applicate a un Postgres embedded (PGlite) e ogni permesso di Viola, Adam, utenti in attesa e anonimi viene verificato, compresi i tentativi di attacco; e la sincronizzazione di `update.sql`.
 
-Durante lo sviluppo è stato fatto anche un test end-to-end completo (103 controlli) sulla build di produzione con Supabase locale e un finto server Gemini.
+Durante lo sviluppo e l'audit sono stati eseguiti anche: la suite end-to-end (103 controlli) sulla build di produzione con Supabase locale e un finto server Gemini; controlli di resilienza (rete che cade durante "Ho bisogno di Adam" e il salvataggio dell'umore, home senza moduli, modalità Conforto, interruttore privacy); il flusso completo del cuore tra i due account; il giro di tutte le pagine a 375 / 390 / 402 / 430 / 768 / 1024 / 1440 px, in tema chiaro e scuro e con "riduci movimento" (nessun errore, nessuno scroll orizzontale); l'offline con il server spento; la compatibilità con un database non ancora aggiornato.
 
 ---
 
@@ -326,6 +338,7 @@ Durante lo sviluppo è stato fatto anche un test end-to-end completo (103 contro
 - Deploy su **Vercel** in corso di configurazione da parte di Adam (variabili d'ambiente inserite, primo deploy creato a mano dal branch sopra).
 - Verificato in sviluppo: tutto il flusso con Supabase locale, foto, AI con Gemini simulato, Copilot, notifiche simulate, offline.
 - **Da verificare sul campo**: Gemini reale, notifiche Telegram reali, Web Push su iPhone installato, login sul Supabase di produzione. Il login ora mostra messaggi d'errore specifici (password errata, account non confermato, chiave o URL Supabase sbagliati, database non inizializzato) per facilitare la diagnosi.
+- **Da fare una volta sul database di produzione**: eseguire `supabase/update.sql` (vedi SETUP.md, passo 5). Fino ad allora l'app funziona, ma "Cuore a distanza" e l'interruttore privacy rispondono con un errore gentile.
 - Contenuti da personalizzare: ricordi e countdown iniziali sono bozze; foto, audio, avatar di Adam e memoria AI vanno caricati dall'admin.
 
 ---
@@ -341,6 +354,10 @@ Durante lo sviluppo è stato fatto anche un test end-to-end completo (103 contro
 - Le impostazioni si leggono con `getSettings()` (server, con service role quando disponibile), non direttamente dal client.
 - Testi dell'interfaccia in **italiano**, tono caldo; messaggi d'errore gentili (`FRIENDLY_ERROR`).
 - Non introdurre servizi a pagamento, non esporre segreti al client, non indebolire la RLS, non aggiungere strumenti AI che eseguono SQL/codice arbitrario.
+- **Colori**: usare i token di `globals.css`. `wine-*`, `rouge-*`, `night-*`, `moon` sono fissi (per superfici piene); `canvas`, `surface`, `line`, `ink*`, `vio-*` (testo), `tint-*`, `blush/peach/lilac/cream` cambiano col tema scuro. Testo su superfici chiare → `text-vio-*`/`text-ink*`; testo su superfici piene → `text-white`/`text-wine-100…300`. Le foto "stampate" usano la utility `polaroid`.
+- **Chiamare una server action dal browser** sempre con `callAction(() => azione(...))` (`src/utils/call-action.ts`): una rete che cade diventa un messaggio gentile invece della schermata d'errore.
+- "Riduci movimento": usare `useReducedMotion` da `src/hooks/use-reduced-motion.ts` (non quello di `motion/react`, che rompe l'idratazione).
+- Nuove migration: devono essere **rieseguibili** (`if not exists`, `drop policy if exists`…); poi `npm run db:bundle` aggiorna `setup.sql` e `update.sql`. Il codice deve continuare a funzionare anche prima che la migration sia applicata in produzione (es. `select("*")` invece di nominare una colonna nuova).
 
 ### Aggiungere un nuovo tipo di contenuto
 1. Nuova migrazione in `supabase/migrations/` (tabella + trigger `touch_updated_at` + RLS con policy esplicite, niente "allow all").

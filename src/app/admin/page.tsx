@@ -8,6 +8,8 @@ import { getSettings } from "@/server/settings";
 import { getNotificationStatus } from "@/server/notifications/status";
 import { getHeartState } from "@/server/hearts";
 import { HeartExchange } from "@/features/hearts/heart-exchange";
+import { NextSteps, ReadinessHero } from "@/features/readiness/readiness-hero";
+import { getReadiness } from "@/server/readiness";
 import { MOODS } from "@/features/content/constants";
 import { formatDateTime, relativeTime, todayKey } from "@/utils/dates";
 import { cn } from "@/utils/cn";
@@ -36,7 +38,7 @@ export default async function AdminDashboard() {
     supabase.from("activity_events").select("*").order("created_at", { ascending: false }).limit(6),
     getNotificationStatus(settings, admin.id),
   ]);
-  const hearts = await getHeartState(admin.id);
+  const [hearts, readiness] = await Promise.all([getHeartState(admin.id), getReadiness(admin.id, settings)]);
 
   const urgent = reqNew.data ?? [];
   const aiReq = (usage.data ?? []).filter((u) => u.scope === "viola").reduce((s, u) => s + u.requests, 0);
@@ -65,6 +67,9 @@ export default async function AdminDashboard() {
           <p className="text-sm text-ink-soft">Nessuna richiesta aperta. Quando {viola} premerà &quot;Ho bisogno di Adam&quot; la vedrai qui (e riceverai una notifica).</p>
         </div>
       )}
+
+      <ReadinessHero summary={readiness.summary} violaName={viola} link />
+      <NextSteps summary={readiness.summary} />
 
       <HeartExchange state={hearts} otherName={viola} />
 

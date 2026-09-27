@@ -4,7 +4,7 @@ import {
   Footprints, Gamepad2, Gift, GlassWater, Hand, Headphones, Heart, HeartHandshake, HeartPulse, Home, Hourglass,
   Image as ImageIcon, Images, Laugh, Leaf, Lightbulb, Mail, MapPin, MessageCircleHeart, Mic, Moon, MoonStar, Music,
   Notebook, NotebookPen, Orbit, Palette, PawPrint, Pen, Phone, Plane, Puzzle, Rainbow, Send, Shield, Shuffle, Smile,
-  Snowflake, Sparkles, Star, Sun, Sunrise, Sunset, Target, Timer, Train, Trophy, Umbrella, Wand2, Waves, Wind, Zap,
+  Snowflake, Sparkles, Star, Sun, Sunrise, Sunset, Target, Timer, ListChecks, Train, Trophy, Umbrella, Wand2, Waves, Wind, Zap,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -89,6 +89,7 @@ export const ICONS: Record<string, LucideIcon> = {
   compass: Compass,
   crown: Crown,
   trophy: Trophy,
+  "list-checks": ListChecks,
   lightbulb: Lightbulb,
   check: Check,
   back: ArrowLeft,

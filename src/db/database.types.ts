@@ -515,6 +515,19 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"readiness_checks": {
+                  Row: {
+                    "done_at": string,"done_by": string | null,"state": string,"task_id": string
+                  }
+                  Insert: {
+                    "done_at"?: string,"done_by"?: string | null,"state"?: string,"task_id": string
+                  }
+                  Update: {
+                    "done_at"?: string,"done_by"?: string | null,"state"?: string,"task_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"time_capsules": {
                   Row: {
                     "body": string,"created_at": string,"id": string,"is_published": boolean,"media_id": string | null,"opened_at": string | null,"teaser": string | null,"title": string,"unlock_at": string,"updated_at": string

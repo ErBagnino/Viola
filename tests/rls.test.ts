@@ -305,4 +305,19 @@ describe("cuore a distanza", () => {
     expect((await rows("select share_activity, role from public.profiles where id = $1", [VIOLA]))[0]).toEqual({ share_activity: false, role: "user" });
     expect(await as(VIOLA, () => fails("update public.profiles set role = 'admin' where id = $1", [VIOLA]))).toBe(true);
   });
+
+  it("the \"Completa Vio\" checklist is Adam's only", async () => {
+    await as(ADAM, () => q("insert into public.readiness_checks (task_id, state) values ('install-adam', 'done')"));
+    expect((await rows("select task_id, state, done_by from public.readiness_checks"))[0]).toEqual({ task_id: "install-adam", state: "done", done_by: ADAM });
+    expect(await as(VIOLA, () => rows("select * from public.readiness_checks"))).toEqual([]);
+    expect(await as(VIOLA, () => fails("insert into public.readiness_checks (task_id) values ('offline-test')"))).toBe(true);
+    expect(await as(STRANGER, () => fails("insert into public.readiness_checks (task_id) values ('offline-test')"))).toBe(true);
+    expect(await as(null, () => fails("select * from public.readiness_checks"))).toBe(true);
+    await as(VIOLA, () => q("delete from public.readiness_checks"));
+    expect((await rows("select count(*)::int n from public.readiness_checks"))[0].n).toBe(1);
+    expect(await as(ADAM, () => fails("insert into public.readiness_checks (task_id) values ('DROP TABLE')"))).toBe(true);
+    expect(await as(ADAM, () => fails("insert into public.readiness_checks (task_id, state) values ('x-task', 'hacked')"))).toBe(true);
+    await as(ADAM, () => q("delete from public.readiness_checks"));
+    expect((await rows("select count(*)::int n from public.readiness_checks"))[0].n).toBe(0);
+  });
 });

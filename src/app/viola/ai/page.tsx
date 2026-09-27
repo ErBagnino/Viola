@@ -2,13 +2,13 @@ import { Chat } from "@/features/ai-chat/chat";
 import { getSettings } from "@/server/settings";
 import { getAiProfile } from "@/server/ai/profile";
 import { isAiConfigured } from "@/server/ai/gemini";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 
 export const metadata = { title: "Adam AI" };
 
 export default async function AiPage({ searchParams }: PageProps<"/viola/ai">) {
   const [settings, sp] = await Promise.all([getSettings(), searchParams]);
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [profile, { data: facts }] = await Promise.all([
     getAiProfile(settings),
     // RLS returns only facts that are enabled AND marked visible to Viola

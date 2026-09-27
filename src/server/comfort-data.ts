@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
@@ -8,7 +8,7 @@ import type { ComfortItem } from "@/features/comfort/help-now";
 import { FALLBACK_COMFORT } from "@/features/content/fallbacks";
 
 export async function getComfortItems(): Promise<ComfortItem[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data }, settings] = await Promise.all([supabase.from("comfort_actions").select("*"), getSettings()]);
   const contact = getContact(settings);
   // Nothing configured (or the database is unreachable): never an empty "help me" screen.

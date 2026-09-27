@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/fields";
 import { HeartBurst } from "@/components/decor/burst";
 import { whatsappLink } from "@/features/actions/registry";
+import { useToast } from "@/components/ui/toast";
 import { callAction } from "@/utils/call-action";
 import { requestAdam } from "./actions";
 
-type Result = { delivered: boolean; throttled: boolean; channels: string[]; whatsappUrl: string | null; phoneUrl: string | null };
+type Result = { delivered: boolean; throttled: boolean; channels: string[]; whatsappUrl: string | null; phoneUrl: string | null; preview?: boolean };
 
 const CHANNEL_LABEL: Record<string, string> = { telegram: "Telegram", webpush: "notifica sul telefono" };
 
@@ -38,6 +39,7 @@ export function NeedAdam({
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const toast = useToast();
   const hasContacts = Boolean(whatsappNumber || phoneUrl);
 
   const send = () =>
@@ -45,7 +47,10 @@ export function NeedAdam({
       setError(null);
       if ("vibrate" in navigator) navigator.vibrate?.(40);
       const res = await callAction(() => requestAdam({ message }));
-      if (res.ok) setResult(res);
+      if (res.ok) {
+        setResult(res);
+        if (res.preview) toast.show("Anteprima ♡ Così lo vedrebbe lei: nessuna notifica è partita.", "info");
+      }
       else setError(hasContacts ? `${res.error} Intanto puoi scrivergli o chiamarlo qui sotto.` : res.error);
     });
 

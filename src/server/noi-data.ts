@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds, signMedia } from "@/server/media";
 import type { DedicationView } from "@/features/dedications/dedications-list";
 import type { GalleryPhoto } from "@/features/gallery/gallery";
@@ -21,7 +21,7 @@ export function toPhoto(m: MediaView): GalleryPhoto {
 }
 
 export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase
     .from("media")
     .select("*")
@@ -35,7 +35,7 @@ export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
 }
 
 export async function getDedications(signature: string): Promise<DedicationView[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase.from("dedications").select("*").order("pinned", { ascending: false }).order("position");
   const media = await mediaByIds(supabase, (data ?? []).flatMap((d) => [d.media_id, d.audio_id]));
   return (data ?? []).map((d) => ({
@@ -51,7 +51,7 @@ export async function getDedications(signature: string): Promise<DedicationView[
 }
 
 export async function getMemories() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase
     .from("memories")
     .select("*")

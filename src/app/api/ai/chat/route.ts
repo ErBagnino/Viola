@@ -12,6 +12,7 @@ import { loadAiMemory } from "@/server/ai/memory";
 import { loadHistory } from "@/server/ai/history";
 import { friendlyAiError, runChatLoop, saveModelMessage } from "@/server/ai/run-chat";
 import { runViolaTool, VIOLA_TOOLS } from "@/server/ai/viola-tools";
+import { violaView } from "@/server/viola-view";
 import { ndjsonStream } from "@/server/ai/stream";
 import { aiModes } from "@/features/settings/schema";
 import type { Json } from "@/db/database.types";
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
           send(e);
         },
         runTool: async (name, args) => {
-          const res = await runViolaTool(name, args, supabase, settings);
+          const res = await runViolaTool(name, args, viewer.role === "admin" ? violaView(supabase, viewer.id) : supabase, settings);
           await supabase.from("ai_tool_logs").insert({
             conversation_id: conversationId,
             user_id: viewer.id,

@@ -20,3 +20,10 @@ export async function safeAction<T extends object>(fn: () => Promise<T>): Promis
 
 /** An error whose message is safe to show to the user. */
 export class UserError extends Error {}
+
+/** Adam walking through Viola's app ("Vedi come Viola"): nothing is saved or sent. */
+export const PREVIEW_ONLY = "Sei in \"Vedi come Viola\": qui non salvo e non invio niente. ♡";
+
+export function assertNotPreview(viewer: { role: string }) {
+  if (viewer.role === "admin") throw new UserError(PREVIEW_ONLY);
+}

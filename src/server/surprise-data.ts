@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { signMedia } from "@/server/media";
 import { getComfortItems } from "@/server/comfort-data";
 import { getNextCountdown, randomPhrase } from "@/server/viola-data";
@@ -13,7 +13,7 @@ const GAMES = ["game_heart", "game_memory", "game_puzzle", "game_reaction", "gam
 
 /** A shuffled bag of surprises of different kinds. */
 export async function getSurprises(): Promise<SurpriseItem[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const settings = await getSettings();
   const daAdam = await randomPhrase("da_adam", "Adam ha preparato questa sorpresa.");
   const [{ data: ded }, { data: mem }, { data: photos }, { data: ow }, comfort, countdown] = await Promise.all([

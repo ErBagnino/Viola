@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { MoodPicker } from "@/features/mood/mood-picker";
 import { MOODS } from "@/features/content/constants";
 import { MoodHistoryDelete } from "@/features/mood/mood-history";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { getSettings } from "@/server/settings";
 import { getViewer } from "@/server/auth";
 import { formatDateTime } from "@/utils/dates";
@@ -11,7 +11,7 @@ export const metadata = { title: "Come mi sento" };
 
 export default async function UmorePage() {
   const viewer = await getViewer();
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data }, settings] = await Promise.all([
     supabase.from("mood_entries").select("*").eq("user_id", viewer!.id).order("created_at", { ascending: false }).limit(30),
     getSettings(),

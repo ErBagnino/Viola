@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds } from "@/server/media";
 import { getSettings } from "@/server/settings";
 
@@ -9,7 +9,7 @@ export const metadata = { title: "La voce di Adam" };
 const CAT: Record<string, string> = { voice: "Vocale", song: "Canzone", sleep: "Per dormire", breathing: "Respiro", other: "Audio" };
 
 export default async function AudioPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data }, settings] = await Promise.all([supabase.from("audio_items").select("*").order("position"), getSettings()]);
   const media = await mediaByIds(supabase, (data ?? []).map((a) => a.media_id));
   const items = (data ?? []).filter((a) => a.media_id && media.get(a.media_id));

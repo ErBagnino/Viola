@@ -23,6 +23,10 @@ export async function requestAdam(input: { message?: string }) {
     const settings = await getSettings();
     const contact = getContact(settings);
     const { message } = schema.parse(input ?? {});
+    // "Vedi come Viola": Adam sees the same screen, but nothing is stored or sent.
+    if (viewer.role === "admin") {
+      return { requestId: null, delivered: true, throttled: false, channels: [] as string[], whatsappUrl: contact.whatsappUrl, phoneUrl: contact.phoneUrl, preview: true };
+    }
     const supabase = await createClient();
 
     // Anti-spam: at most 4 automatic alerts every 10 minutes.
@@ -77,6 +81,7 @@ export async function requestAdam(input: { message?: string }) {
       channels,
       whatsappUrl: contact.whatsappUrl,
       phoneUrl: contact.phoneUrl,
+      preview: false,
     };
   });
 }

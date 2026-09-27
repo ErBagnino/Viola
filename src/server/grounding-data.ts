@@ -1,9 +1,9 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { DEFAULT_54321, parseSteps, type GroundingExercise } from "@/features/grounding/types";
 
 export async function getGroundingExercises(): Promise<GroundingExercise[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase.from("grounding_exercises").select("*").order("position");
   return (data ?? [])
     .map((g) => ({

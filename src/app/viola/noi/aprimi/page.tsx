@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { OpenWhenGrid } from "@/features/open-when/open-when-grid";
 import { APP_ACTIONS, actionHref, isAppAction } from "@/features/actions/registry";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
@@ -10,7 +10,7 @@ import { getContact } from "@/server/contact";
 export const metadata = { title: "Aprimi quando…" };
 
 export default async function AprimiPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const settings = await getSettings();
   const contact = getContact(settings);
   const { data } = await supabase.from("open_when_cards").select("*").order("position");

@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GuessMemory, type GuessItem } from "@/features/games/guess-memory";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds, signMedia } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { shuffle } from "@/utils/random";
@@ -10,7 +10,7 @@ export const metadata = { title: "Indovina il ricordo" };
 
 // Memories with a photo first; photos with a title from the gallery as a fallback.
 export default async function GuessPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data: memories }, { data: photos }, settings] = await Promise.all([
     supabase.from("memories").select("id, title, body, place, happened_on, media_id").not("media_id", "is", null).limit(60),
     supabase.from("media").select("*").eq("kind", "image").eq("include_in_random", true).not("title", "is", null).limit(60),

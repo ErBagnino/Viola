@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { assertMember } from "@/server/auth";
-import { safeAction, UserError } from "@/server/action-result";
+import { safeAction, UserError, assertNotPreview } from "@/server/action-result";
 import { getSettings } from "@/server/settings";
 import { notifyAdmin } from "@/server/notifications";
 
@@ -17,6 +17,7 @@ const schema = z.object({
 export async function saveMood(input: z.input<typeof schema>) {
   return safeAction(async () => {
     const viewer = await assertMember();
+    assertNotPreview(viewer);
     const parsed = schema.safeParse(input);
     if (!parsed.success) throw new UserError("Qualcosa non va nei dati ♡");
     const { mood, note, shared } = parsed.data;

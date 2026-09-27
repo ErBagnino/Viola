@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds, signMedia } from "@/server/media";
 import { getPhrases } from "@/server/viola-data";
 import { DEFAULT_PATTERN } from "@/features/breathing/cycle";
@@ -26,7 +26,7 @@ export const FALLBACK_PRESET: BreathingPresetView = {
 
 /** Presets (default first), photos for breathing and phrases. */
 export async function getBreathingData() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data: presets }, { data: links }, { data: pool }, phrases] = await Promise.all([
     supabase.from("breathing_presets").select("*").order("is_default", { ascending: false }).order("position"),
     supabase.from("breathing_media").select("*").order("position"),

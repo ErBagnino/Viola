@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { assertMember } from "@/server/auth";
-import { safeAction } from "@/server/action-result";
+import { safeAction, assertNotPreview } from "@/server/action-result";
 
 const schema = z.object({
   moods: z.boolean(),
@@ -18,6 +18,7 @@ const schema = z.object({
 export async function deleteMyData(input: z.input<typeof schema>) {
   return safeAction(async () => {
     const viewer = await assertMember();
+    assertNotPreview(viewer);
     const opts = schema.parse(input);
     const supabase = await createClient();
     const jobs: PromiseLike<unknown>[] = [];
@@ -36,6 +37,7 @@ export async function deleteMyData(input: z.input<typeof schema>) {
 export async function setShareActivity(share: boolean) {
   return safeAction(async () => {
     const viewer = await assertMember();
+    assertNotPreview(viewer);
     const supabase = await createClient();
     const { error } = await supabase.from("profiles").update({ share_activity: z.boolean().parse(share) }).eq("id", viewer.id);
     if (error) throw error;

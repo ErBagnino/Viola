@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { MessageComposer } from "@/features/messages/composer";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { getSettings } from "@/server/settings";
 import { getViewer } from "@/server/auth";
 
@@ -8,7 +8,7 @@ export const metadata = { title: "Scrivi ad Adam" };
 
 export default async function ScriviPage() {
   const viewer = await getViewer();
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data }, settings] = await Promise.all([
     supabase.from("messages").select("*").eq("sender_id", viewer!.id).order("created_at", { ascending: false }).limit(50),
     getSettings(),

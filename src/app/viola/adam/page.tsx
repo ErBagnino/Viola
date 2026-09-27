@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { NeedAdam } from "@/features/need-adam/need-adam";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 import { formatDateTime } from "@/utils/dates";
@@ -17,7 +17,7 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 export default async function NeedAdamPage() {
   const settings = await getSettings();
   const contact = getContact(settings);
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data: recent } = await supabase.from("adam_requests").select("*").order("created_at", { ascending: false }).limit(5);
   const { texts, general } = settings;
 

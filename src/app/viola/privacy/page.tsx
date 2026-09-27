@@ -1,7 +1,7 @@
 import { Bot, Eye, Lock, Smartphone } from "lucide-react";
 import type { ReactNode } from "react";
 import { PageHeader } from "@/components/ui/page-header";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireMember } from "@/server/auth";
 import { getSettings } from "@/server/settings";
@@ -29,7 +29,7 @@ export default async function PrivacyPage() {
   const settings = await getSettings();
   const adam = settings.general.adamName;
   const ai = settings.ai_profile.name;
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data: facts } = await supabase.from("ai_memory").select("key, value").eq("enabled", true).eq("visible_to_viola", true).order("category").limit(50);
   const admin = createAdminClient();
   const hidden = admin ? ((await admin.from("ai_memory").select("id", { count: "exact", head: true }).eq("enabled", true).eq("visible_to_viola", false)).count ?? 0) : 0;

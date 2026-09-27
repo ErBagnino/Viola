@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
-import { createClient, type ServerSupabase } from "@/lib/supabase/server";
+import type { ServerSupabase } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { signOne, type MediaView } from "@/server/media";
 import { todayKey, occurrenceOf } from "@/utils/dates";
 import { seededRandom, weightedPick } from "@/utils/random";
@@ -9,7 +10,7 @@ import type { Tables } from "@/db/database.types";
 export type Phrase = Tables<"phrases">;
 
 export const getPhrases = cache(async (kind: string): Promise<Phrase[]> => {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase.from("phrases").select("*").eq("kind", kind).eq("is_active", true);
   return data ?? [];
 });
@@ -29,7 +30,7 @@ export type DailySurprise = Tables<"daily_surprises"> & { media: MediaView | nul
 
 /** Today's surprise: a surprise scheduled for today wins, otherwise a stable daily pick. */
 export async function getDailySurprise(tz: string): Promise<DailySurprise | null> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const today = todayKey(tz);
   const { data } = await supabase.from("daily_surprises").select("*").order("created_at");
   const all = data ?? [];
@@ -47,7 +48,7 @@ export async function mediaFor(supabase: ServerSupabase, id: string | null | und
 }
 
 export async function getNextCountdown(tz: string): Promise<(Tables<"countdowns"> & { isToday: boolean }) | null> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase.from("countdowns").select("*").eq("show_on_home", true);
   const now = new Date();
   // Rank by the NEXT occurrence (a yearly birthday stored in 1998 is not "first"),
@@ -62,7 +63,7 @@ export async function getNextCountdown(tz: string): Promise<(Tables<"countdowns"
 
 /** Countdowns happening today (birthdays, anniversaries, meetings…) — "Momenti speciali". */
 export async function getTodayMoments(tz: string): Promise<Tables<"countdowns">[]> {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { data } = await supabase.from("countdowns").select("*");
   const now = new Date();
   return (data ?? []).filter((c) => occurrenceOf(c.target_at, c.recurring_yearly, now, tz).isToday);
@@ -70,7 +71,7 @@ export async function getTodayMoments(tz: string): Promise<Tables<"countdowns">[
 
 /** Media the app may use for a given purpose (random photos, breathing, …). */
 export async function mediaPool(opts: { context?: string; breathing?: boolean; random?: boolean; category?: string; limit?: number } = {}) {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   let q = supabase.from("media").select("*").eq("kind", "image");
   if (opts.context) q = q.contains("contexts", [opts.context]);
   if (opts.breathing) q = q.eq("breathing_enabled", true);

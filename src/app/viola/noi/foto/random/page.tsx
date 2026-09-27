@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RandomPhoto } from "@/features/gallery/random-photo";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { signMedia } from "@/server/media";
 import { toPhoto } from "@/server/noi-data";
 import { getPhrases } from "@/server/viola-data";
@@ -13,7 +13,7 @@ export const metadata = { title: "Fammi vedere noi" };
 export default async function RandomPhotoPage({ searchParams }: PageProps<"/viola/noi/foto/random">) {
   const { chi } = await searchParams;
   const onlyAdam = chi === "adam";
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const settings = await getSettings();
 
   let q = supabase.from("media").select("*").eq("kind", "image").eq("include_in_random", true);

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
+import { PreviewBar } from "@/features/preview/preview-bar";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { Bot, Flower2, Heart, Home, LayoutDashboard, MoreHorizontal } from "lucide-react";
@@ -65,12 +67,9 @@ export function VioShell({ children, appName, isAdmin }: { children: ReactNode; 
 
       <main className={cn("relative mx-auto w-full max-w-2xl px-4 pt-[max(env(safe-area-inset-top),1.25rem)] sm:px-6", immersive ? "pb-8" : "pb-32 lg:pb-12")}>
         {isAdmin && (
-          <Link
-            href="/admin"
-            className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-lilac-100 px-3 py-1 text-xs font-bold text-lilac-600 lg:hidden"
-          >
-            <LayoutDashboard className="size-3.5" /> Anteprima di Viola · torna all&apos;admin
-          </Link>
+          <Suspense fallback={null}>
+            <PreviewBar />
+          </Suspense>
         )}
         <NeedAdamShortcut.Provider value="/viola/adam">{children}</NeedAdamShortcut.Provider>
       </main>

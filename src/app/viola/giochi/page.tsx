@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { ActionCard } from "@/features/home/action-card";
 import { APP_ACTIONS } from "@/features/actions/registry";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 
 export const metadata = { title: "Giochi" };
 
@@ -18,7 +18,7 @@ const GAMES = [
 ] as const;
 
 export default async function GiochiPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const { count } = await supabase.from("quiz_questions").select("id", { count: "exact", head: true });
   const games = GAMES.filter((g) => g.key !== "game_quiz" || (count ?? 0) > 0);
   return (

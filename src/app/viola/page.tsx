@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import { ArrowRight, HeartHandshake, Moon, Sparkles, Sunrise } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { getSettings } from "@/server/settings";
 import { requireMember } from "@/server/auth";
 import { getHeartState } from "@/server/hearts";
@@ -29,7 +29,7 @@ type Module = Tables<"home_modules">;
 export default async function ViolaHome() {
   const [settings, viewer] = await Promise.all([getSettings(), requireMember()]);
   const { general, distance } = settings;
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const contact = getContact(settings);
 
   const [{ data: modules }, phrase] = await Promise.all([

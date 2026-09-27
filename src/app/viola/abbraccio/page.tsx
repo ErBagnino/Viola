@@ -1,5 +1,5 @@
 import { Hug } from "@/features/hug/hug";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { signOne } from "@/server/media";
 import { getPhrases } from "@/server/viola-data";
 import { getSettings } from "@/server/settings";
@@ -8,7 +8,7 @@ import { pickOne } from "@/utils/random";
 export const metadata = { title: "Un abbraccio" };
 
 export default async function AbbraccioPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [lines, settings, { data }] = await Promise.all([
     getPhrases("hug"),
     getSettings(),

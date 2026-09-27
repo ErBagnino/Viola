@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MessageCircleHeart, Sunrise } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Sparkle } from "@/components/decor/stars";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { signOne } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
@@ -16,7 +16,7 @@ export const metadata = { title: "Buongiorno" };
 export default async function BuongiornoPage() {
   const settings = await getSettings();
   const tz = settings.general.timezone;
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [phrase, mission, { data }] = await Promise.all([
     phraseOfTheDay("good_morning", tz, "Buongiorno amore ♡"),
     phraseOfTheDay("mission", tz, "Bevi un bicchiere d'acqua."),

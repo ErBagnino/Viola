@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
 import { LiveCountdown } from "@/features/home/live-countdown";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { mediaByIds } from "@/server/media";
 import { formatDate, occurrenceOf } from "@/utils/dates";
 import { getSettings } from "@/server/settings";
@@ -20,7 +20,7 @@ const KIND: Record<string, string> = {
 };
 
 export default async function CountdownPage() {
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const [{ data }, settings] = await Promise.all([supabase.from("countdowns").select("*").order("position"), getSettings()]);
   const { texts, general } = settings;
   const tz = general.timezone;

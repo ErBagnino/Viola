@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { DistanceMap } from "@/features/distance/distance-map";
 import { LiveCountdown } from "@/features/home/live-countdown";
-import { createClient } from "@/lib/supabase/server";
+import { createViolaClient } from "@/server/viola-view";
 import { getSettings } from "@/server/settings";
 import { formatDate, haversineKm } from "@/utils/dates";
 
@@ -9,7 +9,7 @@ export const metadata = { title: "Distanza" };
 
 export default async function DistanzaPage() {
   const { distance: d } = await getSettings();
-  const supabase = await createClient();
+  const supabase = await createViolaClient();
   const km = Math.round(haversineKm(d.fromLat, d.fromLng, d.toLat, d.toLng));
 
   let meeting = null;

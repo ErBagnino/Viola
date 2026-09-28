@@ -3,7 +3,8 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { assertAdmin, HttpError } from "@/server/auth";
 import { audit } from "@/server/audit";
-import { AUDIO_EXTENSIONS, detectAudioType, extensionOf, MAX_AUDIO_BYTES } from "@/utils/file-signature";
+import { detectAudioType, MAX_AUDIO_BYTES } from "@/utils/file-signature";
+import { audioExtension, STORAGE_AUDIO_MIME } from "@/utils/audio-formats";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,6 +13,8 @@ const signSchema = z.object({
   step: z.literal("sign"),
   filename: z.string().min(1).max(200),
   size: z.number().int().positive().max(MAX_AUDIO_BYTES),
+  /** false = first ask whether the same file is already in the library */
+  allowDuplicate: z.boolean().optional().default(false),
 });
 const finalizeSchema = z.object({
   step: z.literal("finalize"),
@@ -23,6 +26,9 @@ const finalizeSchema = z.object({
 /**
  * Audio upload in two steps so big files never pass through the server
  * function (Vercel limit): 1) signed upload URL, 2) validate + register.
+ * Step 2 is idempotent: a repeated "finalize" (double tap, retry after a
+ * lost answer) returns the same audio instead of a copy — and never
+ * deletes a file that is already registered.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -34,17 +40,24 @@ export async function POST(request: NextRequest) {
     if (body?.step === "sign") {
       const parsed = signSchema.safeParse(body);
       if (!parsed.success) return NextResponse.json({ error: "File audio non valido o troppo grande (max 10 MB)." }, { status: 400 });
-      const ext = extensionOf(parsed.data.filename);
-      if (!AUDIO_EXTENSIONS.includes(ext)) return NextResponse.json({ error: "Formato audio non supportato (mp3, m4a, ogg, wav, webm)." }, { status: 415 });
+      const ext = audioExtension(parsed.data.filename);
+      if (!ext) return NextResponse.json({ error: "Formato audio non supportato (m4a, mp3, wav, ogg, webm)." }, { status: 415 });
+      if (!parsed.data.allowDuplicate) {
+        // Same size to the byte = almost surely the same file uploaded twice.
+        const { data: same } = await supabase.from("media").select("id, title, created_at").eq("kind", "audio").eq("size_bytes", parsed.data.size).limit(1).maybeSingle();
+        if (same) return NextResponse.json({ duplicate: { id: same.id, title: same.title, createdAt: same.created_at } });
+      }
       const path = `audio/${crypto.randomUUID()}/audio.${ext}`;
       const { data, error } = await storage.createSignedUploadUrl(path);
       if (error) throw error;
-      return NextResponse.json({ path, token: data.token });
+      return NextResponse.json({ path, token: data.token, contentType: STORAGE_AUDIO_MIME[ext] });
     }
 
     const parsed = finalizeSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 });
     const { path } = parsed.data;
+    const existing = await supabase.from("media").select("*").eq("path", path).maybeSingle();
+    if (existing.data) return NextResponse.json({ media: existing.data });
     const { data: blob, error: dlErr } = await storage.download(path);
     if (dlErr || !blob) return NextResponse.json({ error: "File non trovato." }, { status: 404 });
     if (blob.size > MAX_AUDIO_BYTES) {
@@ -73,6 +86,11 @@ export async function POST(request: NextRequest) {
       .select("*")
       .single();
     if (error) {
+      // A parallel finalize won the race: that row owns the file, keep it.
+      if (error.code === "23505") {
+        const again = await supabase.from("media").select("*").eq("path", path).maybeSingle();
+        if (again.data) return NextResponse.json({ media: again.data });
+      }
       await storage.remove([path]);
       throw error;
     }

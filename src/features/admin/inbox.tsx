@@ -12,13 +12,14 @@ import { cn } from "@/utils/cn";
 import { formatDateTime } from "@/utils/dates";
 import { deleteMessageAdmin, markMessageRead, replyToMessage } from "./inbox-actions";
 import { callAction } from "@/utils/call-action";
+import { WritingAssistant } from "@/features/ai-writing/writing-assistant";
 
 export type InboxMessage = { id: string; body: string; category: string; isPrivate: boolean; readAt: string | null; reply: string | null; respondedAt: string | null; createdAt: string };
 export type SharedJournal = { id: string; title: string | null; body: string; mood: number | null; createdAt: string };
 
 const CAT: Record<string, string> = { thought: "💭 Pensiero", love: "💗 Ti amo", sad: "🌧️ Giù", need: "🫂 Ho bisogno", happy: "☀️ Felice", other: "✉️ Altro" };
 
-export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; journal: SharedJournal[]; tz: string }) {
+export function Inbox({ messages, journal, tz, aiWriting = false, violaName = "Viola" }: { messages: InboxMessage[]; journal: SharedJournal[]; tz: string; aiWriting?: boolean; violaName?: string }) {
   const [tab, setTab] = useState<"messages" | "journal">("messages");
   const [replying, setReplying] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -78,7 +79,8 @@ export function Inbox({ messages, journal, tz }: { messages: InboxMessage[]; jou
                 {m.reply && <p className="mt-3 rounded-2xl bg-surface/80 px-3 py-2 text-sm text-vio-800">La tua risposta: {m.reply}</p>}
                 {replying === m.id ? (
                   <div className="mt-3 space-y-2">
-                    <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="La tua risposta (la vedrà nella pagina Scrivi ad Adam)" />
+                    <Textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="La tua risposta (la vedrà nella pagina Scrivi ad Adam)" aria-label="La tua risposta" />
+                    {aiWriting && <WritingAssistant target="messages.reply" value={text} onApply={setText} messageId={m.id} messagePrivate={m.isPrivate} violaName={violaName} />}
                     <div className="flex gap-2">
                       <Button size="sm" variant="soft" onClick={() => setReplying(null)}>
                         Annulla

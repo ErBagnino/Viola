@@ -177,6 +177,16 @@ export const aiProfileSchema = z.object({
   ]),
 });
 
+/** Adam's writing assistant (admin only): how Adam writes, so drafts sound like him. */
+export const writingSchema = z.object({
+  enabled: z.boolean().default(true),
+  style: text(300, ""),
+  sample: text(1500, ""),
+  avoid: text(500, ""),
+  /** the assistant may use the facts in "Memoria di Adam AI" that are switched on */
+  useMemory: z.boolean().default(true),
+});
+
 export const distanceSchema = z.object({
   fromName: text(60, "Torino"),
   fromLat: z.number().min(-90).max(90).default(45.0703),
@@ -209,6 +219,7 @@ export const settingsSchemas = {
   notifications: notificationsSchema,
   ai: aiSchema,
   ai_profile: aiProfileSchema,
+  writing: writingSchema,
   distance: distanceSchema,
   calm: calmSchema,
   cost: costSchema,

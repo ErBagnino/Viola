@@ -18,6 +18,7 @@ export default async function AdminAiPage() {
   const copilot = (usage ?? []).filter((u) => u.scope === "copilot").reduce((s, u) => s + u.requests, 0);
   const profile = SETTINGS_FORMS.ai_profile!;
   const ai = SETTINGS_FORMS.ai!;
+  const writing = SETTINGS_FORMS.writing!;
   return (
     <div className="space-y-5">
       <AdminHeader title="Adam AI" description="Profilo, personalità, memoria e limiti gratuiti dell'assistente che hai creato per Viola." icon="bot-heart" />
@@ -27,7 +28,7 @@ export default async function AdminAiPage() {
             {isAiConfigured() ? "GEMINI CONFIGURATO" : "MANCA GEMINI_API_KEY"}
           </span>
           <span className="text-sm text-ink-soft">
-            Oggi: <b>{viola}</b>/{settings.ai.dailyMessageLimit} richieste di Viola · <b>{copilot}</b>/{settings.ai.copilotDailyLimit} del Copilot
+            Oggi: <b>{viola}</b>/{settings.ai.dailyMessageLimit} richieste di Viola · <b>{copilot}</b>/{settings.ai.copilotDailyLimit} tue (Copilot e assistente di scrittura)
           </span>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -43,6 +44,7 @@ export default async function AdminAiPage() {
         </div>
       </section>
       <SettingsForm settingsKey="ai_profile" title={profile.title} description={profile.description} fields={profile.fields} initial={settings.ai_profile} />
+      <SettingsForm settingsKey="writing" title={writing.title} description={writing.description} fields={writing.fields} initial={settings.writing} />
       <SettingsForm settingsKey="ai" title={ai.title} description={ai.description} fields={ai.fields} initial={settings.ai} />
     </div>
   );

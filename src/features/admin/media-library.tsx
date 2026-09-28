@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { Check, CheckSquare, Lock, Music, Pencil, Trash2, Wind, X } from "lucide-react";
@@ -12,7 +13,8 @@ import { MEDIA_CATEGORY_SUGGESTIONS, MEDIA_CONTEXTS } from "@/features/content/c
 import { cn } from "@/utils/cn";
 import { formatDate } from "@/utils/dates";
 import { deleteResourceAction, updateResourceAction } from "./actions";
-import { AudioUploader, ImageUploader } from "./fields/uploaders";
+import { ImageUploader } from "./fields/uploaders";
+import { AudioCapture } from "./fields/audio-capture";
 import { ResourceForm } from "./resource-form";
 import { RESOURCES } from "./resources";
 import { callAction } from "@/utils/call-action";
@@ -219,9 +221,21 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
         </section>
       ) : (
         <section className="paper space-y-3 rounded-4xl p-5">
-          <h2 className="font-display text-lg font-semibold text-vio-900">Carica un audio</h2>
-          <p className="text-sm text-ink-soft">Poi aggiungilo in &quot;Audio&quot; (La voce di Adam), in una dedica, in una busta o in un preset di respiro.</p>
-          <AudioUploader onUploaded={() => router.refresh()} />
+          <h2 className="font-display text-lg font-semibold text-vio-900">Aggiungi un audio</h2>
+          <p className="text-sm text-ink-soft">
+            Poi usalo in{" "}
+            <Link href="/admin/audio" className="font-bold text-vio-700 underline underline-offset-2">
+              La voce di Adam
+            </Link>
+            , in una dedica, in una busta o in un preset di respiro.
+          </p>
+          <AudioCapture
+            heading="Registra o scegli un audio"
+            onSaved={() => {
+              toast.show("Audio salvato ♡");
+              router.refresh();
+            }}
+          />
         </section>
       )}
 

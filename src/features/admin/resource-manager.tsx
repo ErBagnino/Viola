@@ -41,6 +41,7 @@ export function ResourceManager({
   lockedDefaults,
   initialNew,
   preview,
+  aiWriting = false,
 }: {
   resourceKey: string;
   rows: Row[];
@@ -52,6 +53,8 @@ export function ResourceManager({
   initialNew?: string | null;
   /** names/texts for the "Così la vede Viola" preview */
   preview?: PreviewContext;
+  /** the "✨ Genera con AI" helper under the text editors */
+  aiWriting?: boolean;
 }) {
   const def = getResource(resourceKey)!;
   const router = useRouter();
@@ -304,7 +307,14 @@ export function ResourceManager({
             {canPreview && tab === "preview" ? (
               <ContentPreview resourceKey={def.key} values={editing.values} ctx={preview!} />
             ) : (
-              <ResourceForm fields={formFields} values={editing.values} onChange={(p) => setEditing((ed) => (ed ? { ...ed, values: { ...ed.values, ...p } } : ed))} extraOptions={extraOptions} errors={errors} />
+              <ResourceForm
+                fields={formFields}
+                values={editing.values}
+                onChange={(p) => setEditing((ed) => (ed ? { ...ed, values: { ...ed.values, ...p } } : ed))}
+                extraOptions={extraOptions}
+                errors={errors}
+                assist={aiWriting ? { resourceKey: def.key, preview: canPreview ? preview : undefined, violaName: preview?.violaName } : undefined}
+              />
             )}
             <div className="sticky -bottom-8 mt-6 flex gap-3 bg-cream-50 pt-3 pb-2">
               <Button variant="soft" className="flex-1" onClick={() => setEditing(null)}>

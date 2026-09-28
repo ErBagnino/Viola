@@ -5,6 +5,7 @@ import { resourceBySlug } from "@/features/admin/resources";
 import { listRows } from "@/server/admin/crud";
 import { adminThumbs } from "@/server/admin/thumbs";
 import { getSettings } from "@/server/settings";
+import { isAiConfigured } from "@/server/ai/gemini";
 
 export default async function ResourcePage({ params, searchParams }: PageProps<"/admin/[resource]">) {
   const [{ resource }, { nuovo }] = await Promise.all([params, searchParams]);
@@ -21,6 +22,7 @@ export default async function ResourcePage({ params, searchParams }: PageProps<"
         rows={rows}
         thumbs={thumbs}
         initialNew={typeof nuovo === "string" ? nuovo.slice(0, 30) : null}
+        aiWriting={settings.writing.enabled && isAiConfigured()}
         preview={{
           adamName: general.adamName,
           violaName: general.violaName,

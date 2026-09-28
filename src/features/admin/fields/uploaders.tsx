@@ -1,11 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Music, UploadCloud } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { getBrowserClient } from "@/lib/supabase/client";
 import { cn } from "@/utils/cn";
-import { MAX_AUDIO_BYTES } from "@/utils/file-signature";
 import { compressImage, uploadPhoto } from "./image-compress";
 
 type Job = { name: string; progress: number; error?: string; done?: boolean };
@@ -96,62 +94,6 @@ export function ImageUploader({
           ))}
         </ul>
       )}
-    </div>
-  );
-}
-
-/** Audio uploader: signed direct upload to storage, then server-side validation. */
-export function AudioUploader({ onUploaded }: { onUploaded?: (id: string) => void }) {
-  const [busy, setBusy] = useState<string | null>(null);
-  const input = useRef<HTMLInputElement>(null);
-  const toast = useToast();
-
-  const handle = async (file: File) => {
-    if (file.size > MAX_AUDIO_BYTES) return toast.show("Audio troppo grande (max 10 MB).", "error");
-    setBusy(file.name);
-    try {
-      const duration = await new Promise<number | undefined>((resolve) => {
-        const a = document.createElement("audio");
-        a.preload = "metadata";
-        a.onloadedmetadata = () => resolve(Number.isFinite(a.duration) ? a.duration : undefined);
-        a.onerror = () => resolve(undefined);
-        a.src = URL.createObjectURL(file);
-      });
-      const sign = await fetch("/api/admin/media/audio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ step: "sign", filename: file.name, size: file.size }) }).then((r) => r.json());
-      if (sign.error) throw new Error(sign.error);
-      const { error } = await getBrowserClient().storage.from("media").uploadToSignedUrl(sign.path, sign.token, file, { contentType: file.type || "audio/mpeg" });
-      if (error) throw new Error("Caricamento non riuscito.");
-      const fin = await fetch("/api/admin/media/audio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ step: "finalize", path: sign.path, title: file.name.replace(/\.[^.]+$/, ""), duration }),
-      }).then((r) => r.json());
-      if (fin.error) throw new Error(fin.error);
-      toast.show("Audio caricato ♡");
-      onUploaded?.(fin.media.id);
-    } catch (e) {
-      toast.show(e instanceof Error ? e.message : "Errore", "error");
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  return (
-    <div>
-      <button type="button" onClick={() => input.current?.click()} disabled={Boolean(busy)} className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-tint-200 bg-surface/60 px-4 py-4 font-bold text-vio-800 hover:bg-surface disabled:opacity-60">
-        <Music className="size-5 text-vio-500" /> {busy ? `Carico ${busy}…` : "Carica un audio (mp3, m4a, ogg, wav · max 10 MB)"}
-      </button>
-      <input
-        ref={input}
-        type="file"
-        accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/wav,audio/webm,.mp3,.m4a,.aac,.ogg,.wav,.webm"
-        className="hidden"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) handle(f);
-          e.target.value = "";
-        }}
-      />
     </div>
   );
 }

@@ -2,12 +2,12 @@ import "server-only";
 import type { StreamEvent } from "@/features/ai-chat/types";
 
 /** NDJSON stream helper: one JSON event per line. */
-export function ndjsonStream(run: (send: (e: StreamEvent) => void) => Promise<void>) {
+export function ndjsonStream<E = StreamEvent>(run: (send: (e: E) => void) => Promise<void>) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let closed = false;
-      const send = (e: StreamEvent) => {
+      const send = (e: E) => {
         if (closed) return;
         try {
           controller.enqueue(encoder.encode(`${JSON.stringify(e)}\n`));

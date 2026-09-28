@@ -27,4 +27,15 @@ describe("magic-byte detection", () => {
     expect(detectAudioType(bytes([0x1a, 0x45, 0xdf, 0xa3]))).toBe("audio/webm");
     expect(detectAudioType(bytes("#!/bin/sh"))).toBeNull();
   });
+
+  it("tells raw AAC (ADTS) apart from MP3, and reads Voice Memos files", () => {
+    expect(detectAudioType(bytes([0xff, 0xf1, 0x50, 0x80]))).toBe("audio/aac"); // MPEG-4 ADTS
+    expect(detectAudioType(bytes([0xff, 0xf9, 0x50, 0x80]))).toBe("audio/aac"); // MPEG-2 ADTS
+    expect(detectAudioType(bytes([0xff, 0xfb, 0x90, 0x64]))).toBe("audio/mpeg"); // MP3 layer III
+    expect(detectAudioType(bytes([0xff, 0xf3, 0x90, 0x64]))).toBe("audio/mpeg"); // MPEG-2 layer III
+    // iPhone Voice Memos export: an MP4 container with the "M4A " brand
+    expect(detectAudioType(bytes([0, 0, 0, 0x1c], "ftypM4A ", [0, 0, 0, 0], "M4A isom"))).toBe("audio/mp4");
+    // Safari's MediaRecorder: "iso5"/"mp42" brands
+    expect(detectAudioType(bytes([0, 0, 0, 0x18], "ftypiso5"))).toBe("audio/mp4");
+  });
 });

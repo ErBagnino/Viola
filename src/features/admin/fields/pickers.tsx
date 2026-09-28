@@ -12,12 +12,25 @@ import { APP_ACTIONS, APP_ACTION_KEYS } from "@/features/actions/registry";
 import { TONE_OPTIONS } from "@/features/content/constants";
 import { cn } from "@/utils/cn";
 import { listMediaForPicker, mediaPreview, type PickerMedia } from "../media-actions";
-import { AudioUploader, ImageUploader } from "./uploaders";
+import { ImageUploader } from "./uploaders";
+import { AudioCapture, type SavedAudio } from "./audio-capture";
+import { formatDuration } from "@/utils/audio-formats";
 
 // ---------------------------------------------------------------------------
 // MediaPicker — choose (or upload) a photo / audio from the library
 // ---------------------------------------------------------------------------
-export function MediaPicker({ value, onChange, kind = "image" }: { value: string | null; onChange: (id: string | null) => void; kind?: "image" | "audio" }) {
+export function MediaPicker({
+  value,
+  onChange,
+  kind = "image",
+  inline = false,
+}: {
+  value: string | null;
+  onChange: (id: string | null, info?: { title: string | null }) => void;
+  kind?: "image" | "audio";
+  /** audio: with no file yet, show "Registra / Scegli un file" right in the form */
+  inline?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<PickerMedia[] | null>(null);
   const [loaded, setLoaded] = useState<{ id: string; url: string; thumbUrl: string; title: string | null } | null>(null);
@@ -47,6 +60,89 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
   }, [value]);
 
   const filtered = useMemo(() => (items ?? []).filter((m) => !q || `${m.title ?? ""} ${m.category ?? ""}`.toLowerCase().includes(q.toLowerCase())), [items, q]);
+  const choose = (id: string, title: string | null) => {
+    onChange(id, { title });
+    setOpen(false);
+  };
+  const audioSaved = async (m: SavedAudio) => {
+    choose(m.id, m.title);
+    await load();
+  };
+
+  const library = (
+    <Sheet open={open} onClose={() => setOpen(false)} title={kind === "image" ? "Scegli una foto" : "Scegli un audio"} wide>
+      <div className="space-y-4">
+        {kind === "image" ? (
+          <ImageUploader
+            compact
+            onUploaded={async (ids) => {
+              await load();
+              onChange(ids[0]);
+              setOpen(false);
+            }}
+          />
+        ) : (
+          !inline && <AudioCapture heading="Aggiungi un nuovo audio" onSaved={audioSaved} />
+        )}
+        {kind === "audio" && !inline && <p className="pt-1 text-sm font-extrabold text-vio-800">Oppure uno già caricato</p>}
+        <div className="relative">
+          <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-muted" />
+          <Input value={q} aria-label="Cerca" onChange={(e) => setQ(e.target.value)} placeholder="Cerca per titolo o categoria" className="pl-10" />
+        </div>
+        {!items ? (
+          <p className="py-6 text-center text-ink-muted">Carico…</p>
+        ) : filtered.length === 0 ? (
+          <p className="py-6 text-center text-ink-muted">{kind === "image" ? "Nessun file. Caricane uno qui sopra ♡" : "Ancora nessun audio caricato."}</p>
+        ) : kind === "image" ? (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {filtered.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => choose(m.id, m.title)}
+                className={cn("relative overflow-hidden rounded-2xl ring-offset-2", value === m.id && "ring-4 ring-wine-500")}
+                aria-label={m.title ?? "Foto"}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={m.thumbUrl} alt={m.title ?? ""} loading="lazy" className="aspect-square w-full object-cover" />
+                {value === m.id && <Check className="absolute top-1.5 right-1.5 size-5 rounded-full bg-wine-600 p-0.5 text-white" />}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {filtered.map((m) => (
+              <li key={m.id} className={cn("space-y-2 rounded-2xl bg-surface p-3", value === m.id && "ring-2 ring-wine-500")}>
+                <div className="flex items-center gap-2">
+                  <p className="min-w-0 flex-1 truncate font-bold text-vio-900">
+                    {m.title || "Audio senza titolo"}
+                    <span className="ml-2 text-xs font-semibold text-ink-muted">{formatDuration(m.duration)}</span>
+                  </p>
+                  <Button size="sm" onClick={() => choose(m.id, m.title)} aria-label={`Usa ${m.title || "questo audio"}`}>
+                    Usa
+                  </Button>
+                </div>
+                <audio src={m.url} controls preload="none" className="h-9 w-full" aria-label={`Ascolta ${m.title || "l'audio"}`} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Sheet>
+  );
+
+  // Audio, nothing chosen yet, main field of the form: record or pick right here.
+  if (kind === "audio" && inline && !value) {
+    return (
+      <div className="space-y-2">
+        <AudioCapture onSaved={audioSaved} askTitle={false} />
+        <Button size="sm" variant="ghost" onClick={openPicker}>
+          <Music className="size-4" /> Oppure scegli un audio già caricato
+        </Button>
+        {library}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -66,11 +162,11 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
           )}
         </button>
         <div className="min-w-0 flex-1 space-y-1.5">
-          {preview && kind === "audio" && <audio src={preview.url} controls className="h-9 w-full" preload="none" />}
+          {preview && kind === "audio" && <audio src={preview.url} controls className="h-9 w-full" preload="none" aria-label={`Ascolta ${preview.title || "l'audio"}`} />}
           {preview?.title && <p className="truncate text-sm font-bold text-vio-800">{preview.title}</p>}
           <div className="flex gap-2">
             <Button size="sm" variant="soft" onClick={openPicker}>
-              {value ? "Cambia" : kind === "image" ? "Scegli foto" : "Scegli audio"}
+              {value ? "Cambia" : kind === "image" ? "Scegli foto" : "Aggiungi audio"}
             </Button>
             {value && (
               <Button size="sm" variant="ghost" onClick={() => onChange(null)}>
@@ -80,74 +176,7 @@ export function MediaPicker({ value, onChange, kind = "image" }: { value: string
           </div>
         </div>
       </div>
-
-      <Sheet open={open} onClose={() => setOpen(false)} title={kind === "image" ? "Scegli una foto" : "Scegli un audio"} wide>
-        <div className="space-y-4">
-          {kind === "image" ? (
-            <ImageUploader
-              compact
-              onUploaded={async (ids) => {
-                await load();
-                onChange(ids[0]);
-                setOpen(false);
-              }}
-            />
-          ) : (
-            <AudioUploader
-              onUploaded={async (id) => {
-                await load();
-                onChange(id);
-                setOpen(false);
-              }}
-            />
-          )}
-          <div className="relative">
-            <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-muted" />
-            <Input value={q} aria-label="Cerca" onChange={(e) => setQ(e.target.value)} placeholder="Cerca per titolo o categoria" className="pl-10" />
-          </div>
-          {!items ? (
-            <p className="py-6 text-center text-ink-muted">Carico…</p>
-          ) : filtered.length === 0 ? (
-            <p className="py-6 text-center text-ink-muted">Nessun file. Caricane uno qui sopra ♡</p>
-          ) : kind === "image" ? (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {filtered.map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => {
-                    onChange(m.id);
-                    setOpen(false);
-                  }}
-                  className={cn("relative overflow-hidden rounded-2xl ring-offset-2", value === m.id && "ring-4 ring-wine-500")}
-                  aria-label={m.title ?? "Foto"}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.thumbUrl} alt={m.title ?? ""} loading="lazy" className="aspect-square w-full object-cover" />
-                  {value === m.id && <Check className="absolute top-1.5 right-1.5 size-5 rounded-full bg-wine-600 p-0.5 text-white" />}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <ul className="space-y-2">
-              {filtered.map((m) => (
-                <li key={m.id} className={cn("flex items-center gap-3 rounded-2xl bg-surface p-3", value === m.id && "ring-2 ring-wine-500")}>
-                  <audio src={m.url} controls preload="none" className="h-9 min-w-0 flex-1" />
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      onChange(m.id);
-                      setOpen(false);
-                    }}
-                  >
-                    Usa
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </Sheet>
+      {library}
     </div>
   );
 }
@@ -249,7 +278,7 @@ export function ActionPicker({ value, onChange, id, allowUrl }: { value: string 
 // ---------------------------------------------------------------------------
 // RichTextEditor (markdown + toolbar + preview)
 // ---------------------------------------------------------------------------
-export function RichTextEditor({ value, onChange, id }: { value: string; onChange: (v: string) => void; id?: string }) {
+export function RichTextEditor({ value, onChange, id, rows = 8 }: { value: string; onChange: (v: string) => void; id?: string; rows?: number }) {
   const [preview, setPreview] = useState(false);
   const [el, setEl] = useState<HTMLTextAreaElement | null>(null);
   const wrap = (before: string, after = before, placeholder = "testo") => {
@@ -291,7 +320,7 @@ export function RichTextEditor({ value, onChange, id }: { value: string; onChang
       {preview ? (
         <div className="min-h-40 p-4">{value.trim() ? <Markdown>{value}</Markdown> : <p className="text-ink-muted">Niente da mostrare.</p>}</div>
       ) : (
-        <Textarea id={id} ref={setEl} value={value} onChange={(e) => onChange(e.target.value)} rows={8} className="rounded-none border-0 bg-transparent shadow-none focus:ring-0" />
+        <Textarea id={id} ref={setEl} value={value} onChange={(e) => onChange(e.target.value)} rows={rows} className="rounded-none border-0 bg-transparent shadow-none focus:ring-0" />
       )}
     </div>
   );

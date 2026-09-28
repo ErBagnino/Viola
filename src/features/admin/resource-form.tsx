@@ -3,6 +3,9 @@
 import { Chip, Field, Input, Select, Switch, Textarea } from "@/components/ui/fields";
 import { cn } from "@/utils/cn";
 import type { FieldDef, Option } from "./resources";
+import { WritingAssistant } from "@/features/ai-writing/writing-assistant";
+import { WRITING_TARGETS, writingTargetFor } from "@/features/ai-writing/targets";
+import { ContentPreview, type PreviewContext } from "./content-preview";
 import {
   ActionPicker,
   ColorPicker,
@@ -20,6 +23,8 @@ import {
 } from "./fields/pickers";
 
 type Values = Record<string, unknown>;
+/** "✨ Genera con AI" under the text editors of this resource */
+type Assist = { resourceKey: string; preview?: PreviewContext; violaName?: string };
 
 export function ResourceForm({
   fields,
@@ -27,28 +32,42 @@ export function ResourceForm({
   onChange,
   extraOptions,
   errors,
+  assist,
 }: {
   fields: FieldDef[];
   values: Values;
   onChange: (patch: Values) => void;
   extraOptions?: Record<string, Option[]>;
   errors?: Record<string, string>;
+  assist?: Assist;
 }) {
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-4">
       {fields.map((f) => (
         <div key={f.name} className={cn(f.half ? "col-span-1" : "col-span-2")}>
-          <FieldControl field={f} values={values} onChange={onChange} options={extraOptions?.[f.name] ?? f.options} error={errors?.[f.name]} />
+          <FieldControl field={f} values={values} onChange={onChange} options={extraOptions?.[f.name] ?? f.options} error={errors?.[f.name]} assist={assist} />
         </div>
       ))}
     </div>
   );
 }
 
-function FieldControl({ field: f, values, onChange, options, error }: { field: FieldDef; values: Values; onChange: (p: Values) => void; options?: Option[]; error?: string }) {
+function FieldControl({ field: f, values, onChange, options, error, assist }: { field: FieldDef; values: Values; onChange: (p: Values) => void; options?: Option[]; error?: string; assist?: Assist }) {
   const v = values[f.name];
   const set = (x: unknown) => onChange({ [f.name]: x });
   const label = `${f.label}${f.required ? " *" : ""}`;
+  const target = assist ? writingTargetFor(assist.resourceKey, f.name) : null;
+  const helper = (text: string) =>
+    target && assist ? (
+      <WritingAssistant
+        target={target}
+        value={text}
+        onApply={set}
+        details={values}
+        violaName={assist.violaName}
+        renderPreview={assist.preview ? (draft) => <ContentPreview resourceKey={assist.resourceKey} values={{ ...values, [f.name]: draft }} ctx={assist.preview!} /> : undefined}
+      />
+    ) : null;
 
   if (f.type === "boolean") {
     return <Switch label={f.label} description={f.hint} checked={Boolean(v)} onChange={set} />;
@@ -61,12 +80,18 @@ function FieldControl({ field: f, values, onChange, options, error }: { field: F
           case "text":
             return <Input id={id} value={(v as string) ?? ""} placeholder={f.placeholder} onChange={(e) => set(e.target.value)} list={f.suggestions?.length ? `${id}-list` : undefined} />;
           case "textarea":
-            return <Textarea id={id} rows={3} value={(v as string) ?? ""} placeholder={f.placeholder} onChange={(e) => set(e.target.value)} />;
+            return (
+              <div>
+                <Textarea id={id} rows={3} value={(v as string) ?? ""} placeholder={f.placeholder} onChange={(e) => set(e.target.value)} />
+                {helper((v as string) ?? "")}
+              </div>
+            );
           case "markdown":
             return (
               <div>
-                <RichTextEditor id={id} value={(v as string) ?? ""} onChange={set} />
+                <RichTextEditor id={id} value={(v as string) ?? ""} onChange={set} rows={target && WRITING_TARGETS[target].layout === "letter" ? 14 : 8} />
                 {f.hint && <p className="mt-1 text-xs text-ink-muted">{f.hint}</p>}
+                {helper((v as string) ?? "")}
               </div>
             );
           case "number":
@@ -110,7 +135,14 @@ function FieldControl({ field: f, values, onChange, options, error }: { field: F
           case "image":
             return <MediaPicker kind="image" value={(v as string) ?? null} onChange={set} />;
           case "audio":
-            return <MediaPicker kind="audio" value={(v as string) ?? null} onChange={set} />;
+            return (
+              <MediaPicker
+                kind="audio"
+                value={(v as string) ?? null}
+                inline={f.required}
+                onChange={(id, info) => onChange({ [f.name]: id, ...(f.fills && id && info?.title && !String(values[f.fills] ?? "").trim() ? { [f.fills]: info.title } : {}) })}
+              />
+            );
           case "icon":
             return <IconPicker value={(v as string) ?? null} onChange={set} />;
           case "color":

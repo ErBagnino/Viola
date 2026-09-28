@@ -190,6 +190,7 @@ Adam AI usa **Google Gemini** con il **piano gratuito** di Google AI Studio.
 
 - È gratis entro dei limiti giornalieri (che Google cambia nel tempo). L'app ha limiti suoi, più bassi, modificabili in **Admin → Adam AI**.
 - Se il limite viene raggiunto, Adam AI dice "ha bisogno di una piccola pausa": **non paghi nulla**, l'app non passa mai a servizi a pagamento.
+- La stessa chiave fa funzionare anche l'**assistente di scrittura** (✨ Genera con AI negli editor): conta nelle richieste giornaliere del Copilot. Il tuo stile si imposta in **Admin → Adam AI → Il tuo stile di scrittura**.
 - ⚠️ **Privacy:** sul piano gratuito Google può usare le conversazioni per migliorare i suoi prodotti. Non scrivete in chat dati sensibili (password, documenti, dati sanitari). Adam AI riceve solo il necessario: le informazioni che scegli tu in "Memoria AI", mai chiavi o password.
 
 ## 11. La API key di Gemini
@@ -396,6 +397,8 @@ Su **Android** (Chrome): menu ⋮ → **Installa app** / "Aggiungi a schermata H
 | Telegram: DISCONNECTED | Token sbagliato o chat ID mancante: rifai i passi 13–14 e premi Start nella chat del bot. |
 | Web Push su iPhone non si attiva | L'app deve essere aperta dall'icona sulla Home (passo 25), iOS 16.4+. Controlla anche Impostazioni iPhone → Notifiche → Vio. |
 | Le foto non si caricano | Max 10 MB, solo JPEG/PNG/WEBP. Le foto dell'iPhone vengono convertite in automatico. |
+| "Registra ora" dice che il microfono è bloccato | iPhone: Impostazioni → App → Safari → Microfono → Consenti (oppure «aA» nella barra dell'indirizzo → Impostazioni sito web → Microfono). Serve Safari 14.3+ e l'indirizzo https. |
+| Un vocale di Memo Vocali non si trova in "Scegli un file" | In Memo Vocali: apri il vocale → ··· → Condividi → **Salva su File**, poi sceglilo dall'app File. Max 10 MB (≈ 20 minuti): se è più lungo, accorcialo in Memo Vocali. |
 | L'app non si apre dopo giorni di inattività | Il progetto Supabase è in pausa: Supabase → Restore. Controlla il Cron (passo 22). |
 | Accesso: "Email o password non corrette" | Controlla con l'occhio accanto alla password che l'iPhone non abbia cambiato lettere. Se l'utente è stato creato dalla dashboard, deve avere "Auto Confirm User". |
 | Accesso: "La chiave di Supabase non è valida" | In `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` va la chiave **publishable** (o anon), non la secret. Poi Redeploy. |

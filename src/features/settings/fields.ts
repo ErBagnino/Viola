@@ -192,6 +192,22 @@ export const SETTINGS_FORMS: Partial<Record<SettingsKey, { title: string; descri
       { name: "copilotDailyLimit", label: "Messaggi Copilot al giorno", type: "number", min: 0, max: 5000, half: true },
     ],
   },
+  writing: {
+    title: "Il tuo stile di scrittura",
+    description: "Per l'assistente che ti aiuta a scrivere dediche, lettere e ricordi: così le bozze sembrano scritte da te e non da un'AI.",
+    fields: [
+      { name: "enabled", label: "Assistente di scrittura attivo", type: "boolean", hint: "Il pulsante «✨ Genera con AI» negli editor. Spento = gli editor restano normali." },
+      { name: "style", label: "Come scrivi, in poche parole", type: "text", placeholder: "Es. semplice, diretto, un po' ironico, frasi corte" },
+      {
+        name: "sample",
+        label: "Un esempio di come scrivi (facoltativo)",
+        type: "textarea",
+        hint: "Incolla un messaggio vero che hai scritto a Viola: l'AI ne imita il ritmo e le parole, non il contenuto.",
+      },
+      { name: "avoid", label: "Parole o frasi che non usi mai", type: "text", placeholder: "Es. «anima gemella», «per sempre e oltre»" },
+      { name: "useMemory", label: "Può usare le informazioni attive della «Memoria di Adam AI»", type: "boolean", hint: "Solo cose vere scritte da te. I dati privati di Viola (diario, umore, messaggi) non vengono mai usati." },
+    ],
+  },
   cost: {
     title: "Soglie di costo",
     description: "Limiti del piano gratuito usati per gli avvisi.",

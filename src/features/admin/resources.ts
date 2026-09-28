@@ -66,6 +66,8 @@ export type FieldDef = {
   emptyLabel?: string;
   /** extra list suggestions (tags / category) */
   suggestions?: string[];
+  /** audio: copy the new file's title into this field when it is still empty */
+  fills?: string;
 };
 
 const opts = (rec: Record<string, string | { label: string }>): Option[] =>
@@ -751,8 +753,8 @@ export const RESOURCES = {
     sortable: true,
     order: [{ column: "position", ascending: true }],
     fields: [
+      { name: "media_id", label: "L'audio", type: "audio", required: true, fills: "title" },
       { name: "title", label: "Titolo", type: "text", required: true },
-      { name: "media_id", label: "File audio", type: "audio", required: true },
       { name: "category", label: "Categoria", type: "select", options: opts(AUDIO_CATEGORIES) },
       { name: "description", label: "Descrizione", type: "text" },
       { name: "is_published", label: "Pubblicato", type: "boolean" },

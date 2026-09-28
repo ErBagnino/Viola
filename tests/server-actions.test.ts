@@ -30,6 +30,13 @@ describe("server action modules", () => {
 
   // Admin-only actions check the role themselves (never trust the page that calls them).
   const adminOnly = ["features/admin/media-batch-actions.ts", "features/admin/media-actions.ts", "features/admin/inbox-actions.ts", "features/admin/notification-actions.ts", "features/readiness/actions.ts", "features/settings/actions.ts"];
+  // Admin API routes check the role in the handler too (the proxy is not enough).
+  const apiDir = path.join(src, "app/api/admin");
+  for (const f of files(apiDir).filter((x) => x.endsWith("route.ts"))) {
+    it(`${path.relative(src, f)}: checks that the caller is Adam`, () => {
+      expect(readFileSync(f, "utf8")).toMatch(/assertAdmin\(\)|role !== "admin"/);
+    });
+  }
   for (const rel of adminOnly) {
     it(`${rel}: every action checks that the caller is Adam`, () => {
       const code = readFileSync(path.join(src, rel), "utf8");

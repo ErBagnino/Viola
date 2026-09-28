@@ -32,12 +32,19 @@ const csp = [
   .join("; ")
   .replace(/\s+/g, " ");
 
+// No page may use camera, location, payments or USB. The microphone only for
+// this site (never embedded pages): Adam records voice messages in the admin.
+// Not limited to /admin: the policy is fixed when a document loads, and Adam
+// often reaches the admin from the login page without a reload. Only the
+// admin recorder ever asks for it, and the browser still asks him first.
+const permissions = "camera=(), microphone=(self), geolocation=(), payment=(), usb=()";
+
 const securityHeaders = [
   { key: "Content-Security-Policy", value: csp },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  { key: "Permissions-Policy", value: permissions },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   // Private app: keep every response (pages, manifest, images) out of search engines.
   { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },

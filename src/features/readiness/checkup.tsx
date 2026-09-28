@@ -63,7 +63,7 @@ export function Checkup() {
                     <span className="block text-sm font-bold text-vio-900">{it.title}</span>
                     {it.detail && <span className="block text-xs break-words text-ink-soft">{it.detail}</span>}
                   </span>
-                  {it.href && <span className="shrink-0 text-xs font-extrabold text-wine-600 dark:text-rouge-400">Sistema →</span>}
+                  {it.href && <span className="shrink-0 text-xs font-extrabold text-wine-600 dark:text-vio-600">Sistema →</span>}
                 </>
               );
               return (

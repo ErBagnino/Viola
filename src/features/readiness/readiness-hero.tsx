@@ -96,7 +96,7 @@ export function NextSteps({ summary, limit = 3 }: { summary: ReadinessSummary; l
                       <span className="block font-bold text-vio-900">{t.title}</span>
                       {t.detail && <span className="block truncate text-xs text-ink-muted">{t.detail}</span>}
                     </span>
-                    <span className="shrink-0 text-sm font-extrabold text-wine-600 dark:text-rouge-400">{t.cta} →</span>
+                    <span className="shrink-0 text-sm font-extrabold text-wine-600 dark:text-vio-600">{t.cta} →</span>
                   </Link>
                 </li>
               ))}

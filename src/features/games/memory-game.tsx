@@ -9,6 +9,7 @@ import { track } from "@/features/activity/track";
 import { seededRandom, shuffle } from "@/utils/random";
 import { cn } from "@/utils/cn";
 import { MEMORY_PAIRS } from "@/features/content/constants";
+import { brokenRef, focusPosition, type PhotoSrc } from "@/components/ui/photo";
 
 const FALLBACK = ["💗", "🌸", "⭐", "🌙", "🍓", "🦋"];
 
@@ -22,7 +23,9 @@ function deal(images: string[], rand: () => number = Math.random): Card[] {
   return shuffle([...faces, ...faces], rand).map((f, i) => ({ key: i, ...f }));
 }
 
-export function MemoryGame({ images, seed }: { images: string[]; seed: string }) {
+export function MemoryGame({ images: photos, seed }: { images: (string | PhotoSrc)[]; seed: string }) {
+  const images = photos.map((p) => (typeof p === "string" ? p : p.url));
+  const focusOf = new Map(photos.flatMap((p) => (typeof p === "string" ? [] : [[p.url, p.focus] as const])));
   const [cards, setCards] = useState<Card[]>(() => deal(images, seededRandom(seed)));
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<Set<string>>(new Set());
@@ -90,7 +93,7 @@ export function MemoryGame({ images, seed }: { images: string[]; seed: string })
                 <span className={cn("absolute inset-0 grid place-items-center overflow-hidden rounded-2xl bg-surface text-4xl shadow-soft [backface-visibility:hidden] [transform:rotateY(180deg)]", matched.has(c.face) && "ring-4 ring-blush-300")}>
                   {c.isImage && !broken.has(c.face) ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.face} alt="" className="h-full w-full object-cover" draggable={false} onError={() => setBroken((b) => new Set(b).add(c.face))} />
+                    <img src={c.face} alt="" className="h-full w-full object-cover" style={{ objectPosition: focusPosition(focusOf.get(c.face)) }} draggable={false} ref={brokenRef(() => setBroken((b) => new Set(b).add(c.face)))} onError={() => setBroken((b) => new Set(b).add(c.face))} />
                   ) : c.isImage ? (
                     "♡"
                   ) : (

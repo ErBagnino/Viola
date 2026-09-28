@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Chip, Segmented } from "@/components/ui/fields";
 import { formatDate } from "@/utils/dates";
+import { Photo as PhotoFrame } from "@/components/ui/photo";
 import { Lightbox, type Photo } from "./lightbox";
 
 type Layout = "polaroid" | "masonry" | "timeline" | "fullscreen";
@@ -67,8 +68,7 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
                 className="polaroid rounded-md p-2 pb-3 text-left shadow-soft"
                 aria-label={p.title ?? "Apri foto"}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.thumbUrl} alt={p.title ?? ""} loading="lazy" className="aspect-square w-full rounded-sm object-cover" />
+                <PhotoFrame photo={p} alt={p.title ?? ""} frame={1} useThumb className="w-full rounded-sm" />
                 <span className="mt-2 block truncate text-center font-hand text-xl text-vio-800">{p.title || formatDate(p.takenOn, { month: "short", year: "numeric" }) || "♡"}</span>
               </motion.button>
             ))}
@@ -79,8 +79,7 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
           <div className="columns-2 gap-3 sm:columns-3">
             {list.map((p, i) => (
               <button key={p.id} type="button" onClick={() => setOpen(i)} className="press mb-3 block w-full overflow-hidden rounded-3xl shadow-soft" aria-label={p.title ?? "Apri foto"}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.thumbUrl} alt={p.title ?? ""} loading="lazy" className="w-full" style={p.width && p.height ? { aspectRatio: `${p.width}/${p.height}` } : undefined} />
+                <PhotoFrame photo={p} alt={p.title ?? ""} frame="natural" minRatio={9 / 16} maxRatio={2.4} useThumb className="w-full" />
               </button>
             ))}
           </div>
@@ -97,8 +96,7 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
                 <div className="mt-2 grid grid-cols-3 gap-2">
                   {items.map(({ p, i }) => (
                     <button key={p.id} type="button" onClick={() => setOpen(i)} className="press overflow-hidden rounded-2xl" aria-label={p.title ?? "Apri foto"}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={p.thumbUrl} alt={p.title ?? ""} loading="lazy" className="aspect-square w-full object-cover" />
+                      <PhotoFrame photo={p} alt={p.title ?? ""} frame={1} useThumb className="w-full" />
                     </button>
                   ))}
                 </div>
@@ -112,14 +110,13 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
             {list.map((p, i) => (
               <figure key={p.id} className="paper overflow-hidden rounded-4xl">
                 <button type="button" onClick={() => setOpen(i)} className="block w-full" aria-label={p.title ?? "Apri foto"}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.url} alt={p.title ?? ""} loading="lazy" className="w-full" style={p.width && p.height ? { aspectRatio: `${p.width}/${p.height}` } : undefined} />
+                  <PhotoFrame photo={p} alt={p.title ?? ""} frame="natural" className="w-full" />
                 </button>
-                {(p.title || p.caption) && (
+                {(p.title || p.caption || p.place) && (
                   <figcaption className="p-4">
                     {p.title && <p className="font-display text-lg font-semibold text-vio-900">{p.title}</p>}
                     {p.caption && <p className="text-sm text-ink-soft">{p.caption}</p>}
-                    {p.takenOn && <p className="mt-1 text-xs font-bold text-vio-500">{formatDate(p.takenOn)}</p>}
+                    {(p.takenOn || p.place) && <p className="mt-1 text-xs font-bold text-vio-500">{[p.takenOn ? formatDate(p.takenOn) : null, p.place].filter(Boolean).join(" · ")}</p>}
                   </figcaption>
                 )}
               </figure>

@@ -117,6 +117,7 @@ Aggiunge: una protezione in più sulle funzioni del database, l'interruttore pri
 > Su un progetto **nuovo** non serve: `setup.sql` contiene già tutto.
 
 - Per aggiornamenti futuri: `update.sql` contiene sempre tutte le migration successive alla prima versione, ed è sempre sicuro da rieseguire.
+- 🔒 **I tuoi dati sono al sicuro**: `update.sql` aggiunge solo colonne, tabelle e funzioni nuove, non cancella né modifica foto, ricordi, dediche o messaggi (c'è un test che lo controlla). `setup.sql`, se per errore lo esegui su un progetto già in uso, si ferma alla prima riga senza toccare niente.
 - (Per sviluppatori) con il CLI di Supabase: `supabase link` e poi `supabase db push`.
 - Dopo aver modificato migration o seed, rigenera i file con `npm run db:bundle` (aggiorna `setup.sql` e `update.sql`).
 

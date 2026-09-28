@@ -54,11 +54,12 @@ export async function getBreathingData() {
     audioUrl: p.audio_id ? (media.get(p.audio_id)?.url ?? null) : null,
   }));
 
-  const linked: BreathingPhoto[] = (links ?? [])
-    .map((l) => ({ url: l.media_id ? media.get(l.media_id)?.url : undefined, text: l.text }))
-    .filter((x): x is BreathingPhoto => Boolean(x.url));
+  const linked: BreathingPhoto[] = (links ?? []).flatMap((l) => {
+    const m = l.media_id ? media.get(l.media_id) : undefined;
+    return m ? [{ url: m.url, text: l.text, thumbUrl: m.thumbUrl, width: m.width, height: m.height, focus: m.focus }] : [];
+  });
   const signedPool = await signMedia(supabase, shuffle(pool ?? []).slice(0, 12));
-  const photos = [...linked, ...signedPool.map((m) => ({ url: m.url, text: null }))];
+  const photos = [...linked, ...signedPool.map((m) => ({ url: m.url, text: null, thumbUrl: m.thumbUrl, width: m.width, height: m.height, focus: m.focus }))];
 
   return {
     presets: views.length ? views : [FALLBACK_PRESET],

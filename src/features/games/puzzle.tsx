@@ -7,6 +7,7 @@ import { HeartBurst } from "@/components/decor/burst";
 import { track } from "@/features/activity/track";
 import { seededRandom, shuffle } from "@/utils/random";
 import { cn } from "@/utils/cn";
+import { brokenRef, focusPosition } from "@/components/ui/photo";
 
 /** Tap two tiles to swap them until the photo is complete. */
 const N = 3;
@@ -17,8 +18,11 @@ function scrambled(rand: () => number) {
   return t;
 }
 
-export function Puzzle({ imageUrl, seed }: { imageUrl: string | null; seed: string }) {
+export function Puzzle({ imageUrl: photoUrl, seed, focus }: { imageUrl: string | null; seed: string; focus?: string | null }) {
   const n = N;
+  // a photo that cannot be loaded falls back to the numbered gradient tiles
+  const [broken, setBroken] = useState(false);
+  const imageUrl = broken ? null : photoUrl;
   const [tiles, setTiles] = useState<number[]>(() => scrambled(seededRandom(seed)));
   const [sel, setSel] = useState<number | null>(null);
   const [moves, setMoves] = useState(0);
@@ -72,7 +76,7 @@ export function Puzzle({ imageUrl, seed }: { imageUrl: string | null; seed: stri
       <div className="relative mx-auto max-w-sm">
       {peek && imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt="La foto completa" className="absolute inset-0 z-10 aspect-square h-full w-full rounded-3xl object-cover shadow-soft" />
+        <img src={imageUrl} alt="La foto completa" className="absolute inset-0 z-10 aspect-square h-full w-full rounded-3xl object-cover shadow-soft" style={{ objectPosition: focusPosition(focus) }} />
       )}
       <div className="grid aspect-square gap-1 overflow-hidden rounded-3xl bg-surface p-1 shadow-soft" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
         {tiles.map((t, i) => {
@@ -93,7 +97,7 @@ export function Puzzle({ imageUrl, seed }: { imageUrl: string | null; seed: stri
                 // shifted so this tile shows its own n×n piece.
                 <span className="pointer-events-none absolute" style={{ width: `${n * 100}%`, height: `${n * 100}%`, left: `${-col * 100}%`, top: `${-row * 100}%` }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={imageUrl} alt="" className="h-full w-full object-cover" draggable={false} />
+                  <img src={imageUrl} alt="" className="h-full w-full object-cover" style={{ objectPosition: focusPosition(focus) }} draggable={false} ref={brokenRef(() => setBroken(true))} onError={() => setBroken(true)} />
                 </span>
               ) : (
                 <span className="absolute inset-0 grid place-items-center text-xl font-extrabold text-white/80">{t + 1}</span>

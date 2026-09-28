@@ -9,6 +9,7 @@ import { Markdown } from "@/components/ui/markdown";
 import { formatDate } from "@/utils/dates";
 import { pickOne } from "@/utils/random";
 import { MEMORY_KINDS } from "@/features/content/constants";
+import { Photo, type PhotoSrc } from "@/components/ui/photo";
 
 export type MemoryItem = {
   id: string;
@@ -18,6 +19,7 @@ export type MemoryItem = {
   happenedOn: string | null;
   place: string | null;
   imageUrl: string | null;
+  photo?: PhotoSrc | null;
   important: boolean;
 };
 
@@ -59,10 +61,7 @@ export function MemoryTimeline({ items, initialOpenId, now }: { items: MemoryIte
                 {k.emoji}
               </span>
               <button type="button" onClick={() => setOpen(m)} className="press paper block w-full overflow-hidden rounded-[1.75rem] text-left">
-                {m.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={m.imageUrl} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
-                )}
+                {m.imageUrl && <Photo photo={m.photo ?? { url: m.imageUrl }} alt="" frame={16 / 9} useThumb className="w-full" />}
                 <span className="block p-4">
                   <span className="block text-xs font-extrabold tracking-widest text-vio-500 uppercase">
                     {k.label}
@@ -96,10 +95,7 @@ export function MemoryTimeline({ items, initialOpenId, now }: { items: MemoryIte
                 <MapPin className="size-4" /> {open.place}
               </p>
             )}
-            {open.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={open.imageUrl} alt="" className="mt-4 w-full rounded-3xl" />
-            )}
+            {open.imageUrl && <Photo photo={open.photo ?? { url: open.imageUrl }} alt={open.title} frame="natural" className="mt-4 w-full rounded-3xl" />}
             {open.body && <Markdown className="mt-4 text-[17px]">{open.body}</Markdown>}
           </article>
         )}

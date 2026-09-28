@@ -67,7 +67,7 @@ export const TASKS: TaskDef[] = [
     priority: "essential",
     href: "/admin/completa#come-aggiornare",
     cta: "Come si fa",
-    check: (f) => ({ done: f.databaseUpdated, detail: f.databaseUpdated ? "aggiornato" : "mancano le ultime novità (cuori, lista \"Completa\")" }),
+    check: (f) => ({ done: f.databaseUpdated, detail: f.databaseUpdated ? "aggiornato" : "mancano le ultime novità (cuori, lista \"Completa\", luogo e soggetto delle foto)" }),
   },
   {
     id: "service-key",

@@ -10,6 +10,7 @@ import { HeartBurst } from "@/components/decor/burst";
 import { Sparkle } from "@/components/decor/stars";
 import { track } from "@/features/activity/track";
 import { shuffle } from "@/utils/random";
+import { Photo, type PhotoSrc } from "@/components/ui/photo";
 
 export type SurpriseItem = {
   type: string;
@@ -17,6 +18,7 @@ export type SurpriseItem = {
   title: string;
   text?: string | null;
   imageUrl?: string | null;
+  photo?: PhotoSrc | null;
   href?: string | null;
   ctaLabel?: string | null;
 };
@@ -82,10 +84,7 @@ export function SurpriseBox({ items }: { items: SurpriseItem[] }) {
             transition={{ type: "spring", damping: 14 }}
             className="paper mt-2 w-full overflow-hidden rounded-[2rem]"
           >
-            {current.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={current.imageUrl} alt="" className="aspect-[4/3] w-full object-cover" />
-            )}
+            {current.imageUrl && <Photo photo={current.photo ?? { url: current.imageUrl }} alt="" frame={4 / 3} className="w-full" />}
             <div className="p-6">
               <p className="font-hand text-2xl text-vio-500">{current.eyebrow}</p>
               <h2 className="mt-1 font-display text-[1.7rem] leading-tight font-semibold text-vio-900">{current.title}</h2>

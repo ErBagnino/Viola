@@ -18,6 +18,16 @@ export function buildSetupSql() {
     "-- new project. Do not edit by hand: edit supabase/migrations instead.",
     "-- =====================================================================",
     "",
+    "-- Safety first: on a database that already holds Vio ♡ (your photos,",
+    "-- memories, messages…) this file stops right here and changes nothing.",
+    "do $$",
+    "begin",
+    "  if to_regclass('public.media') is not null then",
+    "    raise exception 'Questo database contiene già Vio ♡: setup.sql è solo per un progetto NUOVO e non è stato eseguito. Per aggiornare usa supabase/update.sql (non cancella niente).';",
+    "  end if;",
+    "end;",
+    "$$;",
+    "",
   ];
   for (const f of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     parts.push(`-- ---------------------------------------------------------------------`, `-- ${f}`, `-- ---------------------------------------------------------------------`, readFileSync(path.join(dir, f), "utf8").trim(), "");

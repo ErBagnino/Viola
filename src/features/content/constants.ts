@@ -112,6 +112,15 @@ export const MEDIA_CONTEXTS: Record<string, string> = {
   surprises: "Sorprese",
 };
 
+/** Which part of a photo to keep when a frame has to crop it. */
+export const PHOTO_FOCUS: Record<string, string> = {
+  center: "Al centro",
+  top: "In alto",
+  bottom: "In basso",
+  left: "A sinistra",
+  right: "A destra",
+};
+
 export const MEDIA_CATEGORY_SUGGESTIONS = ["noi", "adam", "viola", "viaggi", "appuntamenti", "casa", "divertenti"];
 
 export const OPEN_WHEN_ANIMATIONS: Record<string, string> = { hearts: "Cuori", stars: "Stelle", petals: "Petali", none: "Nessuna" };

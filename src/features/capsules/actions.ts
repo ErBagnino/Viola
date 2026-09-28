@@ -16,6 +16,6 @@ export async function openCapsule(id: string) {
     if (!data || new Date(data.unlock_at).getTime() > Date.now()) throw new UserError("Questa lettera non è ancora pronta.");
     if (viewer.role === "user") await supabase.rpc("mark_capsule_opened", { capsule_id: id });
     const media = await mediaFor(supabase, data.media_id);
-    return { title: data.title, body: data.body, imageUrl: media?.url ?? null };
+    return { title: data.title, body: data.body, imageUrl: media?.url ?? null, photo: media ? { url: media.url, thumbUrl: media.thumbUrl, width: media.width, height: media.height, focus: media.focus } : null };
   });
 }

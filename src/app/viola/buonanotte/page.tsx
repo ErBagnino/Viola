@@ -8,6 +8,7 @@ import { phraseOfTheDay } from "@/server/viola-data";
 import { getDedications } from "@/server/noi-data";
 import { pickOne } from "@/utils/random";
 import { Markdown } from "@/components/ui/markdown";
+import { Photo } from "@/components/ui/photo";
 
 export const metadata = { title: "Buonanotte" };
 
@@ -35,8 +36,7 @@ export default async function BuonanottePage() {
         </header>
         {photo && (
           <figure className="mx-auto w-3/4 rotate-2 polaroid rounded-md p-2 pb-4 shadow-2xl">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo.url} alt="Noi" className="aspect-square w-full rounded-sm object-cover" />
+            <Photo photo={photo} alt="Noi" frame="natural" minRatio={4 / 5} maxRatio={16 / 9} loading="eager" className="w-full rounded-sm" />
             <figcaption className="mt-2 text-center font-hand text-xl text-night-800">sogni d&apos;oro</figcaption>
           </figure>
         )}

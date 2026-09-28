@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { PhotoFallback } from "@/components/ui/photo";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { formatDate } from "@/utils/dates";
@@ -16,11 +17,14 @@ export type Photo = {
   title: string | null;
   caption: string | null;
   takenOn: string | null;
+  place?: string | null;
+  focus?: string | null;
 };
 
 export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]; index: number | null; onChange: (i: number) => void; onClose: () => void }) {
   const open = index !== null;
   const isClient = useIsClient();
+  const [broken, setBroken] = useState<string | null>(null);
   const go = useCallback(
     (d: number) => {
       if (index === null || !photos.length) return;
@@ -52,7 +56,7 @@ export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]
     <AnimatePresence>
       {p && (
         <motion.div
-          className="fixed inset-0 z-[90] flex flex-col bg-black/95 text-white"
+          className="fixed inset-0 z-[90] flex flex-col bg-black text-white"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -70,8 +74,14 @@ export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]
           </div>
           <div className="relative flex flex-1 items-center justify-center overflow-hidden">
             <AnimatePresence mode="popLayout" initial={false}>
+              {broken === p.url ? (
+                <span key={`${p.id}-x`} className="relative block aspect-square w-[min(80vw,24rem)] overflow-hidden rounded-3xl">
+                  <PhotoFallback text="Questa foto non si apre adesso" />
+                </span>
+              ) : (
               <motion.img
                 key={p.id}
+                onError={() => setBroken(p.url)}
                 src={p.url}
                 alt={p.title ?? p.caption ?? "Foto"}
                 className="max-h-full max-w-full object-contain select-none"
@@ -87,6 +97,7 @@ export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]
                 }}
                 draggable={false}
               />
+              )}
             </AnimatePresence>
             {photos.length > 1 && (
               <>
@@ -102,7 +113,7 @@ export function Lightbox({ photos, index, onChange, onClose }: { photos: Photo[]
           <div className="px-5 pt-3 pb-[max(env(safe-area-inset-bottom),1.25rem)] text-center">
             {p.title && <p className="font-display text-xl font-semibold">{p.title}</p>}
             {p.caption && <p className="mt-1 text-white/75">{p.caption}</p>}
-            {p.takenOn && <p className="mt-1 text-sm text-white/50">{formatDate(p.takenOn)}</p>}
+            {(p.takenOn || p.place) && <p className="mt-1 text-sm text-white/50">{[p.takenOn ? formatDate(p.takenOn) : null, p.place].filter(Boolean).join(" · ")}</p>}
           </div>
         </motion.div>
       )}

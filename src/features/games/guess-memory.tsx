@@ -8,8 +8,9 @@ import { HeartBurst } from "@/components/decor/burst";
 import { track } from "@/features/activity/track";
 import { formatDate } from "@/utils/dates";
 import { haptic } from "@/utils/haptics";
+import { Photo, type PhotoSrc } from "@/components/ui/photo";
 
-export type GuessItem = { id: string; imageUrl: string; question: string; title: string | null; date: string | null; place: string | null; text: string | null };
+export type GuessItem = { id: string; imageUrl: string; photo?: PhotoSrc | null; question: string; title: string | null; date: string | null; place: string | null; text: string | null };
 
 /** "Indovina il ricordo": a blurred photo, a question, then the reveal. */
 export function GuessMemory({ items }: { items: GuessItem[] }) {
@@ -39,12 +40,14 @@ export function GuessMemory({ items }: { items: GuessItem[] }) {
           className="polaroid w-full max-w-sm rounded-md p-3 pb-5 shadow-float"
         >
           <div className="relative overflow-hidden rounded-sm">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={item.imageUrl}
+            <Photo
+              photo={item.photo ?? { url: item.imageUrl }}
               alt={revealed ? (item.title ?? "Un nostro ricordo") : "Foto sfocata: prova a indovinare"}
-              className="aspect-[4/5] w-full object-cover transition-[filter] duration-700 ease-out"
-              style={{ filter: revealed ? "none" : "blur(18px) saturate(1.1)" }}
+              frame={4 / 5}
+              loading="eager"
+              className="w-full"
+              imgClassName="transition-[filter] duration-700 ease-out"
+              imgStyle={{ filter: revealed ? "none" : "blur(18px) saturate(1.1)" }}
             />
             {!revealed && <span className="absolute inset-0 grid place-items-center font-display text-5xl text-white drop-shadow">?</span>}
           </div>

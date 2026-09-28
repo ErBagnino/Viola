@@ -25,4 +25,4 @@ export type BreathingPresetView = {
   audioUrl: string | null;
 };
 
-export type BreathingPhoto = { url: string; text: string | null };
+export type BreathingPhoto = { url: string; text: string | null; thumbUrl?: string | null; width?: number | null; height?: number | null; focus?: string | null };

@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GuessMemory, type GuessItem } from "@/features/games/guess-memory";
 import { createViolaClient } from "@/server/viola-view";
-import { mediaByIds, signMedia } from "@/server/media";
+import { mediaByIds, signMedia, photoSrc } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { shuffle } from "@/utils/random";
 
@@ -19,9 +19,9 @@ export default async function GuessPage() {
   const memMedia = await mediaByIds(supabase, (memories ?? []).map((m) => m.media_id));
   const fromMemories: GuessItem[] = (memories ?? []).flatMap((m) => {
     const img = m.media_id ? memMedia.get(m.media_id) : null;
-    return img ? [{ id: m.id, imageUrl: img.url, question: m.place ? "Ti ricordi dov'eravamo?" : "Ti ricordi quando?", title: m.title, date: m.happened_on, place: m.place, text: m.body.slice(0, 280) }] : [];
+    return img ? [{ id: m.id, imageUrl: img.url, photo: photoSrc(img), question: m.place ? "Ti ricordi dov'eravamo?" : "Ti ricordi quando?", title: m.title, date: m.happened_on, place: m.place, text: m.body.slice(0, 280) }] : [];
   });
-  const fromPhotos: GuessItem[] = fromMemories.length >= 3 ? [] : (await signMedia(supabase, shuffle(photos ?? []).slice(0, 20))).map((p) => ({ id: p.id, imageUrl: p.url, question: "Ti ricordi questa foto?", title: p.title, date: p.takenOn, place: null, text: p.caption }));
+  const fromPhotos: GuessItem[] = fromMemories.length >= 3 ? [] : (await signMedia(supabase, shuffle(photos ?? []).slice(0, 20))).map((p) => ({ id: p.id, imageUrl: p.url, photo: photoSrc(p), question: "Ti ricordi questa foto?", title: p.title, date: p.takenOn, place: null, text: p.caption }));
   const items = shuffle([...fromMemories, ...fromPhotos]);
   return (
     <div>

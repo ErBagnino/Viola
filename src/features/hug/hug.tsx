@@ -5,9 +5,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { track } from "@/features/activity/track";
+import { brokenRef, focusPosition } from "@/components/ui/photo";
 
-export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: string | null; adamName: string }) {
+export function Hug({ lines, photoUrl, photoFocus, adamName }: { lines: string[]; photoUrl: string | null; photoFocus?: string | null; adamName: string }) {
   const [i, setI] = useState(0);
+  const [broken, setBroken] = useState(false);
   const [holding, setHolding] = useState(false);
   const [squeezes, setSqueezes] = useState(0);
   const vib = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -73,9 +75,9 @@ export function Hug({ lines, photoUrl, adamName }: { lines: string[]; photoUrl: 
           className="relative grid size-56 touch-none place-items-center overflow-hidden rounded-full bg-gradient-to-br from-wine-200 to-rouge-400 shadow-glow select-none"
           aria-label="Tieni premuto per un abbraccio"
         >
-          {photoUrl ? (
+          {photoUrl && !broken ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoUrl} alt={adamName} className="h-full w-full object-cover opacity-90" draggable={false} />
+            <img src={photoUrl} alt={adamName} className="h-full w-full object-cover opacity-90" style={{ objectPosition: focusPosition(photoFocus) }} draggable={false} ref={brokenRef(() => setBroken(true))} onError={() => setBroken(true)} />
           ) : (
             <span className="text-8xl">♥</span>
           )}

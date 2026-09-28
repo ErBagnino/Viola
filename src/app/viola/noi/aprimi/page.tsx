@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { OpenWhenGrid } from "@/features/open-when/open-when-grid";
 import { APP_ACTIONS, actionHref, isAppAction } from "@/features/actions/registry";
 import { createViolaClient } from "@/server/viola-view";
-import { mediaByIds } from "@/server/media";
+import { mediaByIds, photoSrc } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 
@@ -20,6 +20,7 @@ export default async function AprimiPage() {
     title: c.title,
     body: c.body,
     imageUrl: c.media_id ? (media.get(c.media_id)?.url ?? null) : null,
+    photo: c.media_id ? photoSrc(media.get(c.media_id)) : null,
     audioUrl: c.audio_id ? (media.get(c.audio_id)?.url ?? null) : null,
     animation: c.animation,
     ctaHref: actionHref(c.cta_action, contact),

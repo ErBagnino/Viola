@@ -357,13 +357,13 @@ isOneToOne: false
                   ]
                 },"media": {
                   Row: {
-                    "ai_avatar_enabled": boolean,"breathing_enabled": boolean,"bucket": string,"caption": string | null,"category": string | null,"contexts": (string)[],"created_at": string,"created_by": string | null,"duration_seconds": number | null,"featured": boolean,"height": number | null,"id": string,"include_in_random": boolean,"kind": string,"mime": string,"path": string,"size_bytes": number,"tags": (string)[],"taken_on": string | null,"thumb_path": string | null,"title": string | null,"updated_at": string,"visibility": string,"width": number | null
+                    "ai_avatar_enabled": boolean,"breathing_enabled": boolean,"bucket": string,"caption": string | null,"category": string | null,"contexts": (string)[],"created_at": string,"created_by": string | null,"duration_seconds": number | null,"featured": boolean,"focus": string,"height": number | null,"id": string,"include_in_random": boolean,"kind": string,"mime": string,"path": string,"place": string | null,"size_bytes": number,"tags": (string)[],"taken_on": string | null,"thumb_path": string | null,"title": string | null,"updated_at": string,"visibility": string,"width": number | null
                   }
                   Insert: {
-                    "ai_avatar_enabled"?: boolean,"breathing_enabled"?: boolean,"bucket"?: string,"caption"?: string | null,"category"?: string | null,"contexts"?: (string)[],"created_at"?: string,"created_by"?: string | null,"duration_seconds"?: number | null,"featured"?: boolean,"height"?: number | null,"id"?: string,"include_in_random"?: boolean,"kind"?: string,"mime": string,"path": string,"size_bytes"?: number,"tags"?: (string)[],"taken_on"?: string | null,"thumb_path"?: string | null,"title"?: string | null,"updated_at"?: string,"visibility"?: string,"width"?: number | null
+                    "ai_avatar_enabled"?: boolean,"breathing_enabled"?: boolean,"bucket"?: string,"caption"?: string | null,"category"?: string | null,"contexts"?: (string)[],"created_at"?: string,"created_by"?: string | null,"duration_seconds"?: number | null,"featured"?: boolean,"focus"?: string,"height"?: number | null,"id"?: string,"include_in_random"?: boolean,"kind"?: string,"mime": string,"path": string,"place"?: string | null,"size_bytes"?: number,"tags"?: (string)[],"taken_on"?: string | null,"thumb_path"?: string | null,"title"?: string | null,"updated_at"?: string,"visibility"?: string,"width"?: number | null
                   }
                   Update: {
-                    "ai_avatar_enabled"?: boolean,"breathing_enabled"?: boolean,"bucket"?: string,"caption"?: string | null,"category"?: string | null,"contexts"?: (string)[],"created_at"?: string,"created_by"?: string | null,"duration_seconds"?: number | null,"featured"?: boolean,"height"?: number | null,"id"?: string,"include_in_random"?: boolean,"kind"?: string,"mime"?: string,"path"?: string,"size_bytes"?: number,"tags"?: (string)[],"taken_on"?: string | null,"thumb_path"?: string | null,"title"?: string | null,"updated_at"?: string,"visibility"?: string,"width"?: number | null
+                    "ai_avatar_enabled"?: boolean,"breathing_enabled"?: boolean,"bucket"?: string,"caption"?: string | null,"category"?: string | null,"contexts"?: (string)[],"created_at"?: string,"created_by"?: string | null,"duration_seconds"?: number | null,"featured"?: boolean,"focus"?: string,"height"?: number | null,"id"?: string,"include_in_random"?: boolean,"kind"?: string,"mime"?: string,"path"?: string,"place"?: string | null,"size_bytes"?: number,"tags"?: (string)[],"taken_on"?: string | null,"thumb_path"?: string | null,"title"?: string | null,"updated_at"?: string,"visibility"?: string,"width"?: number | null
                   }
                   Relationships: [
                     
@@ -553,7 +553,15 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_usage_stats":
+            "admin_batch_update_media":
+{ Args: { "media_ids": (string)[],"patch": Json }; Returns: {
+              "id": string,"previous": Json,"updated_at": string
+            }[]
+                           },
+"admin_restore_media":
+{ Args: { "batch_updated_at": string,"snapshot": Json }; Returns: string[]
+                           },
+"admin_usage_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "app_role":

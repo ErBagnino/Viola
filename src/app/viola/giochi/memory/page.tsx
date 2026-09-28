@@ -13,7 +13,7 @@ export default async function Page() {
   return (
     <div>
       <PageHeader title="Memory" subtitle="Trova le coppie." back="/viola/giochi" />
-      <MemoryGame images={signed.map((m) => m.thumbUrl)} seed={newSeed()} />
+      <MemoryGame images={signed.map((m) => ({ url: m.thumbUrl, focus: m.focus }))} seed={newSeed()} />
     </div>
   );
 }

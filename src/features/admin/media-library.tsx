@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { Lock, Music, Trash2, Wind } from "lucide-react";
+import { Check, CheckSquare, Lock, Music, Pencil, Trash2, Wind, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Chip, Field, Input, Segmented, Switch } from "@/components/ui/fields";
 import { Sheet } from "@/components/ui/sheet";
@@ -16,11 +16,29 @@ import { AudioUploader, ImageUploader } from "./fields/uploaders";
 import { ResourceForm } from "./resource-form";
 import { RESOURCES } from "./resources";
 import { callAction } from "@/utils/call-action";
+import { Photo } from "@/components/ui/photo";
+import { BatchEditor } from "./media-batch-editor";
+import { batchDeleteMedia, batchUpdateMedia, undoMediaBatch } from "./media-batch-actions";
+import { LIBRARY_LIMIT, type BatchPatch } from "./media-batch";
+
+// "Usata in…" labels that point to content (a deleted photo leaves that content without its picture)
+const CONTENT_USE = /^(Ricordo|Dedica|Busta|Countdown|Sorpresa|Capsula|Aiutami|La voce|Respiro|Avatar)/;
+
+type BatchResult = { text: string; details?: string[]; undoId?: string | null; tone: "ok" | "warn" };
+
+const photoOf = (m: LibraryItem) => ({
+  url: m.url,
+  thumbUrl: m.thumbUrl,
+  width: typeof m.width === "number" ? m.width : null,
+  height: typeof m.height === "number" ? m.height : null,
+  focus: typeof m.focus === "string" ? m.focus : null,
+});
+const n = (count: number) => (count === 1 ? "1 foto" : `${count} foto`);
 
 export type LibraryItem = Record<string, unknown> & { id: string; kind: string; url: string; thumbUrl: string; size_bytes: number };
 
 export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola" }: { items: LibraryItem[]; categories: string[]; usage?: Record<string, string[]>; violaName?: string }) {
-  const [tab, setTab] = useState<"image" | "audio">("image");
+  const [tab, setTabState] = useState<"image" | "audio">("image");
   const [cat, setCat] = useState<string | null>(null);
   const [only, setOnly] = useState<"unused" | "private" | null>(null);
   const usedIn = (m: LibraryItem) => usage[m.id] ?? [];
@@ -31,6 +49,29 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
   const toast = useToast();
   const router = useRouter();
   const def = RESOURCES.media;
+
+  // --- batch selection -------------------------------------------------------
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selecting, setSelecting] = useState(false);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [result, setResult] = useState<BatchResult | null>(null);
+  const selectionMode = tab === "image" && (selecting || selected.size > 0);
+  const clearSelection = () => {
+    setSelected(new Set());
+    setSelecting(false);
+  };
+  const setTab = (t: "image" | "audio") => {
+    clearSelection();
+    setTabState(t);
+  };
+  const toggle = (id: string) =>
+    setSelected((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const list = useMemo(
     () =>
@@ -45,6 +86,66 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
   const unusedCount = items.filter((m) => m.kind === tab && !(usage[m.id] ?? []).length).length;
   const privateCount = items.filter((m) => m.kind === tab && m.visibility === "private").length;
   const suggestions = Array.from(new Set([...MEDIA_CATEGORY_SUGGESTIONS, ...categories]));
+  const places = Array.from(new Set(items.map((m) => (typeof m.place === "string" ? m.place : "")).filter(Boolean)));
+  const visibleSelected = list.filter((m) => selected.has(m.id)).length;
+  const hiddenSelected = selected.size - visibleSelected;
+  const allVisibleSelected = list.length > 0 && visibleSelected === list.length;
+  const filtered = cat !== null || only !== null;
+  const titleOf = (id: string) => {
+    const m = items.find((x) => x.id === id);
+    return (typeof m?.title === "string" && m.title) || "senza titolo";
+  };
+  const selectedItems = items.filter((m) => selected.has(m.id));
+  const usedInContent = selectedItems.filter((m) => usedIn(m).some((u) => CONTENT_USE.test(u))).length;
+
+  const applyBatch = (patch: BatchPatch) =>
+    start(async () => {
+      const ids = [...selected];
+      const res = await callAction(() => batchUpdateMedia(ids, patch));
+      if (!res.ok) return toast.show(res.error, "error");
+      const failed = res.failed.map(titleOf);
+      setResult({
+        tone: failed.length ? "warn" : "ok",
+        text: failed.length ? `${n(res.updated)} aggiornate · ${n(failed.length)} non aggiornate` : `✓ ${res.updated === 1 ? "1 foto aggiornata" : `${res.updated} foto aggiornate`}`,
+        details: failed.length ? [`Non aggiornate (forse eliminate nel frattempo): ${failed.slice(0, 8).join(", ")}${failed.length > 8 ? "…" : ""}`] : undefined,
+        undoId: res.undoId,
+      });
+      toast.show(res.updated === 1 ? "1 foto aggiornata ♡" : `${res.updated} foto aggiornate ♡`);
+      setBatchOpen(false);
+      clearSelection();
+      router.refresh();
+    });
+
+  const undo = (undoId: string) =>
+    start(async () => {
+      const res = await callAction(() => undoMediaBatch(undoId));
+      if (!res.ok) return toast.show(res.error, "error");
+      setResult({
+        tone: res.skipped ? "warn" : "ok",
+        text: `Modifica annullata: ${res.restored === 1 ? "1 foto tornata" : `${res.restored} foto tornate`} com'era`,
+        details: res.skipped ? [`${n(res.skipped)} erano state cambiate di nuovo dopo: le ho lasciate così.`] : undefined,
+      });
+      router.refresh();
+    });
+
+  const deleteSelected = () =>
+    start(async () => {
+      const ids = [...selected];
+      const res = await callAction(() => batchDeleteMedia(ids));
+      if (!res.ok) return toast.show(res.error, "error");
+      const failed = res.failed.map(titleOf);
+      setResult({
+        tone: failed.length || res.filesLeft ? "warn" : "ok",
+        text: `${res.deleted === 1 ? "1 foto eliminata" : `${res.deleted} foto eliminate`}${failed.length ? ` · ${n(failed.length)} non eliminate` : ""}`,
+        details: [
+          ...(failed.length ? [`Non eliminate: ${failed.slice(0, 8).join(", ")}`] : []),
+          ...(res.filesLeft ? [`${res.filesLeft} file sono rimasti nello spazio foto: puoi ignorarli.`] : []),
+        ],
+      });
+      setDeleteOpen(false);
+      clearSelection();
+      router.refresh();
+    });
 
   const save = () =>
     start(async () => {
@@ -147,6 +248,51 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
           ))}
       </div>
 
+      {result && (
+        <div role="status" className={cn("flex flex-wrap items-center gap-x-3 gap-y-2 rounded-3xl p-4 ring-1", result.tone === "ok" ? "bg-surface ring-line" : "bg-peach-100 ring-peach-200")}>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-vio-900">{result.text}</p>
+            {result.details?.map((d) => (
+              <p key={d} className="text-sm text-ink-soft">
+                {d}
+              </p>
+            ))}
+          </div>
+          {result.undoId && (
+            <Button size="sm" variant="soft" loading={pending} onClick={() => undo(result.undoId!)}>
+              Annulla
+            </Button>
+          )}
+          <Button size="icon" variant="ghost" onClick={() => setResult(null)} aria-label="Chiudi il messaggio">
+            <X className="size-4" />
+          </Button>
+        </div>
+      )}
+
+      {tab === "image" && list.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="mr-auto text-sm font-bold text-ink-muted">
+            {list.length === 1 ? "1 foto" : `${list.length} foto`}
+            {filtered ? " con questo filtro" : ""}
+          </p>
+          {selectionMode ? (
+            <>
+              <Button size="sm" variant="soft" onClick={() => (allVisibleSelected ? setSelected((s) => new Set([...s].filter((id) => !list.some((m) => m.id === id)))) : setSelected((s) => new Set([...s, ...list.map((m) => m.id)])))}>
+                <CheckSquare className="size-4" />
+                {allVisibleSelected ? "Deseleziona tutte" : `Seleziona tutte le ${list.length} mostrate`}
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" variant="soft" onClick={() => setSelecting(true)}>
+              <CheckSquare className="size-4" /> Seleziona più foto
+            </Button>
+          )}
+        </div>
+      )}
+      {selectionMode && items.length >= LIBRARY_LIMIT && (
+        <p className="text-xs text-ink-muted">Qui vedi le ultime {LIBRARY_LIMIT} foto caricate: &quot;Seleziona tutte&quot; vale solo per queste.</p>
+      )}
+
       {list.length === 0 ? (
         only === "unused" ? (
           <EmptyState title="Tutto è usato da qualche parte ♡" text="Nessun file dimenticato." />
@@ -154,20 +300,52 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
           <EmptyState title={tab === "image" ? "Nessuna foto ancora" : "Nessun audio ancora"} text="Caricane qui sopra ♡" />
         )
       ) : tab === "image" ? (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-          {list.map((m) => (
-            <button key={m.id} type="button" onClick={() => setEdit({ ...m })} className="press relative overflow-hidden rounded-2xl bg-surface shadow-soft" aria-label={`Modifica ${String(m.title ?? "foto")}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={m.thumbUrl} alt={String(m.title ?? "")} loading="lazy" className="aspect-square w-full object-cover" />
-              <span className="absolute top-1.5 left-1.5 flex gap-1">
-                {m.visibility === "private" && <Lock className="size-5 rounded-full bg-black/60 p-1 text-white" />}
-                {Boolean(m.breathing_enabled) && <Wind className="size-5 rounded-full bg-black/60 p-1 text-white" />}
-              </span>
-              {usedIn(m).length === 0 && <span className="absolute top-1.5 right-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white">non usata</span>}
-              {typeof m.title === "string" && m.title && <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 px-2 pt-4 pb-1 text-left text-[11px] font-bold text-white">{m.title}</span>}
-            </button>
-          ))}
-        </div>
+        <ul className="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-4 lg:grid-cols-6" aria-label="Foto">
+          {list.map((m) => {
+            const on = selected.has(m.id);
+            const title = (typeof m.title === "string" && m.title) || "foto senza titolo";
+            const meta = [m.category, m.taken_on ? formatDate(String(m.taken_on), { month: "short", year: "numeric" }) : null, m.place].filter(Boolean).join(" · ");
+            return (
+              <li key={m.id} className="group relative" data-selected={on || undefined}>
+                <button
+                  type="button"
+                  onClick={() => (selectionMode ? toggle(m.id) : setEdit({ ...m }))}
+                  aria-pressed={selectionMode ? on : undefined}
+                  aria-label={selectionMode ? `${title}: ${on ? "selezionata" : "non selezionata"}` : `Modifica ${title}`}
+                  className={cn("press relative block w-full overflow-hidden rounded-2xl bg-surface shadow-soft transition", on && "ring-4 ring-wine-600 ring-offset-2 ring-offset-canvas dark:ring-rouge-400")}
+                >
+                  <Photo photo={photoOf(m)} alt={typeof m.title === "string" ? m.title : ""} frame={1} mode="cover" useThumb className="w-full" />
+                  {on && <span className="absolute inset-0 bg-wine-900/30" aria-hidden />}
+                  <span className="absolute top-1.5 left-1.5 flex flex-wrap gap-1" aria-hidden>
+                    {m.visibility === "private" && <Lock className="size-5 rounded-full bg-black/60 p-1 text-white" />}
+                    {Boolean(m.breathing_enabled) && <Wind className="size-5 rounded-full bg-black/60 p-1 text-white" />}
+                    {usedIn(m).length === 0 && <span className="rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white">non usata</span>}
+                  </span>
+                  {typeof m.title === "string" && m.title && <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/60 px-2 pt-4 pb-1 text-left text-[11px] font-bold text-white">{m.title}</span>}
+                </button>
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={on}
+                  aria-label={`Seleziona ${title}`}
+                  onClick={() => toggle(m.id)}
+                  className={cn(
+                    "absolute top-0 right-0 grid size-11 place-items-center rounded-2xl transition-opacity",
+                    selectionMode ? "opacity-100" : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:pointer-events-none",
+                  )}
+                  tabIndex={selectionMode ? 0 : -1}
+                >
+                  <span className={cn("grid size-7 place-items-center rounded-full border-2 border-white shadow-soft", on ? "bg-wine-600" : "bg-black/35")}>{on && <Check className="size-4 text-white" strokeWidth={3} />}</span>
+                </button>
+                {meta && (
+                  <p className="mt-1 truncate px-0.5 text-[11px] font-bold text-ink-muted" title={meta}>
+                    {meta}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       ) : (
         <ul className="space-y-2">
           {list.map((m) => (
@@ -186,12 +364,61 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
         </ul>
       )}
 
+      {selectionMode && (
+        <div className="sticky bottom-24 z-30 lg:bottom-6">
+          <div role="toolbar" aria-label="Azioni sulle foto selezionate" className="mx-auto flex max-w-xl items-center gap-2 rounded-3xl bg-night-800 p-2 pl-4 text-moon shadow-float ring-1 ring-white/10">
+            <p className="min-w-0 flex-1 text-sm leading-tight font-bold" aria-live="polite">
+              {selected.size ? (selected.size === 1 ? "1 foto selezionata" : `${selected.size} foto selezionate`) : "Tocca le foto da selezionare"}
+              {hiddenSelected > 0 && <span className="block text-[11px] font-normal text-white/60">{hiddenSelected} non visibili con questo filtro</span>}
+            </p>
+            <Button size="sm" variant="white" disabled={!selected.size} onClick={() => setBatchOpen(true)}>
+              <Pencil className="size-4" /> Modifica
+            </Button>
+            <Button size="icon" variant="danger" disabled={!selected.size} onClick={() => setDeleteOpen(true)} aria-label="Elimina le foto selezionate">
+              <Trash2 className="size-4" />
+            </Button>
+            <Button size="icon" variant="night" onClick={clearSelection} aria-label="Esci dalla selezione">
+              <X className="size-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <Sheet open={batchOpen} onClose={() => setBatchOpen(false)} title={`Modifica ${n(selected.size)}`} wide>
+        {batchOpen && <BatchEditor count={selected.size} categories={suggestions} places={places} pending={pending} onCancel={() => setBatchOpen(false)} onConfirm={applyBatch} />}
+      </Sheet>
+
+      <Sheet open={deleteOpen} onClose={() => setDeleteOpen(false)} title={`Eliminare ${n(selected.size)}?`}>
+        <div role="alertdialog" aria-label={`Eliminare ${n(selected.size)}?`}>
+          <p className="text-ink-soft">Le foto e i loro file verranno cancellati per sempre. Questa operazione non si può annullare.</p>
+          {usedInContent > 0 && (
+            <p className="mt-3 rounded-2xl bg-peach-100 px-3 py-2 text-sm font-bold text-vio-800">
+              {usedInContent === 1 ? "1 di queste foto è usata" : `${usedInContent} di queste foto sono usate`} in ricordi, dediche o altri contenuti: lì resterà il testo, senza foto.
+            </p>
+          )}
+          <p className="mt-3 text-sm text-ink-muted">
+            {selectedItems
+              .slice(0, 6)
+              .map((m) => (typeof m.title === "string" && m.title) || "senza titolo")
+              .join(", ")}
+            {selectedItems.length > 6 ? ` e altre ${selectedItems.length - 6}` : ""}
+          </p>
+          <div className="mt-5 flex gap-3">
+            <Button variant="soft" className="flex-1" onClick={() => setDeleteOpen(false)} data-autofocus>
+              Annulla
+            </Button>
+            <Button variant="danger" className="flex-1" loading={pending} onClick={deleteSelected}>
+              Elimina {n(selected.size)}
+            </Button>
+          </div>
+        </div>
+      </Sheet>
+
       <Sheet open={Boolean(edit)} onClose={() => setEdit(null)} title={edit?.kind === "audio" ? "Audio" : "Foto"} wide>
         {edit && (
           <div className="space-y-4">
             {edit.kind === "image" ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={edit.url} alt="" className="max-h-72 w-full rounded-3xl object-contain" />
+              <Photo photo={photoOf(edit)} alt="" frame="natural" minRatio={1} maxRatio={16 / 9} className="w-full rounded-3xl" />
             ) : (
               <audio src={edit.url} controls className="w-full" />
             )}
@@ -215,7 +442,14 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
               {Math.round(edit.size_bytes / 1024)} KB{edit.width ? ` · ${String(edit.width)}×${String(edit.height)}` : ""} · caricata il {formatDate(String(edit.created_at))}
             </p>
             <ResourceForm
-              fields={edit.kind === "audio" ? def.fields.filter((f) => ["title", "caption", "category", "visibility"].includes(f.name)) : def.fields.map((f) => (f.name === "category" ? { ...f, suggestions } : f))}
+              fields={
+                edit.kind === "audio"
+                  ? def.fields.filter((f) => ["title", "caption", "category", "visibility"].includes(f.name))
+                  : def.fields
+                      // place/focus exist only after supabase/update.sql: never send a column the database lacks
+                      .filter((f) => (f.name !== "place" && f.name !== "focus") || f.name in edit)
+                      .map((f) => (f.name === "category" ? { ...f, suggestions } : f))
+              }
               values={edit}
               onChange={(p) => setEdit((e) => (e ? { ...e, ...p } : e))}
             />

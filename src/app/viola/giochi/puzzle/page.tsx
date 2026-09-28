@@ -13,7 +13,7 @@ export default async function Page() {
   return (
     <div>
       <PageHeader title="Puzzle" subtitle="Rimetti insieme la foto." back="/viola/giochi" />
-      <Puzzle imageUrl={photo?.url ?? null} seed={newSeed()} />
+      <Puzzle imageUrl={photo?.url ?? null} focus={photo?.focus} seed={newSeed()} />
     </div>
   );
 }

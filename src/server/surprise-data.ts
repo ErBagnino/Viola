@@ -1,6 +1,6 @@
 import "server-only";
 import { createViolaClient } from "@/server/viola-view";
-import { signMedia } from "@/server/media";
+import { signMedia, photoSrc } from "@/server/media";
 import { getComfortItems } from "@/server/comfort-data";
 import { getNextCountdown, randomPhrase } from "@/server/viola-data";
 import { APP_ACTIONS } from "@/features/actions/registry";
@@ -31,7 +31,7 @@ export async function getSurprises(): Promise<SurpriseItem[]> {
   }
   const photoPicks = await signMedia(supabase, shuffle(photos ?? []).slice(0, 2));
   for (const p of photoPicks) {
-    out.push({ type: "photo", eyebrow: "Una foto di noi ♡", title: p.title || "Noi", text: p.caption, imageUrl: p.url, href: "/viola/noi/foto", ctaLabel: "Tutte le foto" });
+    out.push({ type: "photo", eyebrow: "Una foto di noi ♡", title: p.title || "Noi", text: p.caption, imageUrl: p.url, photo: photoSrc(p), href: "/viola/noi/foto", ctaLabel: "Tutte le foto" });
   }
   const m = pickOne(mem ?? []);
   if (m) out.push({ type: "memory", eyebrow: "Ti ricordi?", title: m.title, text: m.body, href: "/viola/noi/ricordi", ctaLabel: "Le nostre cose" });

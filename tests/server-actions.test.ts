@@ -27,4 +27,15 @@ describe("server action modules", () => {
       expect(bad).toEqual([]);
     });
   }
+
+  // Admin-only actions check the role themselves (never trust the page that calls them).
+  const adminOnly = ["features/admin/media-batch-actions.ts", "features/admin/media-actions.ts", "features/admin/inbox-actions.ts", "features/admin/notification-actions.ts", "features/readiness/actions.ts", "features/settings/actions.ts"];
+  for (const rel of adminOnly) {
+    it(`${rel}: every action checks that the caller is Adam`, () => {
+      const code = readFileSync(path.join(src, rel), "utf8");
+      const bodies = code.split(/^export async function /m).slice(1);
+      expect(bodies.length).toBeGreaterThan(0);
+      for (const body of bodies) expect(body.split(/^}/m)[0]).toMatch(/assertAdmin\(\)/);
+    });
+  }
 });

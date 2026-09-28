@@ -154,7 +154,7 @@ export function BreathingSession({
 
       <div className="flex w-full flex-1 flex-col items-center justify-center">
         <div className="relative aspect-square w-[min(78vw,22rem)]">
-          <BreathingVisual visual={preset.visual} expansion={started ? state.expansion : 0.15} photoUrl={photo?.url} blur={blur} photoOpacity={opacity} />
+          <BreathingVisual visual={preset.visual} expansion={started ? state.expansion : 0.15} photoUrl={photo?.url} photoFocus={photo?.focus} blur={blur} photoOpacity={opacity} />
         </div>
 
         <div className="mt-6 min-h-28 text-center" aria-live="polite">

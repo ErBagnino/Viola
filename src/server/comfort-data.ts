@@ -1,6 +1,6 @@
 import "server-only";
 import { createViolaClient } from "@/server/viola-view";
-import { mediaByIds } from "@/server/media";
+import { mediaByIds, photoSrc } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 import { actionHref } from "@/features/actions/registry";
@@ -22,6 +22,7 @@ export async function getComfortItems(): Promise<ComfortItem[]> {
     duration: c.duration_seconds,
     icon: c.icon,
     imageUrl: c.media_id ? (media.get(c.media_id)?.url ?? null) : null,
+    photo: c.media_id ? photoSrc(media.get(c.media_id)) : null,
     soundUrl: c.sound_id ? (media.get(c.sound_id)?.url ?? null) : null,
     ctaLabel: c.cta_label,
     ctaHref: actionHref(c.cta_action, contact, c.cta_url),

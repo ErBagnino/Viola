@@ -2,8 +2,8 @@
 
 export type ChatAction =
   | { type: "link"; title: string; subtitle?: string; href: string; icon: string }
-  | { type: "photo"; mediaId: string; url?: string; title?: string | null; caption?: string | null; date?: string | null }
-  | { type: "memory"; id: string; title: string; excerpt: string; date?: string | null; mediaId?: string | null; url?: string }
+  | { type: "photo"; mediaId: string; url?: string; title?: string | null; caption?: string | null; date?: string | null; width?: number | null; height?: number | null; focus?: string | null }
+  | { type: "memory"; id: string; title: string; excerpt: string; date?: string | null; mediaId?: string | null; url?: string; width?: number | null; height?: number | null; focus?: string | null }
   | { type: "dedication"; id: string; title: string; excerpt: string; signature: string }
   | { type: "tool"; tool: string; summary: string; ok: boolean }
   | { type: "confirm"; logId: string; tool: string; summary: string; state: "pending" | "confirmed" | "rejected" };

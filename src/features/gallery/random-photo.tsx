@@ -8,6 +8,7 @@ import { Sparkle, Star5 } from "@/components/decor/stars";
 import { formatDate } from "@/utils/dates";
 import { pickAvoiding, pickOne } from "@/utils/random";
 import type { GalleryPhoto } from "./gallery";
+import { Photo } from "@/components/ui/photo";
 
 const RECENT = "vio:recent-photos";
 
@@ -50,8 +51,7 @@ export function RandomPhoto({ photos, phrases, initialPhrase }: { photos: Galler
             transition={{ type: "spring", damping: 18, stiffness: 160 }}
             className="polaroid rounded-md p-3 pb-5 shadow-float"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo.url} alt={photo.title ?? "Noi"} className="aspect-[4/5] w-full rounded-sm object-cover" />
+            <Photo photo={photo} alt={photo.title ?? "Noi"} frame={4 / 5} loading="eager" className="w-full rounded-sm" />
             <figcaption className="mt-3 text-center">
               <p className="font-hand text-2xl text-vio-800">{photo.title || photo.caption || "Noi ♡"}</p>
               {photo.takenOn && <p className="text-xs font-bold text-ink-muted">{formatDate(photo.takenOn)}</p>}

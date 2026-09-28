@@ -19,6 +19,10 @@ export type MediaView = {
   featured: boolean;
   mime: string;
   duration: number | null;
+  /** where the photo was taken */
+  place: string | null;
+  /** subject position for cropped frames */
+  focus: string;
 };
 
 const SIGN_TTL = 60 * 60 * 3; // 3 hours
@@ -50,6 +54,8 @@ export async function signMedia(supabase: ServerSupabase, rows: (MediaRow | null
         featured: r.featured,
         mime: r.mime,
         duration: r.duration_seconds === null ? null : Number(r.duration_seconds),
+        place: r.place ?? null,
+        focus: r.focus ?? "center",
       } satisfies MediaView;
     })
     .filter((m): m is MediaView => m !== null);
@@ -67,4 +73,9 @@ export async function mediaByIds(supabase: ServerSupabase, ids: (string | null |
   const { data } = await supabase.from("media").select("*").in("id", unique);
   const signed = await signMedia(supabase, data ?? []);
   return new Map(signed.map((m) => [m.id, m]));
+}
+
+/** The fields a photo frame needs (see components/ui/photo.tsx). */
+export function photoSrc(m: MediaView | null | undefined) {
+  return m ? { url: m.url, thumbUrl: m.thumbUrl, width: m.width, height: m.height, focus: m.focus } : null;
 }

@@ -320,4 +320,57 @@ describe("cuore a distanza", () => {
     await as(ADAM, () => q("delete from public.readiness_checks"));
     expect((await rows("select count(*)::int n from public.readiness_checks"))[0].n).toBe(0);
   });
+
+  it("batch photo editing: only Adam, only the chosen fields, flags follow contexts, undo is safe", async () => {
+    const ids = ["10000000-0000-4000-8000-000000000001", "10000000-0000-4000-8000-000000000002", "10000000-0000-4000-8000-000000000003"];
+    for (const [i, id] of ids.entries()) {
+      await q(
+        `insert into public.media (id, path, mime, title, category, taken_on, place, tags, contexts, breathing_enabled) values ($1, $2, 'image/webp', $3, 'viaggi', '2024-01-0${i + 1}', 'Roma', '{mare}', '{gallery,breathing}', true)`,
+        [id, `images/${id}/full.webp`, `Foto ${i + 1}`],
+      );
+    }
+    const sel = [ids[0], ids[1]];
+    const call = (patch: object, list = sel) => q("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [list, JSON.stringify(patch)]);
+
+    // nobody but Adam, not even by calling the function directly
+    expect(await as(VIOLA, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, '{"category":"noi"}']))).toBe(true);
+    expect(await as(STRANGER, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, '{"category":"noi"}']))).toBe(true);
+    expect(await as(null, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, '{"category":"noi"}']))).toBe(true);
+    expect(await as(VIOLA, () => fails("select * from public.admin_restore_media('[]'::jsonb, now())"))).toBe(true);
+    expect((await rows("select count(*)::int n from public.media where category = 'noi'"))[0].n).toBe(0);
+
+    // unknown fields and empty patches are refused
+    expect(await as(ADAM, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, '{"path":"x"}']))).toBe(true);
+    expect(await as(ADAM, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, "{}"]))).toBe(true);
+    expect(await as(ADAM, () => fails("select * from public.admin_batch_update_media($1::uuid[], $2::jsonb)", [sel, '{"visibility":"public"}']))).toBe(true);
+
+    // only the category changes, on the 2 selected photos only
+    const res = await as(ADAM, () => call({ category: "noi" }));
+    expect(res.rows).toHaveLength(2);
+    const after = await rows("select id, category, taken_on::text, place, tags, contexts from public.media where id = any($1::uuid[]) order by id", [ids]);
+    expect(after.map((r) => r.category)).toEqual(["noi", "noi", "viaggi"]);
+    expect(after.map((r) => r.taken_on)).toEqual(["2024-01-01", "2024-01-02", "2024-01-03"]);
+    expect(after.every((r) => r.place === "Roma")).toBe(true);
+    expect(after.every((r) => JSON.stringify(r.tags) === '["mare"]')).toBe(true);
+
+    // several fields at once; tags/contexts are added/removed per photo; flags follow contexts
+    const batch = await as(ADAM, () => call({ taken_on: "2024-09-04", place: "Torino", tags_add: ["noi2"], tags_remove: ["mare"], contexts_remove: ["breathing"], contexts_add: ["adam_ai"] }));
+    const r2 = await rows("select taken_on::text, place, tags, contexts, breathing_enabled, ai_avatar_enabled, category from public.media where id = $1", [ids[0]]);
+    expect(r2[0]).toMatchObject({ taken_on: "2024-09-04", place: "Torino", tags: ["noi2"], contexts: ["adam_ai", "gallery"], breathing_enabled: false, ai_avatar_enabled: true, category: "noi" });
+
+    // undo: restores the previous values, except on a photo edited meanwhile
+    const at = batch.rows[0].updated_at as string;
+    const snapshot = batch.rows.map((r) => ({ id: r.id, ...(r.previous as object) }));
+    await as(ADAM, () => q("update public.media set title = 'ritoccata' where id = $1", [ids[1]]));
+    const restored = await as(ADAM, () => q("select * from public.admin_restore_media($1::jsonb, $2::timestamptz)", [JSON.stringify(snapshot), at]));
+    expect(restored.rows.map((r) => Object.values(r)[0])).toEqual([ids[0]]);
+    const r3 = await rows("select id, taken_on::text, place, tags, breathing_enabled from public.media where id = any($1::uuid[]) order by id", [sel]);
+    expect(r3[0]).toMatchObject({ taken_on: "2024-01-01", place: "Roma", tags: ["mare"], breathing_enabled: true });
+    expect(r3[1]).toMatchObject({ taken_on: "2024-09-04", place: "Torino" });
+
+    // focus and place are checked by the table
+    expect(await as(ADAM, () => fails("update public.media set focus = 'diagonale' where id = $1", [ids[2]]))).toBe(true);
+    expect(await as(ADAM, () => fails("update public.media set place = repeat('x', 121) where id = $1", [ids[2]]))).toBe(true);
+    await q("delete from public.media where id = any($1::uuid[])", [ids]);
+  });
 });

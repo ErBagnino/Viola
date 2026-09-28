@@ -108,7 +108,7 @@ export async function runViolaTool(name: string, args: Record<string, unknown>, 
       const m = await signOne(supabase, row);
       return {
         result: { mostrata: true, titolo: row.title, didascalia: row.caption, data: row.taken_on },
-        actions: [{ type: "photo", mediaId: row.id, url: m?.url, title: row.title, caption: row.caption, date: row.taken_on }],
+        actions: [{ type: "photo", mediaId: row.id, url: m?.url, title: row.title, caption: row.caption, date: row.taken_on, width: m?.width, height: m?.height, focus: m?.focus }],
       };
     }
     case "show_random_memory": {
@@ -119,7 +119,7 @@ export async function runViolaTool(name: string, args: Record<string, unknown>, 
       const excerpt = m.body.slice(0, 280);
       return {
         result: { titolo: m.title, data: m.happened_on, luogo: m.place, testo: excerpt },
-        actions: [{ type: "memory", id: m.id, title: m.title, excerpt, date: m.happened_on, mediaId: m.media_id, url: img?.url }],
+        actions: [{ type: "memory", id: m.id, title: m.title, excerpt, date: m.happened_on, mediaId: m.media_id, url: img?.url, width: img?.width, height: img?.height, focus: img?.focus }],
       };
     }
     case "show_random_dedication": {

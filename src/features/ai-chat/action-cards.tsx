@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dates";
 import { cn } from "@/utils/cn";
 import type { ChatAction } from "./types";
+import { Photo } from "@/components/ui/photo";
 
 function Go({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   return /^(https?:|tel:)/.test(href) ? (
@@ -39,8 +40,7 @@ export function ActionCard({ action, onConfirm }: { action: ChatAction; onConfir
     case "photo":
       return action.url ? (
         <figure className="polaroid w-56 -rotate-1 rounded-md p-2 pb-3 shadow-soft">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={action.url} alt={action.title ?? "Foto"} className="aspect-square w-full rounded-sm object-cover" />
+          <Photo photo={{ url: action.url, width: action.width, height: action.height, focus: action.focus }} alt={action.title ?? "Foto"} frame={1} className="w-full rounded-sm" fallbackText="Chiedimi un'altra foto" />
           <figcaption className="mt-1.5 text-center">
             <span className="block font-hand text-lg text-vio-800">{action.title || "Noi ♡"}</span>
             {action.date && <span className="text-[11px] text-ink-muted">{formatDate(action.date)}</span>}
@@ -50,10 +50,7 @@ export function ActionCard({ action, onConfirm }: { action: ChatAction; onConfir
     case "memory":
       return (
         <Link href="/viola/noi/ricordi" className="press block w-full max-w-xs overflow-hidden rounded-2xl bg-surface shadow-soft">
-          {action.url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={action.url} alt="" className="aspect-video w-full object-cover" />
-          )}
+          {action.url && <Photo photo={{ url: action.url, width: action.width, height: action.height, focus: action.focus }} alt="" frame={16 / 9} className="w-full" />}
           <span className="block p-3">
             <span className="block text-[11px] font-extrabold tracking-widest text-vio-500 uppercase">Ricordo{action.date ? ` · ${formatDate(action.date)}` : ""}</span>
             <span className="block font-display font-semibold text-vio-900">{action.title}</span>

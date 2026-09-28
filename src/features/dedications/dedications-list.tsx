@@ -7,6 +7,7 @@ import { Chip } from "@/components/ui/fields";
 import { Sheet } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LetterView } from "@/features/letters/letter-view";
+import type { PhotoSrc } from "@/components/ui/photo";
 import { track } from "@/features/activity/track";
 import { pickAvoiding } from "@/utils/random";
 import { DEDICATION_CATEGORIES } from "@/features/content/constants";
@@ -17,6 +18,7 @@ export type DedicationView = {
   body: string;
   category: string;
   imageUrl: string | null;
+  photo?: PhotoSrc | null;
   audioUrl: string | null;
   signature: string;
   pinned: boolean;
@@ -101,7 +103,7 @@ export function DedicationsList({ items, initialOpenId, eyebrow }: { items: Dedi
             eyebrow={eyebrow}
             title={open.title}
             body={open.body}
-            image={open.imageUrl ? { url: open.imageUrl } : null}
+            image={open.photo ?? (open.imageUrl ? { url: open.imageUrl } : null)}
             audioUrl={open.audioUrl}
             signature={open.signature}
           />

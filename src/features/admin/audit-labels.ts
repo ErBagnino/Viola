@@ -3,6 +3,7 @@ import { SETTINGS_FORMS } from "@/features/settings/fields";
 import type { SettingsKey } from "@/features/settings/schema";
 import { TASKS } from "@/features/readiness/tasks";
 import { RESOURCES, type ResourceDef } from "./resources";
+import { batchSentence } from "./media-batch";
 
 export type AuditRow = { action: string; target_table: string | null; target_id: string | null; before: unknown; after: unknown };
 
@@ -60,6 +61,18 @@ export function describeAudit(a: AuditRow): { text: string; href: string | null 
       const name = task ? `“${task.title}”` : "un passaggio";
       const text = a.action === "readiness.done" ? `Hai spuntato ${name}` : a.action === "readiness.skipped" ? `Hai tolto ${name} (non ti serve)` : `Hai rimesso da fare ${name}`;
       return { text, href: "/admin/completa" };
+    }
+    case "media.batch_update": {
+      const after = (a.after ?? {}) as { count?: number; fields?: string[] };
+      return { text: batchSentence(after.fields ?? [], after.count ?? 0), href: "/admin/foto" };
+    }
+    case "media.batch_undo": {
+      const after = (a.after ?? {}) as { restored?: number };
+      return { text: `Hai annullato la modifica di ${after.restored === 1 ? "1 foto" : `${after.restored ?? 0} foto`}`, href: "/admin/foto" };
+    }
+    case "media.batch_delete": {
+      const after = (a.after ?? {}) as { count?: number };
+      return { text: `Hai eliminato ${after.count === 1 ? "1 foto" : `${after.count ?? 0} foto`}`, href: "/admin/foto" };
     }
     default:
       if (a.action.startsWith("request_")) return { text: "Hai aggiornato una richiesta", href: "/admin/richieste" };

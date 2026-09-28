@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Pause, Play, Shuffle, Timer } from "lucide-react";
@@ -11,6 +10,7 @@ import { HeartBurst } from "@/components/decor/burst";
 import { track } from "@/features/activity/track";
 import { pickAvoiding } from "@/utils/random";
 import { COMFORT_CATEGORIES } from "@/features/content/constants";
+import { Photo, type PhotoSrc } from "@/components/ui/photo";
 
 export type ComfortItem = {
   id: string;
@@ -20,6 +20,7 @@ export type ComfortItem = {
   duration: number | null;
   icon: string | null;
   imageUrl: string | null;
+  photo?: PhotoSrc | null;
   soundUrl: string | null;
   ctaLabel: string | null;
   ctaHref: string | null;
@@ -92,11 +93,7 @@ export function HelpNow({ items, initialId }: { items: ComfortItem[]; initialId?
           style={{ transformPerspective: 900 }}
           aria-live="polite"
         >
-          {current.imageUrl && (
-            <div className="relative -mx-6 -mt-6 mb-5 aspect-[16/10]">
-              <Image src={current.imageUrl} alt="" fill className="object-cover" unoptimized />
-            </div>
-          )}
+          {current.imageUrl && <Photo photo={current.photo ?? { url: current.imageUrl }} alt="" frame={16 / 10} className="-mx-6 -mt-6 mb-5" />}
           <div className="flex items-center justify-between gap-2">
             <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${cat.color}`}>{cat.label}</span>
             {current.duration ? (

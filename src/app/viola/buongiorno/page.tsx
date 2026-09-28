@@ -3,13 +3,14 @@ import { MessageCircleHeart, Sunrise } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Sparkle } from "@/components/decor/stars";
 import { createViolaClient } from "@/server/viola-view";
-import { signOne } from "@/server/media";
+import { photoSrc, signOne } from "@/server/media";
 import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 import { phraseOfTheDay } from "@/server/viola-data";
 import { whatsappLink } from "@/features/actions/registry";
 import { todayKey } from "@/utils/dates";
 import { seededRandom } from "@/utils/random";
+import { Photo } from "@/components/ui/photo";
 
 export const metadata = { title: "Buongiorno" };
 
@@ -38,8 +39,7 @@ export default async function BuongiornoPage() {
       </section>
       {photo && (
         <figure className="mx-auto w-4/5 -rotate-2 polaroid rounded-md p-2 pb-4 shadow-float">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo.url} alt={photo.title ?? "Noi"} className="aspect-square w-full rounded-sm object-cover" />
+          <Photo photo={photoSrc(photo)} alt={photo.title ?? "Noi"} frame="natural" minRatio={4 / 5} maxRatio={16 / 9} loading="eager" className="w-full rounded-sm" />
           <figcaption className="mt-2 text-center font-hand text-xl text-vio-700">{photo.title || "per il tuo buongiorno"}</figcaption>
         </figure>
       )}

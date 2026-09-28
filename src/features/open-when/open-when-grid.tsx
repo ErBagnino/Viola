@@ -7,6 +7,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { Icon } from "@/components/ui/icon";
 import { toneClass, isDarkTone } from "@/components/ui/card";
 import { LetterView } from "@/features/letters/letter-view";
+import type { PhotoSrc } from "@/components/ui/photo";
 import { cn } from "@/utils/cn";
 import { markOpenWhenOpened } from "./actions";
 import { callQuietly } from "@/utils/call-action";
@@ -17,6 +18,7 @@ export type OpenWhenCard = {
   title: string;
   body: string;
   imageUrl: string | null;
+  photo?: PhotoSrc | null;
   audioUrl: string | null;
   animation: string;
   ctaHref: string | null;
@@ -99,7 +101,7 @@ export function OpenWhenGrid({ cards, signature }: { cards: OpenWhenCard[]; sign
           {open && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative">
               <Burst kind={open.animation} />
-              <LetterView title={open.title} body={open.body} image={open.imageUrl ? { url: open.imageUrl } : null} audioUrl={open.audioUrl} signature={signature} />
+              <LetterView title={open.title} body={open.body} image={open.photo ?? (open.imageUrl ? { url: open.imageUrl } : null)} audioUrl={open.audioUrl} signature={signature} />
               {open.ctaHref && (
                 <Link href={open.ctaHref} className="press btn-3d mt-6 block rounded-[1.25rem] bg-gradient-to-b from-wine-500 to-wine-700 px-6 py-4 text-center font-extrabold text-white">
                   {open.ctaLabel ?? "Andiamo ♡"}

@@ -6,6 +6,7 @@ import { Lock, Mail } from "lucide-react";
 import { Sheet } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/toast";
 import { LetterView } from "@/features/letters/letter-view";
+import type { PhotoSrc } from "@/components/ui/photo";
 import { useNow } from "@/hooks/use-now";
 import { countdownParts, formatDate } from "@/utils/dates";
 import { openCapsule } from "./actions";
@@ -15,7 +16,7 @@ import { haptic } from "@/utils/haptics";
 export type CapsuleItem = { id: string; title: string; teaser: string | null; unlockAt: string; unlocked: boolean; openedAt: string | null };
 
 export function CapsuleList({ items, lockedText, readyText, signature }: { items: CapsuleItem[]; lockedText: string; readyText: string; signature: string }) {
-  const [letter, setLetter] = useState<{ title: string; body: string; imageUrl: string | null } | null>(null);
+  const [letter, setLetter] = useState<{ title: string; body: string; imageUrl: string | null; photo?: PhotoSrc | null } | null>(null);
   const [pending, start] = useTransition();
   const toast = useToast();
   const now = useNow(30_000);
@@ -70,7 +71,7 @@ export function CapsuleList({ items, lockedText, readyText, signature }: { items
         })}
       </div>
       <Sheet open={Boolean(letter)} onClose={() => setLetter(null)}>
-        {letter && <LetterView eyebrow="Una lettera dal passato" title={letter.title} body={letter.body} image={letter.imageUrl ? { url: letter.imageUrl } : null} signature={signature} />}
+        {letter && <LetterView eyebrow="Una lettera dal passato" title={letter.title} body={letter.body} image={letter.photo ?? (letter.imageUrl ? { url: letter.imageUrl } : null)} signature={signature} />}
       </Sheet>
     </>
   );

@@ -3,6 +3,8 @@
 import { useId } from "react";
 import type { BreathingVisual as Visual } from "./types";
 
+const SVG_FOCUS: Record<string, string> = { center: "xMidYMid", top: "xMidYMin", bottom: "xMidYMax", left: "xMinYMid", right: "xMaxYMid" };
+
 const HEART = "M0 62 C -46 30, -84 4, -78 -34 C -73 -64, -34 -76, 0 -44 C 34 -76, 73 -64, 78 -34 C 84 4, 46 30, 0 62 Z";
 
 function starPath(R: number, inner = 0.48) {
@@ -23,12 +25,15 @@ export function BreathingVisual({
   visual,
   expansion,
   photoUrl,
+  photoFocus,
   blur = 0,
   photoOpacity = 1,
 }: {
   visual: Visual;
   expansion: number;
   photoUrl?: string | null;
+  /** which part of the photo stays inside the shape */
+  photoFocus?: string | null;
   blur?: number;
   photoOpacity?: number;
 }) {
@@ -130,7 +135,7 @@ export function BreathingVisual({
                 y={-90}
                 width={180}
                 height={180}
-                preserveAspectRatio="xMidYMid slice"
+                preserveAspectRatio={`${SVG_FOCUS[photoFocus ?? "center"] ?? "xMidYMid"} slice`}
                 filter={blur > 0.2 ? `url(#${blurId})` : undefined}
                 opacity={photoOpacity}
               />

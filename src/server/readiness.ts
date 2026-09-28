@@ -24,7 +24,7 @@ export async function getReadinessFacts(adminId: string, settings?: SettingsMap)
   const supabase = await createClient();
   const serviceStatus = await serviceRoleStatus();
   const service = serviceStatus === "ok" ? createAdminClient() : null;
-  const [media, memories, dedications, openWhen, countdowns, audio, aiMemory, quiz, phrases, breathingMedia, settingRows, testEvents, conversations, manual, hearts, profiles, subs] =
+  const [media, memories, dedications, openWhen, countdowns, audio, aiMemory, quiz, phrases, breathingMedia, settingRows, testEvents, conversations, manual, hearts, profiles, subs, photoColumns] =
     await Promise.all([
       supabase.from("media").select("id, kind, visibility, contexts, include_in_random, breathing_enabled, ai_avatar_enabled, category, title").limit(5000),
       supabase.from("memories").select("id, is_published, media_id").limit(5000),
@@ -43,6 +43,7 @@ export async function getReadinessFacts(adminId: string, settings?: SettingsMap)
       supabase.from("hearts").select("id", { count: "exact", head: true }),
       supabase.from("profiles").select("id, role"),
       supabase.from("notification_subscriptions").select("user_id").eq("user_id", adminId),
+      supabase.from("media").select("focus").limit(1),
     ]);
 
   const violaIds = (profiles.data ?? []).filter((p) => p.role === "user").map((p) => p.id);
@@ -84,7 +85,7 @@ export async function getReadinessFacts(adminId: string, settings?: SettingsMap)
       serviceRole: serviceStatus,
     },
     // the newest tables exist only after supabase/update.sql
-    databaseUpdated: !manual.error && !hearts.error,
+    databaseUpdated: !manual.error && !hearts.error && !photoColumns.error,
     contact: { whatsapp: Boolean(getContact(s).whatsappNumber) },
     viola: { accounts: profiles.error ? null : violaIds.length, pushDevices: violaDevices },
     adamPushDevices: (subs.data ?? []).length,

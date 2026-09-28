@@ -7,6 +7,8 @@ import { getSettings } from "@/server/settings";
 import { getContact } from "@/server/contact";
 import { getDailySurprise, randomPhrase } from "@/server/viola-data";
 import { formatDate } from "@/utils/dates";
+import { Photo } from "@/components/ui/photo";
+import { photoSrc } from "@/server/media";
 
 export const metadata = { title: "Una cosa per te" };
 
@@ -33,10 +35,7 @@ export default async function OggiPage() {
         <article className="paper relative overflow-visible rounded-[2rem]">
           <Star5 className="absolute -top-3 -right-2 z-10 size-11 rotate-12" />
           <Sparkle outline className="absolute -bottom-2 -left-2 z-10 size-7 text-white" />
-          {s.media && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={s.media.url} alt="" className="aspect-[4/3] w-full rounded-t-[2rem] object-cover" />
-          )}
+          {s.media && <Photo photo={photoSrc(s.media)} alt="" frame={4 / 3} className="w-full rounded-t-[2rem]" />}
           <div className="p-6">
             <p className="text-xs font-extrabold tracking-widest text-vio-500 uppercase">{EYEBROW[s.kind] ?? "Per te"}</p>
             <h2 className="mt-1 font-display text-[1.8rem] leading-tight font-semibold text-vio-900">{s.title}</h2>

@@ -1,6 +1,6 @@
 import "server-only";
 import { createViolaClient } from "@/server/viola-view";
-import { mediaByIds, signMedia } from "@/server/media";
+import { mediaByIds, signMedia, photoSrc } from "@/server/media";
 import type { DedicationView } from "@/features/dedications/dedications-list";
 import type { GalleryPhoto } from "@/features/gallery/gallery";
 import type { MediaView } from "@/server/media";
@@ -17,6 +17,8 @@ export function toPhoto(m: MediaView): GalleryPhoto {
     takenOn: m.takenOn,
     category: m.category,
     featured: m.featured,
+    place: m.place,
+    focus: m.focus,
   };
 }
 
@@ -44,6 +46,7 @@ export async function getDedications(signature: string): Promise<DedicationView[
     body: d.body,
     category: d.category,
     imageUrl: d.media_id ? (media.get(d.media_id)?.url ?? null) : null,
+    photo: d.media_id ? photoSrc(media.get(d.media_id)) : null,
     audioUrl: d.audio_id ? (media.get(d.audio_id)?.url ?? null) : null,
     signature: d.signature || signature,
     pinned: d.pinned,
@@ -66,6 +69,7 @@ export async function getMemories() {
     happenedOn: m.happened_on,
     place: m.place,
     imageUrl: m.media_id ? (media.get(m.media_id)?.url ?? null) : null,
+    photo: m.media_id ? photoSrc(media.get(m.media_id)) : null,
     important: m.is_important,
   }));
 }

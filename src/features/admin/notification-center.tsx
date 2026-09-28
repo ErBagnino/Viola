@@ -39,7 +39,7 @@ export function ChannelCards({ status }: { status: { telegram: Status; webpush: 
         {cards.map((c) => (
           <div key={c.key} className="paper rounded-4xl p-5">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="font-display text-lg font-semibold text-vio-900">{c.name}</h3>
+              <h2 className="font-display text-lg font-semibold text-vio-900">{c.name}</h2>
               <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-extrabold", CHANNEL_STATE[c.s.state].cls)}>{CHANNEL_STATE[c.s.state].label}</span>
             </div>
             <p className="mt-1 min-h-10 text-sm text-ink-soft">{c.s.detail}</p>

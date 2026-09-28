@@ -85,9 +85,10 @@ async function record(payload: NotificationPayload, outcome: NotifyOutcome) {
 export async function notifyAdmin(payload: NotificationPayload, settings: SettingsMap): Promise<NotifyOutcome> {
   try {
     const outcome = await runChain(adminProviders(settings), payload, await adminIds(), settings.notifications.mode);
-    await record(payload, outcome).catch(() => undefined);
+    await record(payload, outcome).catch((e) => console.error("[notify] not recorded:", e instanceof Error ? e.message : e));
     return outcome;
-  } catch {
+  } catch (e) {
+    console.error("[notify] admin alert failed:", e instanceof Error ? e.message.slice(0, 200) : e);
     return { delivered: false, results: [] };
   }
 }
@@ -96,7 +97,8 @@ export async function notifyAdmin(payload: NotificationPayload, settings: Settin
 export async function notifyUser(userId: string, payload: NotificationPayload): Promise<NotifyOutcome> {
   try {
     return await runChain([webPushProvider], payload, [userId], "fallback");
-  } catch {
+  } catch (e) {
+    console.error("[notify] push to Viola failed:", e instanceof Error ? e.message.slice(0, 200) : e);
     return { delivered: false, results: [] };
   }
 }

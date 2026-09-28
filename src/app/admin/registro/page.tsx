@@ -48,7 +48,12 @@ export default async function RegistroPage({ searchParams }: PageProps<"/admin/r
               <b className={r.ok === false ? "text-rouge-600" : "text-vio-900"}>{r.title}</b>
               <span className="text-xs text-ink-muted">{formatDateTime(r.when, tz)}</span>
             </div>
-            {r.detail && <p className="mt-1 font-mono text-xs break-all text-ink-soft">{r.detail}</p>}
+            {r.detail && (
+              <details className="mt-1 text-xs text-ink-muted">
+                <summary className="inline-flex min-h-6 cursor-pointer items-center font-bold select-none">Dettagli tecnici</summary>
+                <p className="mt-1 font-mono break-all text-ink-soft">{r.detail}</p>
+              </details>
+            )}
           </li>
         ))}
       </ul>

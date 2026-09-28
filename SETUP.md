@@ -197,11 +197,12 @@ Adam AI usa **Google Gemini** con il **piano gratuito** di Google AI Studio.
 
 1. Vai su **https://aistudio.google.com/apikey** e accedi con un account Google.
 2. **Create API key** (se chiede un progetto, crea "vio").
-3. Copia la chiave (inizia con `AIza…`) → sarà `GEMINI_API_KEY`.
+3. Copia la chiave (inizia con `AIza…`, 39 caratteri) → sarà `GEMINI_API_KEY`. Incollala così com'è, **senza virgolette**.
 4. **Non** attivare la fatturazione ("Set up billing"): resta sul piano gratuito.
+5. Dopo il deploy verifica in **Admin → Adam AI → «Prova Gemini»**: deve dire «Gemini funziona». Dal computer (con il progetto scaricato) c'è anche `npm run gemini:check`.
 
 Modello: l'app usa di default `gemini-flash-latest` (alias di Google che punta sempre al Flash più recente) e, se non disponibile, `gemini-flash-lite-latest`.
-In **Admin → Adam AI → "Quali modelli posso usare?"** vedi la lista dei modelli attivi per la tua chiave e puoi cambiarlo senza toccare codice.
+In **Admin → Adam AI → «Prova Gemini»** vedi quanti modelli sono attivi per la tua chiave, quali non esistono, e quale ha risposto; il modello si cambia nella stessa pagina senza toccare codice.
 
 ---
 
@@ -393,6 +394,9 @@ Su **Android** (Chrome): menu ⋮ → **Installa app** / "Aggiungi a schermata H
 | "L'app non è ancora configurata" sulla pagina di accesso | Mancano `NEXT_PUBLIC_SUPABASE_URL` / `..._PUBLISHABLE_KEY` su Vercel → aggiungile e fai Redeploy. |
 | "Il tuo account esiste ma non è ancora abilitato" | Assegna il ruolo (passo 9). |
 | Adam AI dice "momentaneamente offline" | Manca `GEMINI_API_KEY`, oppure Adam AI è disattivato in Admin → Adam AI. |
+| L'AI non risponde e non capisci perché | **Admin → Adam AI → «Prova Gemini»**: usa la chiave vera del server, fa una richiesta minima e dice esattamente cosa risponde Google (chiave non valida, API disattivata, restrizioni della chiave, modello inesistente, quota, rete…) senza mai mostrare la chiave. Nei messaggi di errore che vedi tu c'è anche un codice «rif. G-…» che trovi nei log di Vercel (Deployments → Logs, cerca `[gemini]`). |
+| «Google rifiuta la chiave Gemini (API_KEY_INVALID)» | La chiave è sbagliata, scaduta o copiata male: creane una nuova su aistudio.google.com → Get API key, incollala in `GEMINI_API_KEY` su Vercel (senza virgolette) e fai Redeploy. |
+| «403 SERVICE_DISABLED» o «restrizione» | La chiave viene da un progetto Google Cloud dove la «Generative Language API» è spenta, o ha restrizioni (siti web / IP / API). La strada più semplice: una chiave nuova da Google AI Studio, senza restrizioni. |
 | Adam AI dice "ha bisogno di una piccola pausa" | Limite giornaliero raggiunto (tuo o di Google). Si sblocca da solo il giorno dopo. Puoi alzare i tuoi limiti in Admin → Adam AI. |
 | Telegram: DISCONNECTED | Token sbagliato o chat ID mancante: rifai i passi 13–14 e premi Start nella chat del bot. |
 | Web Push su iPhone non si attiva | L'app deve essere aperta dall'icona sulla Home (passo 25), iOS 16.4+. Controlla anche Impostazioni iPhone → Notifiche → Vio. |

@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -31,10 +32,13 @@ export const getSettings = cache(async (): Promise<SettingsMap> => {
   }
   const rows = new Map<string, unknown>();
   try {
-    const { data } = await (await createClient()).from("app_settings").select("key, value");
+    const { data, error } = await (await createClient()).from("app_settings").select("key, value");
+    if (error) console.error("[settings] session read failed, using the defaults:", error.code ?? error.message);
     for (const r of data ?? []) rows.set(r.key, r.value);
-  } catch {
+  } catch (e) {
+    unstable_rethrow(e); // let Next handle its own signals (e.g. request-time APIs during prerender)
     // Unconfigured / offline database: defaults only.
+    console.error("[settings] database unreachable, using the defaults:", e instanceof Error ? e.message : e);
   }
   return buildSettings(rows);
 });

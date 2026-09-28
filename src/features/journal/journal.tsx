@@ -60,10 +60,10 @@ export function Journal({ entries, adamName, tz }: { entries: JournalEntry[]; ad
                   )}
                 </span>
               </div>
-              <h3 className="mt-2 font-display text-lg font-semibold text-vio-900">
+              <h2 className="mt-2 font-display text-lg font-semibold text-vio-900">
                 {e.mood ? `${MOODS[e.mood - 1]?.emoji} ` : ""}
                 {e.title || "Senza titolo"}
-              </h3>
+              </h2>
               <p className="mt-1 line-clamp-4 whitespace-pre-line text-[15px] text-ink-soft">{e.body}</p>
               <div className="mt-3 flex gap-2">
                 <Button size="sm" variant="soft" onClick={() => setDraft({ id: e.id, title: e.title ?? "", body: e.body, mood: e.mood, visibility: e.visibility })}>

@@ -328,7 +328,7 @@ export function MediaLibrary({ items, categories, usage = {}, violaName = "Viola
                   aria-label={selectionMode ? `${title}: ${on ? "selezionata" : "non selezionata"}` : `Modifica ${title}`}
                   className={cn("press relative block w-full overflow-hidden rounded-2xl bg-surface shadow-soft transition", on && "ring-4 ring-wine-600 ring-offset-2 ring-offset-canvas dark:ring-rouge-400")}
                 >
-                  <Photo photo={photoOf(m)} alt={typeof m.title === "string" ? m.title : ""} frame={1} mode="cover" useThumb className="w-full" />
+                  <Photo photo={photoOf(m)} alt="" frame={1} mode="cover" useThumb className="w-full" />
                   {on && <span className="absolute inset-0 bg-wine-900/30" aria-hidden />}
                   <span className="absolute top-1.5 left-1.5 flex flex-wrap gap-1" aria-hidden>
                     {m.visibility === "private" && <Lock className="size-5 rounded-full bg-black/60 p-1 text-white" />}

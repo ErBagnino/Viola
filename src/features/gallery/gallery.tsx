@@ -66,9 +66,9 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
                 whileTap={{ scale: 0.96, rotate: 0 }}
                 transition={{ delay: Math.min(i * 0.03, 0.4) }}
                 className="polaroid rounded-md p-2 pb-3 text-left shadow-soft"
-                aria-label={p.title ?? "Apri foto"}
+                aria-label={p.title ? `Apri la foto «${p.title}»` : "Apri la foto"}
               >
-                <PhotoFrame photo={p} alt={p.title ?? ""} frame={1} useThumb className="w-full rounded-sm" />
+                <PhotoFrame photo={p} alt="" frame={1} useThumb className="w-full rounded-sm" />
                 <span className="mt-2 block truncate text-center font-hand text-xl text-vio-800">{p.title || formatDate(p.takenOn, { month: "short", year: "numeric" }) || "♡"}</span>
               </motion.button>
             ))}
@@ -78,8 +78,8 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
         {layout === "masonry" && (
           <div className="columns-2 gap-3 sm:columns-3">
             {list.map((p, i) => (
-              <button key={p.id} type="button" onClick={() => setOpen(i)} className="press mb-3 block w-full overflow-hidden rounded-3xl shadow-soft" aria-label={p.title ?? "Apri foto"}>
-                <PhotoFrame photo={p} alt={p.title ?? ""} frame="natural" minRatio={9 / 16} maxRatio={2.4} useThumb className="w-full" />
+              <button key={p.id} type="button" onClick={() => setOpen(i)} className="press mb-3 block w-full overflow-hidden rounded-3xl shadow-soft" aria-label={p.title ? `Apri la foto «${p.title}»` : "Apri la foto"}>
+                <PhotoFrame photo={p} alt="" frame="natural" minRatio={9 / 16} maxRatio={2.4} useThumb className="w-full" />
               </button>
             ))}
           </div>
@@ -90,13 +90,13 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
             {byYear.map(([k, items]) => (
               <li key={k}>
                 <span className="absolute -left-[9px] mt-1.5 size-4 rounded-full border-4 border-cream-100 bg-wine-500" aria-hidden />
-                <h3 className="font-display text-lg font-semibold text-vio-800 capitalize">
+                <h2 className="font-display text-lg font-semibold text-vio-800 capitalize">
                   {k === "senza data" ? k : formatDate(`${k}-15`, { month: "long", year: "numeric" })}
-                </h3>
+                </h2>
                 <div className="mt-2 grid grid-cols-3 gap-2">
                   {items.map(({ p, i }) => (
-                    <button key={p.id} type="button" onClick={() => setOpen(i)} className="press overflow-hidden rounded-2xl" aria-label={p.title ?? "Apri foto"}>
-                      <PhotoFrame photo={p} alt={p.title ?? ""} frame={1} useThumb className="w-full" />
+                    <button key={p.id} type="button" onClick={() => setOpen(i)} className="press overflow-hidden rounded-2xl" aria-label={p.title ? `Apri la foto «${p.title}»` : "Apri la foto"}>
+                      <PhotoFrame photo={p} alt="" frame={1} useThumb className="w-full" />
                     </button>
                   ))}
                 </div>
@@ -109,8 +109,8 @@ export function Gallery({ photos, categories }: { photos: GalleryPhoto[]; catego
           <div className="space-y-5">
             {list.map((p, i) => (
               <figure key={p.id} className="paper overflow-hidden rounded-4xl">
-                <button type="button" onClick={() => setOpen(i)} className="block w-full" aria-label={p.title ?? "Apri foto"}>
-                  <PhotoFrame photo={p} alt={p.title ?? ""} frame="natural" className="w-full" />
+                <button type="button" onClick={() => setOpen(i)} className="block w-full" aria-label={p.title ? `Apri la foto «${p.title}»` : "Apri la foto"}>
+                  <PhotoFrame photo={p} alt="" frame="natural" className="w-full" />
                 </button>
                 {(p.title || p.caption || p.place) && (
                   <figcaption className="p-4">

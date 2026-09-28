@@ -521,7 +521,7 @@ export function NumbersInput({ value, onChange, suffix }: { value: number[]; onC
         <div key={i} className="flex items-center gap-1 rounded-2xl bg-surface px-2 py-1">
           <input type="number" min={0} className="w-20 bg-transparent px-1 py-1 text-center font-bold" value={n} onChange={(e) => onChange(value.map((x, k) => (k === i ? Number(e.target.value) : x)))} aria-label={`Valore ${i + 1}`} />
           {suffix && <span className="text-xs text-ink-muted">{suffix}</span>}
-          <button type="button" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label="Rimuovi" className="p-1 text-ink-muted">
+          <button type="button" onClick={() => onChange(value.filter((_, k) => k !== i))} aria-label={`Rimuovi ${n}${suffix ? ` ${suffix}` : ""}`} className="grid size-8 place-items-center rounded-full text-ink-muted hover:bg-tint-50">
             <X className="size-3.5" />
           </button>
         </div>

@@ -59,6 +59,7 @@ export async function runChatLoop(opts: {
       try {
         out = await opts.runTool(call.name, call.args);
       } catch (e) {
+        console.error(`[ai] tool failed ${JSON.stringify({ tool: call.name, message: e instanceof Error ? e.message.slice(0, 200) : "?" })}`);
         out = { result: { errore: e instanceof Error ? e.message.slice(0, 200) : "errore" }, actions: [] };
       }
       for (const a of out.actions) {

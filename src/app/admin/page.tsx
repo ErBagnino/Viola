@@ -205,7 +205,7 @@ export default async function AdminDashboard() {
               })}
             </ul>
           )}
-          <Link href="/admin/registro" className="mt-3 inline-block text-xs font-bold text-vio-600 hover:underline">
+          <Link href="/admin/registro" className="mt-2 inline-flex min-h-11 items-center text-xs font-bold text-vio-600 hover:underline">
             Tutto il registro →
           </Link>
         </section>

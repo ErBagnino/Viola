@@ -96,13 +96,13 @@ export function NextSteps({ summary, limit = 3 }: { summary: ReadinessSummary; l
                       <span className="block font-bold text-vio-900">{t.title}</span>
                       {t.detail && <span className="block truncate text-xs text-ink-muted">{t.detail}</span>}
                     </span>
-                    <span className="shrink-0 text-sm font-extrabold text-wine-600">{t.cta} →</span>
+                    <span className="shrink-0 text-sm font-extrabold text-wine-600 dark:text-rouge-400">{t.cta} →</span>
                   </Link>
                 </li>
               ))}
             </ul>
             {tasks.length > limit && (
-              <Link href="/admin/completa" className="mt-1.5 inline-block text-xs font-bold text-vio-600 underline-offset-2 hover:underline">
+              <Link href="/admin/completa" className="mt-0.5 inline-flex min-h-10 items-center text-xs font-bold text-vio-600 underline-offset-2 hover:underline">
                 e altre {tasks.length - limit} →
               </Link>
             )}

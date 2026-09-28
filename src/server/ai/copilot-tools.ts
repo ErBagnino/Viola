@@ -352,6 +352,7 @@ export async function runCopilotTool(name: string, args: Record<string, unknown>
     return out;
   } catch (e) {
     const msg = e instanceof UserError || e instanceof z.ZodError ? (e instanceof z.ZodError ? "dati non validi" : e.message) : "errore interno";
+    if (msg === "errore interno") console.error(`[copilot] tool failed ${JSON.stringify({ tool: name, message: e instanceof Error ? e.message.slice(0, 200) : "?" })}`);
     await log({ status: "failed", success: false, result: { errore: msg } });
     return { result: { errore: msg }, actions: [{ type: "tool", tool: name, summary: `Non riuscito: ${msg}`, ok: false }] };
   }

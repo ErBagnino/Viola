@@ -66,7 +66,7 @@ export function OfflineKit() {
       <div className="paper mb-5 flex items-center gap-3 rounded-3xl p-4">
         <WifiOff className="size-6 shrink-0 text-vio-500" />
         <div>
-          <p className="font-bold text-vio-900">{online ? "La connessione è tornata ♡" : "Sei offline, ma io sono qui."}</p>
+          <h1 className="font-bold text-vio-900">{online ? "La connessione è tornata ♡" : "Sei offline, ma io sono qui."}</h1>
           <p className="text-sm text-ink-soft">{online ? "Puoi tornare all'app." : "Queste cose funzionano anche senza internet."}</p>
         </div>
         {online && (

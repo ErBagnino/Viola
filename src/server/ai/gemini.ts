@@ -67,8 +67,9 @@ const FIRST_CHUNK_MS = 20_000;
 
 function pause(ms: number, signal?: AbortSignal) {
   return new Promise<void>((resolve) => {
-    const t = setTimeout(resolve, ms);
-    signal?.addEventListener("abort", () => (clearTimeout(t), resolve()), { once: true });
+    const onAbort = () => (clearTimeout(t), resolve());
+    const t = setTimeout(() => (signal?.removeEventListener("abort", onAbort), resolve()), ms);
+    signal?.addEventListener("abort", onAbort, { once: true });
   });
 }
 

@@ -173,6 +173,11 @@ Adam può aprire `/viola` e vedere l'app **esattamente come la vede lei**: le le
 - **Regole nel prompt**: non fingere di essere Adam, non inventare, non diagnosticare, in pericolo indicare il 112 e Adam.
 - **Avatar**: la foto di Adam caricata con contesto "Foto di Adam (avatar, abbraccio)".
 - **Privacy**: le conversazioni di Viola sono visibili **solo a lei** (nemmeno l'admin le legge). All'AI non vengono mai inviate password, chiavi o segreti.
+- **Cosa arriva a Gemini** (e niente altro):
+  - *Chat di Viola*: regole e personalità di Adam AI, nomi/soprannome, ora e fuso, le informazioni attive della Memoria (in modalità General solo il soprannome), gli ultimi messaggi di quella conversazione, i risultati degli strumenti che l'AI usa (titoli e testi dei contenuti che mostra). Mai diario, umore, messaggi ad Adam, richieste.
+  - *Copilot*: istruzioni del Copilot, la conversazione con Adam e i risultati degli strumenti che chiede (elenchi e contenuti da gestire).
+  - *Assistente di scrittura*: il tipo di testo, i campi ammessi del modulo (titolo, categoria, data, luogo…), il testo e le indicazioni di Adam, il suo stile, le cose vere e la Memoria attiva (se permesso); il messaggio di Viola solo con la spunta e mai se privato.
+  - *Prova Gemini*: la frase «Rispondi solo con la parola OK.».
 
 ### AI Copilot (per Adam)
 - Adam scrive cose come "crea tre dediche per quando è triste" e il Copilot usa strumenti **generati automaticamente dal registro dei contenuti**: `create_*`, `update_*`, `delete_*`, `list_*` per ogni tipo di contenuto, più `create_media_record`, `list_messages`, `mark_message_read`, `list_mood_entries`, `list_requests`, `get_app_settings`, `update_app_settings`.
@@ -183,6 +188,9 @@ Adam può aprire `/viola` e vedere l'app **esattamente come la vede lei**: le le
 ### Modelli e limiti
 - Modello di default `gemini-flash-latest`, poi i modelli di riserva scelti da Adam e — con "usa da solo gli altri modelli gratuiti" (attivo di default) — **tutta la catena gratuita**: `gemini-flash-lite-latest`, `gemini-3-flash-preview`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-2.0-flash`, `gemini-2.0-flash-lite` e, **solo per Adam AI**, come ultima spiaggia i modelli **Gemma** (`gemma-3-27b-it`, `gemma-3-12b-it`: quota gratuita molto più alta, ma solo testo — il prompt di sistema viene messo nel primo messaggio e gli strumenti non si usano; i pulsanti di conforto sotto la chat restano sempre). Ogni modello ha la **sua** quota gratuita, quindi quando uno finisce si passa al successivo. Si cambia modello se non esiste, ha finito la quota o è sovraccarico — solo prima che arrivi testo (niente risposte doppie) e ogni modello al massimo una volta per risposta. Un modello esaurito "si riposa" (in memoria del server): fino alla mezzanotte della California (≈ 9:00 in Italia) se è finita la quota giornaliera, qualche secondo se era il limite al minuto, 24 ore se il nome non esiste. Mai modelli "pro" o a pagamento. Timeout di 50 secondi. Il Copilot non usa Gemma (deve usare gli strumenti). Codice: `src/server/ai/models.ts`.
 - Limiti propri dell'app (più bassi di quelli di Google, modificabili): 60 messaggi/giorno per Viola, 6 al minuto, 1024 token di risposta, 80 richieste/giorno per il Copilot e l'assistente di scrittura insieme (quest'ultimo anche 12 al minuto). Superati i limiti, l'AI "si prende una pausa": **non si paga mai**.
+- **Errori spiegati** (`src/server/ai/errors.ts`): lo stato HTTP e il `reason` di Google vengono letti e classificati (chiave non valida, permessi/API disattivata/restrizioni, regione, billing, modello inesistente, quota, richiesta rifiutata, 5xx, rete, timeout, filtri di sicurezza, risposta vuota). Adam (Copilot, assistente di scrittura, "Vedi come Viola") vede la causa e cosa fare, con un riferimento «rif. G-…»; Viola vede una frase gentile senza parole tecniche. Prima ogni 400/401/403 diventava «Ops, qualcosa si è inceppato»: per esempio la risposta di Google a una chiave non valida (400 `API_KEY_INVALID`).
+- **Tentativi**: 5xx e rete → stesso modello dopo 0,5 s e 1,5 s (al massimo 2 pause per richiesta); quota/429, modello inesistente/404, sovraccarico → modello gratuito successivo; un modello che per 20 s non manda niente viene saltato; chiave/permessi/regione/billing → stop subito (nessun modello funzionerebbe). Se Google rifiuta le definizioni degli strumenti, lo stesso modello risponde senza strumenti. Ogni fallimento finisce nei log come `[gemini] … {status, reason, model, ref}` — mai la chiave.
+- **Diagnosi**: «Prova Gemini» in Admin → Adam AI (e il Controllo di "Completa Vio ♡") usa la chiave vera con la richiesta più piccola possibile (stessa chiamata in streaming della chat) e riporta cosa ha risposto Google; la chiave compare solo mascherata (`AIza…****`, lunghezza). Le variabili incollate con virgolette o come `NOME=valore` vengono ripulite. In locale: `npm run gemini:check`.
 - ⚠️ Sul piano gratuito Google può usare le conversazioni per migliorare i suoi servizi.
 
 ---
@@ -356,6 +364,7 @@ npm run dev                     # http://localhost:3000
 | `npm run build` / `start` | build e avvio di produzione |
 | `npm run create-user -- --email … --password … --role admin\|user` | crea/aggiorna un account |
 | `npm run vapid` | genera le chiavi Web Push |
+| `npm run gemini:check` | prova la chiave Gemini di `.env.local` con una richiesta minima (non stampa mai la chiave) |
 | `npm run icons` | rigenera icone, favicon, splash |
 | `npm run db:bundle` | rigenera `supabase/setup.sql` (migrazioni + seed, progetti nuovi) e `supabase/update.sql` (solo le migrazioni successive alla prima versione, per i progetti già installati; sempre rieseguibile) |
 | `npx supabase start` | database locale (richiede Docker) |

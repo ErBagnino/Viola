@@ -221,7 +221,7 @@ export function ResourceManager({
                     {def.badgeField && r[def.badgeField] ? <span className="rounded-full bg-lilac-100 px-2 py-0.5 text-[11px] font-extrabold text-lilac-600">{badgeLabel(r[def.badgeField])}</span> : null}
                     {r.pinned || r.is_default || r.featured ? <span className="rounded-full bg-peach-100 px-2 py-0.5 text-[11px] font-extrabold text-vio-700">in evidenza</span> : null}
                   </div>
-                  <h3 className="mt-0.5 truncate font-extrabold text-vio-900">{plain(r[def.titleField]) || "(senza titolo)"}</h3>
+                  <h2 className="mt-0.5 truncate font-extrabold text-vio-900">{plain(r[def.titleField]) || "(senza titolo)"}</h2>
                   {def.subtitleField && r[def.subtitleField] ? <p className="line-clamp-2 text-sm text-ink-soft">{describe(r[def.subtitleField])}</p> : null}
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <Button size="sm" variant="soft" onClick={() => openEdit(r)}>

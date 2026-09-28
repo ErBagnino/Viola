@@ -13,7 +13,7 @@ export async function audit(entry: {
 }): Promise<string | null> {
   try {
     const supabase = await createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("admin_audit_logs")
       .insert({
       admin_id: entry.adminId,
@@ -25,9 +25,11 @@ export async function audit(entry: {
       })
       .select("id")
       .single();
+    if (error) console.error(`[audit] not recorded ${JSON.stringify({ action: entry.action, code: error.code, message: error.message?.slice(0, 200) })}`);
     return data?.id ?? null;
-  } catch {
-    /* auditing must never break the admin */
+  } catch (e) {
+    // auditing must never break the admin, but it must not fail silently either
+    console.error(`[audit] not recorded ${JSON.stringify({ action: entry.action, message: e instanceof Error ? e.message.slice(0, 200) : "?" })}`);
     return null;
   }
 }

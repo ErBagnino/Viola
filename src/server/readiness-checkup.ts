@@ -5,8 +5,8 @@ import { serverEnv } from "@/server/env";
 import { getSettings } from "@/server/settings";
 import { telegramChatId } from "@/server/notifications";
 import { telegramGetMe } from "@/server/notifications/telegram";
-import { isAiConfigured, listAvailableModels } from "@/server/ai/gemini";
-import { modelChain } from "@/server/ai/models";
+import { isAiConfigured } from "@/server/ai/gemini";
+import { diagnoseGemini } from "@/server/ai/diagnose";
 import { getReadinessFacts } from "@/server/readiness";
 import type { CheckupItem } from "@/features/readiness/types";
 import { occurrenceOf } from "@/utils/dates";
@@ -55,21 +55,11 @@ export async function runCheckupFor(adminId: string): Promise<CheckupItem[]> {
     add("warn", "Nessun avviso configurato", "Se preme \"Ho bisogno di Adam\" non ti arriva niente.", "/admin/notifiche");
   }
 
-  // --- Gemini (lists models: does not use the daily quota) -----------------
+  // --- Gemini: the real key, one tiny request (same check as "Prova Gemini") ---
   if (settings.ai.enabled && !isAiConfigured()) add("warn", "Adam AI è accesa ma manca GEMINI_API_KEY", "Viola vedrà un messaggio gentile al posto delle risposte.", "/admin/ai");
   else if (settings.ai.enabled) {
-    try {
-      const available = new Set(await listAvailableModels());
-      const chain = modelChain(settings, serverEnv.geminiModel, { textOnly: true });
-      const usable = chain.filter((m) => available.has(m));
-      const first = chain[0];
-      if (!usable.length) add("error", "Nessun modello Gemini disponibile per questa chiave", `Modelli provati: ${chain.join(", ")}`, "/admin/ai");
-      else if (!available.has(first)) add("warn", `Il modello "${first}" non esiste per questa chiave`, `Adam AI userà "${usable[0]}". Puoi cambiarlo in Adam AI → Modello.`, "/admin/ai");
-      else add("ok", `Adam AI pronta: ${usable.length} modelli gratuiti disponibili`, `Primo: ${first}. Se finisce la quota passa da solo al successivo.`);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "";
-      add("error", /40[13]|API key|permission/i.test(msg) ? "La chiave Gemini non è valida" : "Gemini non risponde", "Controlla GEMINI_API_KEY su Vercel.", "/admin/ai");
-    }
+    const g = await diagnoseGemini(settings, { maxProbes: 2 });
+    add(g.verdict.ok ? "ok" : "error", g.verdict.ok ? `Adam AI pronta: ${g.verdict.text}` : g.verdict.title, g.verdict.ok ? undefined : g.verdict.text, g.verdict.ok ? undefined : "/admin/ai");
   }
 
   // --- Photos really load ----------------------------------------------------

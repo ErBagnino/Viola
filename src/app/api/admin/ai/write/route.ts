@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/server/auth";
 import { getSettings } from "@/server/settings";
 import { serverEnv } from "@/server/env";
-import { AiError, isAiConfigured, streamRound } from "@/server/ai/gemini";
+import { AiError, isAiConfigured, streamRound, toAiError } from "@/server/ai/gemini";
+import { aiErrorMessage } from "@/server/ai/errors";
 import { modelChain } from "@/server/ai/models";
 import { checkAiLimits, recordAiUsage } from "@/server/ai/limits";
 import { loadAiMemory } from "@/server/ai/memory";
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
         out = await run(missing);
         missing = missingKeeps(out.text, req.keep);
       }
-      if (!out.text.trim()) throw new AiError("error", "risposta vuota");
+      if (!out.text.trim()) throw new AiError("empty", "risposta vuota");
       send({
         t: "done",
         text: out.text,
@@ -104,15 +105,9 @@ export async function POST(request: NextRequest) {
         ...(missing.length ? { warning: `Non sono riuscito a lasciare identica: ${missing.map((m) => `«${m}»`).join(", ")}. Controlla prima di usarla.` } : {}),
       });
     } catch (e) {
-      if (timeout.aborted) send({ t: "error", code: "timeout", message: `L'AI ci sta mettendo troppo. Riprova tra poco. ${SAFE}` });
-      else if (request.signal.aborted) return;
-      else if (e instanceof AiError && e.code === "limit") send({ t: "error", code: "limit", message: `L'AI ha finito le richieste gratuite per adesso. Riprova più tardi o scrivi a mano ♡ ${SAFE}` });
-      else if (e instanceof AiError && (e.code === "offline" || e.code === "not_configured")) send({ t: "error", code: "offline", message: `L'AI non è raggiungibile adesso. ${SAFE}` });
-      else if (e instanceof AiError && e.code === "blocked") send({ t: "error", code: "blocked", message: `L'AI non ha voluto scrivere questo testo: prova a dirlo in un altro modo. ${SAFE}` });
-      else {
-        console.error("[ai-write]", e instanceof Error ? e.message.slice(0, 200) : "errore");
-        send({ t: "error", code: "error", message: `Qualcosa non ha funzionato. Riprova. ${SAFE}` });
-      }
+      if (request.signal.aborted && !timeout.aborted) return;
+      const err = toAiError(e, { signal });
+      send({ t: "error", code: err.code, message: `${aiErrorMessage(err.code, "admin", settings.texts, err.failure, err.ref)} ${SAFE}` });
     } finally {
       if (requests) await recordAiUsage(supabase, "copilot", requests, input, output).catch(() => {});
     }

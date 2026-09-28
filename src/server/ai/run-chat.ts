@@ -3,7 +3,8 @@ import type { Content, FunctionDeclaration, Part } from "@google/genai";
 import type { ServerSupabase } from "@/lib/supabase/server";
 import type { ChatAction, StreamEvent } from "@/features/ai-chat/types";
 import type { Json } from "@/db/database.types";
-import { AiError, streamRound } from "./gemini";
+import { streamRound, toAiError } from "./gemini";
+import { aiErrorMessage, sanitize, type AiAudience, type AiTexts } from "./errors";
 
 const MAX_ROUNDS = 4;
 const MAX_CALLS_PER_ROUND = 4;
@@ -75,13 +76,14 @@ export async function runChatLoop(opts: {
   return { text: text.trim(), actions, rounds, input, output };
 }
 
-export function friendlyAiError(e: unknown, texts: { aiPause: string; aiOffline: string; errorText: string }) {
-  if (e instanceof AiError) {
-    if (e.code === "limit") return { code: "limit", message: texts.aiPause };
-    if (e.code === "offline" || e.code === "not_configured") return { code: "offline", message: texts.aiOffline };
-    if (e.code === "blocked") return { code: "blocked", message: "Non posso rispondere a questa richiesta. Proviamo in un altro modo? ♡" };
-  }
-  return { code: "error", message: texts.errorText };
+/**
+ * The error event for the chat. Adam (Copilot, or "Vedi come Viola") gets the
+ * precise cause and what to do; Viola gets a gentle sentence.
+ */
+export function friendlyAiError(e: unknown, texts: AiTexts, audience: AiAudience = "viola", signal?: AbortSignal) {
+  const err = toAiError(e, { signal });
+  if (!err.failure && err.code === "error") console.error(`[ai] unexpected ${JSON.stringify({ at: new Date().toISOString(), ref: err.ref, detail: sanitize(err.message).slice(0, 300) })}`);
+  return { code: err.code, message: aiErrorMessage(err.code, audience, texts, err.failure, err.ref) };
 }
 
 export async function saveModelMessage(

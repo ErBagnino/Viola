@@ -378,6 +378,8 @@ export function Chat({
                 <div className={cn("flex max-w-[85%] min-w-0 flex-col gap-2", mine && "items-end")}>
                   {(m.content || (pending && waiting)) && (
                     <div
+                      data-role={m.role}
+                      data-status={m.status}
                       className={cn(
                         "rounded-3xl px-4 py-2.5 text-[15.5px] leading-relaxed break-words",
                         mine ? "rounded-br-lg bg-wine-700 text-white" : "rounded-bl-lg bg-surface text-ink shadow-soft",

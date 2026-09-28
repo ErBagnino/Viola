@@ -44,7 +44,7 @@ export function modelChain(settings: SettingsMap, configured: string, opts: { te
 // never a source of truth — worst case a model is simply tried once more.
 // ---------------------------------------------------------------------------
 
-const cooling = new Map<string, number>();
+const cooling = new Map<string, { until: number; kind: ModelFailure }>();
 
 /** Milliseconds until the next midnight in California (when Gemini daily free quotas reset). */
 export function msUntilQuotaReset(now = new Date()) {
@@ -80,17 +80,25 @@ export function failureKind(status: number | undefined, message: string): ModelF
 }
 
 export function coolDown(model: string, kind: ModelFailure, message = "", now = new Date()) {
-  cooling.set(model, now.getTime() + cooldownMs(kind, message, now));
+  cooling.set(model, { until: now.getTime() + cooldownMs(kind, message, now), kind });
 }
 
 export function isCooling(model: string, now = Date.now()) {
-  const until = cooling.get(model);
-  if (until === undefined) return false;
-  if (until <= now) {
+  const entry = cooling.get(model);
+  if (entry === undefined) return false;
+  if (entry.until <= now) {
     cooling.delete(model);
     return false;
   }
   return true;
+}
+
+/** Why every model of a request is resting: quota, missing names, or overload. */
+export function coolingReason(models: string[]): "limit" | "model_not_found" | "unavailable" {
+  const kinds = models.map((m) => cooling.get(m)?.kind).filter(Boolean);
+  if (kinds.some((k) => k === "daily" || k === "rate")) return "limit";
+  if (kinds.length && kinds.every((k) => k === "missing")) return "model_not_found";
+  return "unavailable";
 }
 
 /** Test helper. */

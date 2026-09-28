@@ -14,6 +14,7 @@
     "icons": "node scripts/generate-icons.mjs",
     "create-user": "node scripts/create-user.mjs",
     "vapid": "node scripts/generate-vapid.mjs",
+    "gemini:check": "node scripts/gemini-check.mjs",
     "db:bundle": "node scripts/bundle-sql.mjs",
     "check": "npm run lint && npm run typecheck && npm test"
   },

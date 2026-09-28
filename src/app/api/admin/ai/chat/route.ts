@@ -51,8 +51,11 @@ export async function POST(request: NextRequest) {
     }
     if (!conversationId) {
       if (regenerate) return send({ t: "error", code: "error", message: settings.texts.errorText });
-      const { data } = await supabase.from("ai_conversations").insert({ scope: "copilot", title: message.slice(0, 60) }).select("id").single();
-      if (!data) return send({ t: "error", code: "error", message: settings.texts.errorText });
+      const { data, error } = await supabase.from("ai_conversations").insert({ scope: "copilot", title: message.slice(0, 60) }).select("id").single();
+      if (!data) {
+        console.error(`[copilot] conversation insert failed ${JSON.stringify({ at: new Date().toISOString(), code: error?.code, message: error?.message?.slice(0, 200) })}`);
+        return send({ t: "error", code: "database", message: `Non riesco a salvare la conversazione nel database (${error?.code ?? "?"}). Controlla Supabase.` });
+      }
       conversationId = data.id;
     }
     send({ t: "meta", conversationId });
@@ -89,8 +92,7 @@ export async function POST(request: NextRequest) {
         if (text.trim()) await saveModelMessage(supabase, convId, viewer.id, text, [], "stopped", { input: 0, output: 0 });
         return;
       }
-      console.error("[copilot]", e instanceof Error ? e.message : e);
-      const f = friendlyAiError(e, settings.texts);
+      const f = friendlyAiError(e, settings.texts, "admin");
       send({ t: "error", code: f.code, message: f.message });
     }
   });

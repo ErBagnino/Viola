@@ -2,10 +2,18 @@ import "server-only";
 
 // Server-only secrets. Read lazily so missing optional values never crash
 // the build — every feature degrades gracefully when unconfigured.
-// Trimmed: values pasted into a hosting dashboard often carry stray spaces/newlines.
+// Cleaned: values pasted into a hosting dashboard often carry stray
+// spaces/newlines, surrounding quotes ("AIza…") or the whole "NAME=value" line.
+export function cleanEnvValue(name: string, value: string | undefined) {
+  let v = (value ?? "").trim();
+  if (v.startsWith(`${name}=`)) v = v.slice(name.length + 1).trim();
+  if (v.length >= 2 && (v[0] === '"' || v[0] === "'") && v[v.length - 1] === v[0]) v = v.slice(1, -1).trim();
+  return v;
+}
+
 const read = (...names: string[]) => {
   for (const name of names) {
-    const value = process.env[name]?.trim();
+    const value = cleanEnvValue(name, process.env[name]);
     if (value) return value;
   }
   return "";

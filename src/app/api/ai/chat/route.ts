@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
       }
       const { data, error } = await supabase.from("ai_conversations").insert({ scope: "viola", mode, title: message.slice(0, 60) }).select("id").single();
       if (error || !data) {
-        send({ t: "error", code: "error", message: settings.texts.errorText });
+        console.error(`[ai] conversation insert failed ${JSON.stringify({ at: new Date().toISOString(), code: error?.code, message: error?.message?.slice(0, 200) })}`);
+        send({ t: "error", code: "database", message: viewer.role === "admin" ? `Non riesco a salvare la conversazione nel database (${error?.code ?? "?"}). Controlla Supabase e che update.sql sia stato eseguito.` : settings.texts.errorText });
         return;
       }
       conversationId = data.id;
@@ -126,8 +127,8 @@ export async function POST(request: NextRequest) {
         if (text.trim()) await saveModelMessage(supabase, conversationId, viewer.id, text, actions, "stopped", { input: 0, output: 0 });
         return;
       }
-      console.error("[ai]", e instanceof Error ? e.message : e);
-      const f = friendlyAiError(e, settings.texts);
+      // details are already in the log (errors.ts); Adam previewing Viola's chat sees the precise cause
+      const f = friendlyAiError(e, settings.texts, viewer.role === "admin" ? "admin" : "viola");
       if (f.code !== "limit") await recordAiUsage(supabase, "viola", 1, 0, 0).catch(() => undefined);
       send({ t: "error", code: f.code, message: f.message });
     }

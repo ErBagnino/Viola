@@ -148,7 +148,7 @@ export type WritingEvent =
   | { t: "text"; v: string }
   | { t: "reset" }
   | { t: "done"; text: string; note: string; warning?: string }
-  | { t: "error"; code: "limit" | "offline" | "timeout" | "blocked" | "error" | "invalid"; message: string };
+  | { t: "error"; code: string; message: string };
 
 // ---------------------------------------------------------------------------
 // Sentences to keep word for word

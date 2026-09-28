@@ -166,6 +166,24 @@ describe("Gemini requests: retry only what is temporary", () => {
     expect(hits.map((h) => h.model)).toEqual(["a", "a", "a", "b", "c"]);
   });
 
+  it("after a 5xx on every model, the next request («Riprova») really asks Google again", async () => {
+    for (const m of ["a", "b"]) plans.set(m, (n) => (n <= 4 ? err(500, "INTERNAL", "boom") : { status: 200, stream: [{ candidates: [{ content: { parts: [{ text: "di nuovo qui" }] } }] }] }));
+    expect(await codeOf(round(["a", "b"]))).toBe("unavailable");
+    hits.length = 0;
+    plans.set("a", () => ({ status: 200, stream: [{ candidates: [{ content: { parts: [{ text: "di nuovo qui" }] } }] }] }));
+    const r = await round(["a", "b"]);
+    expect(r.text).toBe("di nuovo qui");
+    expect(hits.map((h) => h.model)).toEqual(["a"]);
+  });
+
+  it("even when every model is resting because it was overloaded, a new request tries the first one", async () => {
+    const { coolDown } = await import("@/server/ai/models");
+    coolDown("a", "busy");
+    coolDown("b", "busy");
+    plans.set("a", () => ({ status: 200, stream: [{ candidates: [{ content: { parts: [{ text: "ok" }] } }] }] }));
+    expect((await round(["a", "b"])).model).toBe("a");
+  });
+
   it("quota (429) or a missing model (404): straight to the next free model", async () => {
     plans.set("a", () => err(429, "RESOURCE_EXHAUSTED", "Quota exceeded for metric GenerateRequestsPerDayPerProjectPerModel-FreeTier"));
     plans.set("b", () => err(404, "NOT_FOUND", "models/b is not found for API version v1beta"));

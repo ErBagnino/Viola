@@ -102,10 +102,12 @@ export async function streamRound(opts: {
   // pauses for transient failures, shared by the whole round (Google fully down ≠ 20 s of waiting)
   let retriesLeft = MAX_RETRIES;
   const models = [...new Set(opts.models.filter(Boolean))];
-  const ready = models.filter((m) => !isCooling(m));
+  let ready = models.filter((m) => !isCooling(m));
   if (models.length && !ready.length) {
     const code = coolingReason(models);
-    throw new AiError(code, code === "limit" ? "quota esaurita su tutti i modelli gratuiti" : "tutti i modelli sono a riposo", undefined, ref);
+    if (code !== "unavailable") throw new AiError(code, code === "limit" ? "quota esaurita su tutti i modelli gratuiti" : "tutti i modelli sono a riposo", undefined, ref);
+    // "busy" is a guess that ages in seconds: a new request («Riprova») still asks the first model
+    ready = models.slice(0, 1);
   }
 
   for (const model of ready) {
@@ -210,7 +212,8 @@ export async function streamRound(opts: {
         }
         const kind = noFirstChunk ? "busy" : failureKind(f.status, f.raw ?? f.detail);
         logGeminiFailure({ ref, model, attempt, code, f, final: false });
-        if (kind || isTransient(code)) coolDown(model, kind ?? "busy", f.raw ?? f.detail);
+        // only what Google names (quota, missing model, overload) or a silent model rests; a plain 5xx was already retried here
+        if (kind) coolDown(model, kind, f.raw ?? f.detail);
         last = err;
         break; // try the next free model
       } finally {

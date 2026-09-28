@@ -257,7 +257,11 @@ VAPID_PRIVATE_KEY=...
 VAPID_SUBJECT=mailto:tua@email.it
 ```
 
-> Senza computer? Puoi generarle su un generatore online di "VAPID keys", ma è più sicuro con lo script.
+> **Non hai scaricato il progetto (o non hai git)?** Basta Node: in PowerShell o nel Terminale scrivi
+> `npx web-push generate-vapid-keys` (alla domanda "Ok to proceed?" rispondi `y`).
+> "Public Key" va in `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, "Private Key" va in `VAPID_PRIVATE_KEY`.
+>
+> Senza computer? Puoi generarle su un generatore online di "VAPID keys", ma è più sicuro sul tuo computer.
 > Genera le chiavi **una volta sola**: se le cambi, bisogna riattivare le notifiche su ogni telefono.
 
 ## 17. WhatsApp (fallback)

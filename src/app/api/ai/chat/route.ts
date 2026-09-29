@@ -9,7 +9,7 @@ import { modelChain } from "@/server/ai/models";
 import { buildVioPrompt } from "@/server/ai/prompt";
 import { checkAiLimits, recordAiUsage } from "@/server/ai/limits";
 import { loadAiMemory } from "@/server/ai/memory";
-import { loadHistory } from "@/server/ai/history";
+import { loadHistory, withoutLastAnswer, withUserTurn } from "@/server/ai/history";
 import { friendlyAiError, runChatLoop, saveModelMessage } from "@/server/ai/run-chat";
 import { runViolaTool, VIOLA_TOOLS } from "@/server/ai/viola-tools";
 import { violaView } from "@/server/viola-view";
@@ -30,16 +30,14 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  // 1. auth
-  const viewer = await getViewer();
+  // 1. auth, settings and body together (settings do not depend on who asks)
+  const [viewer, settings, body] = await Promise.all([getViewer(), getSettings(), request.json().catch(() => null)]);
   if (!viewer || viewer.role === "pending") return NextResponse.json({ error: "Devi accedere di nuovo." }, { status: 401 });
 
   // 2. validation
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  const parsed = bodySchema.safeParse(body);
   if (!parsed.success || (!parsed.data.regenerate && !parsed.data.message)) return NextResponse.json({ error: "Messaggio non valido." }, { status: 400 });
   const { message, mode, regenerate } = parsed.data;
-
-  const settings = await getSettings();
   const supabase = await createClient();
 
   return ndjsonStream(async (send) => {
@@ -47,18 +45,21 @@ export async function POST(request: NextRequest) {
       send({ t: "error", code: "offline", message: settings.texts.aiOffline });
       return;
     }
-    const limit = await checkAiLimits(supabase, viewer.id, "viola", settings);
+
+    // 3. limits, conversation, memory and history in ONE round trip to the database
+    const askedId = parsed.data.conversationId ?? null;
+    const [limit, existing, memory, history] = await Promise.all([
+      checkAiLimits(supabase, viewer.id, "viola", settings),
+      askedId ? supabase.from("ai_conversations").select("id, mode").eq("id", askedId).eq("scope", "viola").maybeSingle().then((r) => r.data) : null,
+      loadAiMemory(supabase),
+      askedId ? loadHistory(supabase, askedId) : Promise.resolve([]),
+    ]);
     if (!limit.ok) {
       send({ t: "error", code: "limit", message: settings.texts.aiPause });
       return;
     }
 
-    // 3. conversation + context retrieval
-    let conversationId = parsed.data.conversationId ?? null;
-    if (conversationId) {
-      const { data } = await supabase.from("ai_conversations").select("id").eq("id", conversationId).eq("scope", "viola").maybeSingle();
-      if (!data) conversationId = null;
-    }
+    let conversationId = existing?.id ?? null;
     if (!conversationId) {
       if (regenerate) {
         send({ t: "error", code: "error", message: settings.texts.errorText });
@@ -71,20 +72,31 @@ export async function POST(request: NextRequest) {
         return;
       }
       conversationId = data.id;
-    } else {
-      await supabase.from("ai_conversations").update({ mode }).eq("id", conversationId);
     }
-    send({ t: "meta", conversationId });
+    const convId = conversationId;
+    send({ t: "meta", conversationId: convId });
 
+    // Saved while Gemini is already answering; awaited before the answer is saved (so it stays in order).
+    const saving: Promise<unknown>[] = [];
+    const inBackground = (what: string, query: PromiseLike<{ error: { code?: string; message?: string } | null }>) =>
+      saving.push(Promise.resolve(query).then((r) => r.error && console.error(`[ai] ${what} not saved ${JSON.stringify({ code: r.error.code, message: r.error.message?.slice(0, 200) })}`)));
+    if (existing && existing.mode !== mode) inBackground("mode", supabase.from("ai_conversations").update({ mode }).eq("id", convId));
+    let contents;
     if (regenerate) {
       // Drop the last answer(s) after the last user message.
-      const { data: lastUser } = await supabase.from("ai_messages").select("created_at").eq("conversation_id", conversationId).eq("role", "user").order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (lastUser) await supabase.from("ai_messages").delete().eq("conversation_id", conversationId).eq("role", "model").gt("created_at", lastUser.created_at);
+      saving.push(
+        (async () => {
+          const { data: lastUser } = await supabase.from("ai_messages").select("created_at").eq("conversation_id", convId).eq("role", "user").order("created_at", { ascending: false }).limit(1).maybeSingle();
+          if (lastUser) await supabase.from("ai_messages").delete().eq("conversation_id", convId).eq("role", "model").gt("created_at", lastUser.created_at);
+        })(),
+      );
+      contents = withoutLastAnswer(existing ? history : []);
     } else {
-      await supabase.from("ai_messages").insert({ conversation_id: conversationId, role: "user", content: message, actions: [] });
+      inBackground("user message", supabase.from("ai_messages").insert({ conversation_id: convId, role: "user", content: message, actions: [] }));
+      contents = withUserTurn(existing ? history : [], message);
     }
+    const saved = () => Promise.all(saving);
 
-    const [memory, contents] = await Promise.all([loadAiMemory(supabase), loadHistory(supabase, conversationId)]);
     const system = buildVioPrompt(settings, mode, memory);
     const models = modelChain(settings, serverEnv.geminiModel, { textOnly: true });
 
@@ -99,6 +111,8 @@ export async function POST(request: NextRequest) {
         tools: VIOLA_TOOLS,
         maxOutputTokens: settings.ai.maxOutputTokens,
         temperature: settings.ai.temperature,
+        // a chat, not a puzzle: no thinking pause before the first words
+        thinkingBudget: 0,
         signal: AbortSignal.any([request.signal, AbortSignal.timeout(AI_TIMEOUT_MS)]),
         send: (e) => {
           if (e.t === "text") text += e.v;
@@ -107,24 +121,31 @@ export async function POST(request: NextRequest) {
         },
         runTool: async (name, args) => {
           const res = await runViolaTool(name, args, viewer.role === "admin" ? violaView(supabase, viewer.id) : supabase, settings);
-          await supabase.from("ai_tool_logs").insert({
-            conversation_id: conversationId,
-            user_id: viewer.id,
-            scope: "viola",
-            tool: name,
-            args: args as NonNullable<Json>,
-            result: res.result as Json,
-            success: !("errore" in res.result),
-          });
+          inBackground(
+            "tool log",
+            supabase.from("ai_tool_logs").insert({
+              conversation_id: convId,
+              user_id: viewer.id,
+              scope: "viola",
+              tool: name,
+              args: args as NonNullable<Json>,
+              result: res.result as Json,
+              success: !("errore" in res.result),
+            }),
+          );
           return res;
         },
       });
-      await recordAiUsage(supabase, "viola", out.rounds, out.input, out.output);
-      const id = await saveModelMessage(supabase, conversationId, viewer.id, out.text, out.actions, "ok", { input: out.input, output: out.output });
+      await saved();
+      const [, id] = await Promise.all([
+        recordAiUsage(supabase, "viola", out.rounds, out.input, out.output),
+        saveModelMessage(supabase, convId, viewer.id, out.text, out.actions, "ok", { input: out.input, output: out.output }),
+      ]);
       send({ t: "done", messageId: id });
     } catch (e) {
+      await saved().catch(() => undefined);
       if (request.signal.aborted) {
-        if (text.trim()) await saveModelMessage(supabase, conversationId, viewer.id, text, actions, "stopped", { input: 0, output: 0 });
+        if (text.trim()) await saveModelMessage(supabase, convId, viewer.id, text, actions, "stopped", { input: 0, output: 0 });
         return;
       }
       // details are already in the log (errors.ts); Adam previewing Viola's chat sees the precise cause

@@ -22,6 +22,7 @@ export async function runChatLoop(opts: {
   tools: FunctionDeclaration[];
   maxOutputTokens: number;
   temperature: number;
+  thinkingBudget?: number;
   signal: AbortSignal;
   send: (e: StreamEvent) => void;
   runTool: ToolRunner;
@@ -42,6 +43,7 @@ export async function runChatLoop(opts: {
       tools: opts.tools,
       maxOutputTokens: opts.maxOutputTokens,
       temperature: opts.temperature,
+      thinkingBudget: opts.thinkingBudget,
       signal: opts.signal,
       onText: (d) => {
         text += d;
@@ -96,21 +98,24 @@ export async function saveModelMessage(
   status: "ok" | "error" | "stopped",
   tokens: { input: number; output: number },
 ) {
-  const { data } = await supabase
-    .from("ai_messages")
-    .insert({
-      conversation_id: conversationId,
-      user_id: userId,
-      role: "model",
-      content: content.slice(0, 39000),
-      // strip short-lived signed URLs; they are re-signed when history loads
-      actions: actions.map((a) => (a.type === "photo" || a.type === "memory" ? { ...a, url: undefined } : a)) as unknown as NonNullable<Json>,
-      status,
-      input_tokens: tokens.input,
-      output_tokens: tokens.output,
-    })
-    .select("id")
-    .single();
-  await supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId);
+  // one round trip: the message and the conversation's "last activity" together
+  const [{ data }] = await Promise.all([
+    supabase
+      .from("ai_messages")
+      .insert({
+        conversation_id: conversationId,
+        user_id: userId,
+        role: "model",
+        content: content.slice(0, 39000),
+        // strip short-lived signed URLs; they are re-signed when history loads
+        actions: actions.map((a) => (a.type === "photo" || a.type === "memory" ? { ...a, url: undefined } : a)) as unknown as NonNullable<Json>,
+        status,
+        input_tokens: tokens.input,
+        output_tokens: tokens.output,
+      })
+      .select("id")
+      .single(),
+    supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId),
+  ]);
   return data?.id ?? null;
 }

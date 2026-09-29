@@ -91,6 +91,12 @@ export async function streamRound(opts: {
   tools?: FunctionDeclaration[];
   maxOutputTokens: number;
   temperature: number;
+  /**
+   * Thinking tokens before the answer (thinking models only). 0 = answer at
+   * once: the first words arrive seconds earlier (Viola's chat). A model that
+   * refuses 0 gets a small budget instead.
+   */
+  thinkingBudget?: number;
   signal?: AbortSignal;
   onText?: (delta: string) => void;
   /** reference written in the logs (and shown to Adam) */
@@ -113,6 +119,7 @@ export async function streamRound(opts: {
   for (const model of ready) {
     const textOnly = isTextOnlyModel(model);
     let withThinking = !textOnly;
+    let budget = opts.thinkingBudget ?? 512;
     let withTools = Boolean(opts.tools?.length) && !textOnly;
     let attempt = 0;
     for (;;) {
@@ -133,10 +140,10 @@ export async function streamRound(opts: {
           contents: textOnly ? textOnlyContents(opts.system, opts.contents) : opts.contents,
           config: {
             ...(textOnly ? {} : { systemInstruction: opts.system }),
-            maxOutputTokens: opts.maxOutputTokens + (withThinking ? 512 : 0),
+            maxOutputTokens: opts.maxOutputTokens + (withThinking ? budget : 0),
             temperature: opts.temperature,
             abortSignal: attemptCtrl.signal,
-            ...(withThinking ? { thinkingConfig: { thinkingBudget: 512 } } : {}),
+            ...(withThinking ? { thinkingConfig: { thinkingBudget: budget } } : {}),
             ...(withTools ? { tools: [{ functionDeclarations: opts.tools! }] } : {}),
           },
         });
@@ -185,7 +192,9 @@ export async function streamRound(opts: {
           throw err;
         }
         if (withThinking && isThinkingRejected(f)) {
-          withThinking = false; // same model without the thinking config
+          // same model: a model that must think gets a small budget, then no thinking config at all
+          if (budget === 0) budget = 128;
+          else withThinking = false;
           continue;
         }
         if (withTools && isToolsRejected(f)) {

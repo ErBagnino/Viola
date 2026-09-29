@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUp, Copy, HeartHandshake, History, ImagePlus, Lightbulb, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowUp, Copy, HeartHandshake, History, ImagePlus, Lightbulb, MessageSquarePlus, RefreshCw, Square, Trash2, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useNeedAdamShortcut } from "@/components/layout/shell-context";
@@ -60,6 +60,74 @@ function Typing() {
   );
 }
 
+type RowProps = {
+  m: ChatMessage;
+  avatarUrl: string | null;
+  /** the answer being written right now */
+  pending: boolean;
+  /** dots while waiting for the first words */
+  showTyping: boolean;
+  canRegenerate: boolean;
+  onRegenerate: () => void;
+  onDelete: (id: string) => void;
+  onCopy: (text: string) => void;
+  onConfirm: (logId: string, decision: "confirm" | "reject") => Promise<void>;
+};
+
+/** One message. Memoized: while an answer streams, only the last bubble re-renders (not every Markdown above it). */
+const MessageRow = memo(function MessageRow({ m, avatarUrl, pending, showTyping, canRegenerate, onRegenerate, onDelete, onCopy, onConfirm }: RowProps) {
+  if (m.role === "note")
+    return (
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-xs font-bold text-ink-muted">
+        {m.content}
+      </motion.p>
+    );
+  const mine = m.role === "user";
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cn("group flex gap-2", mine && "justify-end")}>
+      {!mine && <Avatar url={avatarUrl} />}
+      <div className={cn("flex max-w-[85%] min-w-0 flex-col gap-2", mine && "items-end")}>
+        {(m.content || showTyping) && (
+          <div
+            data-role={m.role}
+            data-status={m.status}
+            className={cn(
+              "rounded-3xl px-4 py-2.5 text-[15.5px] leading-relaxed break-words",
+              mine ? "rounded-br-lg bg-wine-700 text-white" : "rounded-bl-lg bg-surface text-ink shadow-soft",
+              m.status === "error" && "bg-blush-100 text-vio-900",
+            )}
+          >
+            {mine ? <p className="whitespace-pre-wrap">{m.content}</p> : m.content ? <Markdown className="prose-vio [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{m.content}</Markdown> : <Typing />}
+            {m.status === "stopped" && <p className="mt-1 text-xs text-ink-muted italic">(interrotto)</p>}
+          </div>
+        )}
+        {m.actions.length > 0 && (
+          <div className="flex flex-col items-start gap-2">
+            {m.actions.map((a, k) => (
+              <ActionCard key={k} action={a} onConfirm={onConfirm} />
+            ))}
+          </div>
+        )}
+        {!pending && m.content && (
+          <div className={cn("flex gap-1 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100", mine && "justify-end")}>
+            <button type="button" onClick={() => onCopy(m.content)} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface" aria-label="Copia">
+              <Copy className="size-4" />
+            </button>
+            {canRegenerate && (
+              <button type="button" onClick={onRegenerate} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface" aria-label="Rigenera risposta">
+                <RefreshCw className="size-4" />
+              </button>
+            )}
+            <button type="button" onClick={() => onDelete(m.id)} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface" aria-label="Elimina messaggio">
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+});
+
 export function Chat({
   scope,
   endpoint,
@@ -72,6 +140,7 @@ export function Chat({
   showModes,
   allowAttachments,
   knownFacts,
+  initialConversation,
 }: {
   scope: "viola" | "copilot";
   endpoint: string;
@@ -85,11 +154,13 @@ export function Chat({
   allowAttachments?: boolean;
   /** facts Adam taught the AI and chose to show to Viola */
   knownFacts?: { key: string; value: string }[];
+  /** the conversation of the last few hours, picked up where it was left */
+  initialConversation?: { id: string; mode: string; messages: ChatMessage[] } | null;
 }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialConversation?.messages ?? []);
+  const [conversationId, setConversationId] = useState<string | null>(initialConversation?.id ?? null);
   const [input, setInput] = useState("");
-  const [mode, setMode] = useState<Mode>(defaultMode);
+  const [mode, setMode] = useState<Mode>(MODES.some((m) => m.value === initialConversation?.mode) ? (initialConversation!.mode as Mode) : defaultMode);
   const [streaming, setStreaming] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -97,10 +168,14 @@ export function Chat({
   const [history, setHistory] = useState<ConversationSummary[] | null>(null);
   const [offline, setOffline] = useState(false);
   const [attaching, setAttaching] = useState(false);
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const [showJump, setShowJump] = useState(false);
   const needAdam = useNeedAdamShortcut();
   const abort = useRef<AbortController | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
-  const stick = useRef(true);
+  /** follow the answer while it is written: only while she is at the bottom */
+  const follow = useRef(true);
+  const lastTop = useRef(0);
   const fileInput = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const askedInitial = useRef(false);
@@ -116,11 +191,34 @@ export function Chat({
     };
   }, []);
 
-  // Smooth auto-scroll while streaming, unless she scrolled up to read.
+  // Follow the answer while it streams — instant jumps, never an animation that
+  // fights her finger. The app only ever scrolls DOWN, so any upward scroll is
+  // hers: it stops the follow at once; coming back to the bottom resumes it.
+  const toBottom = useCallback(() => {
+    const el = scroller.current;
+    if (el && follow.current) el.scrollTop = el.scrollHeight;
+  }, []);
+  useLayoutEffect(toBottom, [messages, waiting, toBottom]);
+  // the list also changes size (keyboard, quick replies coming back): stay at the bottom if she was there
   useEffect(() => {
     const el = scroller.current;
-    if (el && stick.current) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages, waiting]);
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(toBottom);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [toBottom]);
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (el.scrollTop < lastTop.current - 1) follow.current = false;
+    else if (distance < 32) follow.current = true;
+    lastTop.current = el.scrollTop;
+    setShowJump(distance > 240);
+  };
+  const jumpToBottom = () => {
+    follow.current = true;
+    scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
+  };
 
   const patchLast = useCallback((fn: (m: ChatMessage) => ChatMessage) => {
     setMessages((ms) => {
@@ -152,7 +250,7 @@ export function Chat({
       setInput("");
       setStreaming(true);
       setWaiting(true);
-      stick.current = true;
+      follow.current = true;
       const ctrl = new AbortController();
       abort.current = ctrl;
       try {
@@ -227,30 +325,44 @@ export function Chat({
 
   const newChat = () => {
     stop();
+    follow.current = true;
     setMessages([]);
     setConversationId(null);
   };
 
+  // The list opens at once with what we already know, and refreshes in the background.
   const openHistory = async () => {
     setHistoryOpen(true);
     const r = await callAction(() => listConversations(scope));
     if (r.ok) setHistory(r.items);
     else {
-      setHistory([]);
+      setHistory((h) => h ?? []);
       toast.show(r.error, "error");
     }
   };
 
   const openConversation = async (id: string) => {
+    setHistoryOpen(false);
+    if (id === conversationId) return;
+    stop();
+    setLoadingConversation(true);
     const r = await callAction(() => loadConversation(id, scope));
+    setLoadingConversation(false);
     if (!r.ok) return toast.show(r.error, "error");
+    follow.current = true;
     setMessages(r.messages);
     setConversationId(id);
     if (MODES.some((m) => m.value === r.mode)) setMode(r.mode as Mode);
-    setHistoryOpen(false);
   };
 
-  const confirmAction = async (logId: string, decision: "confirm" | "reject") => {
+  const regenerate = useCallback(() => send("", { regenerate: true }), [send]);
+  const copy = useCallback((text: string) => navigator.clipboard?.writeText(text).then(() => toast.show("Copiato ♡", "info")), [toast]);
+  const removeMessage = useCallback(async (id: string) => {
+    setMessages((ms) => ms.filter((x) => x.id !== id));
+    if (!id.startsWith("tmp-")) await callAction(() => deleteAiMessage(id));
+  }, []);
+
+  const confirmAction = useCallback(async (logId: string, decision: "confirm" | "reject") => {
     const res = await fetch("/api/admin/ai/confirm", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ logId, decision }) });
     const json = await res.json().catch(() => ({}));
     const state = decision === "confirm" && json.ok ? "confirmed" : "rejected";
@@ -259,7 +371,7 @@ export function Chat({
       { id: `note-${Date.now()}`, role: "note", content: json.summary ? `${json.ok ? "✓" : "✗"} ${json.summary}` : (json.error ?? "Annullato"), actions: [], status: "ok", createdAt: new Date().toISOString() },
     ]);
     if (!res.ok) toast.show(json.error ?? "Errore", "error");
-  };
+  }, [toast]);
 
   const attach = async (file: File) => {
     setAttaching(true);
@@ -279,7 +391,7 @@ export function Chat({
   const lastModelIndex = messages.map((m) => m.role).lastIndexOf("model");
 
   return (
-    <div className="flex h-[calc(100dvh-9.5rem)] flex-col lg:h-[calc(100dvh-4rem)]">
+    <div className="h-chat flex flex-col">
       {/* header */}
       <div className="flex items-center gap-3 pb-3">
         <Avatar url={profile.avatarUrl} />
@@ -324,112 +436,70 @@ export function Chat({
       )}
 
       {/* messages */}
-      <div
-        ref={scroller}
-        onScroll={(e) => {
-          const el = e.currentTarget;
-          stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-        }}
-        className="no-scrollbar -mx-1 flex-1 space-y-4 overflow-y-auto px-1 py-2"
-        aria-live="polite"
-      >
-        {(!available || offline) && (
-          <div className="paper rounded-3xl p-4 text-center">
-            <WifiOff className="mx-auto size-6 text-vio-500" />
-            <p className="mt-2 font-bold text-vio-900">{unavailableText}</p>
-            {scope === "viola" && (
-              <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
-                <Link href="/viola/calma/respira" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
-                  Respira
-                </Link>
-                <Link href="/viola/calma/54321" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
-                  5-4-3-2-1
-                </Link>
-                <Link href="/viola/calma/aiutami" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
-                  Aiutami adesso
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {messages.length === 0 && available && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-6 text-center">
-            <Avatar url={profile.avatarUrl} size="lg" />
-            <p className="mt-4 max-w-xs font-display text-2xl leading-snug text-vio-900">{profile.welcome}</p>
-            {profile.signature && <p className="mt-1 font-hand text-xl text-vio-500">{profile.signature}</p>}
-          </motion.div>
-        )}
-
-        <AnimatePresence initial={false}>
-          {messages.map((m, i) => {
-            if (m.role === "note")
-              return (
-                <motion.p key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-xs font-bold text-ink-muted">
-                  {m.content}
-                </motion.p>
-              );
-            const mine = m.role === "user";
-            const isLast = i === lastModelIndex;
-            const pending = streaming && isLast;
-            return (
-              <motion.div key={m.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cn("group flex gap-2", mine && "justify-end")}>
-                {!mine && <Avatar url={profile.avatarUrl} />}
-                <div className={cn("flex max-w-[85%] min-w-0 flex-col gap-2", mine && "items-end")}>
-                  {(m.content || (pending && waiting)) && (
-                    <div
-                      data-role={m.role}
-                      data-status={m.status}
-                      className={cn(
-                        "rounded-3xl px-4 py-2.5 text-[15.5px] leading-relaxed break-words",
-                        mine ? "rounded-br-lg bg-wine-700 text-white" : "rounded-bl-lg bg-surface text-ink shadow-soft",
-                        m.status === "error" && "bg-blush-100 text-vio-900",
-                      )}
-                    >
-                      {mine ? <p className="whitespace-pre-wrap">{m.content}</p> : m.content ? <Markdown className="prose-vio [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{m.content}</Markdown> : <Typing />}
-                      {m.status === "stopped" && <p className="mt-1 text-xs text-ink-muted italic">(interrotto)</p>}
-                    </div>
-                  )}
-                  {m.actions.length > 0 && (
-                    <div className="flex flex-col items-start gap-2">
-                      {m.actions.map((a, k) => (
-                        <ActionCard key={k} action={a} onConfirm={confirmAction} />
-                      ))}
-                    </div>
-                  )}
-                  {!pending && m.content && (
-                    <div className={cn("flex gap-1 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100", mine && "justify-end")}>
-                      <button
-                        type="button"
-                        onClick={() => navigator.clipboard?.writeText(m.content).then(() => toast.show("Copiato ♡", "info"))}
-                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface"
-                        aria-label="Copia"
-                      >
-                        <Copy className="size-4" />
-                      </button>
-                      {!mine && isLast && !streaming && (
-                        <button type="button" onClick={() => send("", { regenerate: true })} className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface" aria-label="Rigenera risposta">
-                          <RefreshCw className="size-4" />
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          setMessages((ms) => ms.filter((x) => x.id !== m.id));
-                          if (!m.id.startsWith("tmp-")) await callAction(() => deleteAiMessage(m.id));
-                        }}
-                        className="grid size-8 place-items-center rounded-lg text-ink-muted hover:bg-surface"
-                        aria-label="Elimina messaggio"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
-                  )}
+      <div className="relative -mx-1 min-h-0 flex-1">
+        <div ref={scroller} onScroll={onScroll} className="h-full space-y-4 overflow-y-auto overscroll-contain px-1 py-2 [scrollbar-width:thin]" aria-live="polite" aria-busy={loadingConversation}>
+          {(!available || offline) && (
+            <div className="paper rounded-3xl p-4 text-center">
+              <WifiOff className="mx-auto size-6 text-vio-500" />
+              <p className="mt-2 font-bold text-vio-900">{unavailableText}</p>
+              {scope === "viola" && (
+                <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
+                  <Link href="/viola/calma/respira" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
+                    Respira
+                  </Link>
+                  <Link href="/viola/calma/54321" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
+                    5-4-3-2-1
+                  </Link>
+                  <Link href="/viola/calma/aiutami" className="rounded-full bg-lilac-100 px-3 py-1.5 font-bold text-lilac-600">
+                    Aiutami adesso
+                  </Link>
                 </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+              )}
+            </div>
+          )}
+
+          {loadingConversation && <p className="py-10 text-center text-sm font-bold text-ink-muted">Carico la conversazione…</p>}
+
+          {messages.length === 0 && available && !loadingConversation && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-6 text-center">
+              <Avatar url={profile.avatarUrl} size="lg" />
+              <p className="mt-4 max-w-xs font-display text-2xl leading-snug text-vio-900">{profile.welcome}</p>
+              {profile.signature && <p className="mt-1 font-hand text-xl text-vio-500">{profile.signature}</p>}
+            </motion.div>
+          )}
+
+          <AnimatePresence initial={false}>
+            {!loadingConversation &&
+              messages.map((m, i) => {
+                const isLast = i === lastModelIndex;
+                const pending = streaming && isLast;
+                return (
+                  <MessageRow
+                    key={m.id}
+                    m={m}
+                    avatarUrl={profile.avatarUrl}
+                    pending={pending}
+                    showTyping={pending && waiting}
+                    canRegenerate={m.role === "model" && isLast && !streaming}
+                    onRegenerate={regenerate}
+                    onDelete={removeMessage}
+                    onCopy={copy}
+                    onConfirm={confirmAction}
+                  />
+                );
+              })}
+          </AnimatePresence>
+        </div>
+        {showJump && (
+          <button
+            type="button"
+            onClick={jumpToBottom}
+            className="press absolute bottom-3 left-1/2 grid size-10 -translate-x-1/2 place-items-center rounded-full bg-surface text-vio-700 shadow-float ring-1 ring-line"
+            aria-label="Vai agli ultimi messaggi"
+          >
+            <ArrowDown className="size-5" />
+          </button>
+        )}
       </div>
 
       {/* quick actions */}

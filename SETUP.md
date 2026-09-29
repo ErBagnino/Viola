@@ -322,6 +322,7 @@ Vercel ospita l'app. Piano **Hobby** (gratis, per uso personale).
 2. Apri **Environment Variables** e inserisci **tutte** le variabili del passo 22 **prima** di premere Deploy.
 3. Premi **Deploy** e aspetta 1–3 minuti.
 4. Vercel ti dà un indirizzo tipo `https://viola-xxxx.vercel.app`: è la tua app!
+   Le funzioni del server girano a **Francoforte** (`vercel.json` → `"regions": ["fra1"]`), vicino al database: ogni risposta di Adam AI e ogni pagina fanno meno strada. Se hai creato Supabase in un'altra regione, metti in `vercel.json` la regione Vercel più vicina (per esempio `cdg1` Parigi, `lhr1` Londra, `iad1` Stati Uniti est).
 5. Torna su Supabase → **Authentication → URL Configuration → Site URL** e incolla questo indirizzo.
 6. Su Vercel imposta anche `NEXT_PUBLIC_SITE_URL` con lo stesso indirizzo (serve al pulsante "Apri app" di Telegram) e fai **Redeploy**.
 

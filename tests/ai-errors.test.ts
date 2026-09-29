@@ -82,7 +82,7 @@ describe("what really went wrong with Gemini", () => {
 // ---------------------------------------------------------------------------
 // The real SDK against a fake Gemini: retries, fallbacks and stops.
 // ---------------------------------------------------------------------------
-type Plan = (n: number, body: { tools?: unknown[] }) => { status: number; body?: object; hang?: boolean; stream?: object[] };
+type Plan = (n: number, body: { tools?: unknown[]; generationConfig?: { thinkingConfig?: unknown } }) => { status: number; body?: object; hang?: boolean; stream?: object[] };
 const plans = new Map<string, Plan>();
 const hits: { model: string; tools: number }[] = [];
 let server: http.Server;
@@ -190,6 +190,18 @@ describe("Gemini requests: retry only what is temporary", () => {
     const r = await round(["a", "b", "c"]);
     expect(r.model).toBe("c");
     expect(await codeOf(round(["a", "b"]))).toBe("limit"); // both cooling now
+  });
+
+  it("the chat can ask for no thinking; a model that must think gets a small budget, then no setting at all", async () => {
+    const seen: unknown[] = [];
+    plans.set("a", (n, body) => {
+      seen.push(body.generationConfig?.thinkingConfig ?? null);
+      return n <= 2 ? err(400, "INVALID_ARGUMENT", "Budget 0 is invalid. This model only works in thinking mode.") : { status: 200, stream: [{ candidates: [{ content: { parts: [{ text: "subito" }] } }] }] };
+    });
+    const { streamRound } = await import("@/server/ai/gemini");
+    const r = await streamRound({ models: ["a"], system: "S", contents: [{ role: "user", parts: [{ text: "ciao" }] }], maxOutputTokens: 50, temperature: 0.5, thinkingBudget: 0 });
+    expect(r.text).toBe("subito");
+    expect(seen).toEqual([{ thinkingBudget: 0 }, { thinkingBudget: 128 }, null]);
   });
 
   it("a model that never answers is dropped after the first-chunk timeout", async () => {

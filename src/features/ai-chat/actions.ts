@@ -30,9 +30,13 @@ export async function loadConversation(id: string, scope: "viola" | "copilot") {
     await guard(scope);
     if (!z.uuid().safeParse(id).success) throw new UserError("Conversazione non valida");
     const supabase = await createClient();
-    const { data: conv } = await supabase.from("ai_conversations").select("id, mode").eq("id", id).eq("scope", scope).maybeSingle();
+    // together: RLS already limits the messages to her own conversations
+    const [{ data: conv }, messages] = await Promise.all([
+      supabase.from("ai_conversations").select("id, mode").eq("id", id).eq("scope", scope).maybeSingle(),
+      loadMessagesForUi(supabase, id),
+    ]);
     if (!conv) throw new UserError("Conversazione non trovata");
-    return { mode: conv.mode, messages: await loadMessagesForUi(supabase, id) };
+    return { mode: conv.mode, messages };
   });
 }
 

@@ -285,6 +285,15 @@
   padding-top: max(env(safe-area-inset-top), 0.75rem);
 }
 
+/* The AI chat fills the screen exactly: the viewport minus the shell's top
+   padding (safe area on iPhone) and bottom padding (tab bar on phones). */
+@utility h-chat {
+  height: calc(100dvh - 8rem - max(env(safe-area-inset-top), 1.25rem));
+  @media (width >= 64rem) {
+    height: calc(100dvh - 3rem - max(env(safe-area-inset-top), 1.25rem));
+  }
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {

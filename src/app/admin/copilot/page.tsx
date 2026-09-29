@@ -1,11 +1,13 @@
 import { Chat } from "@/features/ai-chat/chat";
 import { getSettings } from "@/server/settings";
 import { isAiConfigured } from "@/server/ai/gemini";
+import { loadRecentConversation } from "@/server/ai/history";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "AI Copilot" };
 
 export default async function CopilotPage() {
-  const settings = await getSettings();
+  const [settings, recent] = await Promise.all([getSettings(), createClient().then((supabase) => loadRecentConversation(supabase, "copilot"))]);
   const available = settings.ai.copilotEnabled && isAiConfigured();
   return (
     <Chat
@@ -29,6 +31,7 @@ export default async function CopilotPage() {
       available={available}
       unavailableText={isAiConfigured() ? "Il Copilot è disattivato nelle impostazioni AI." : "Manca GEMINI_API_KEY: segui SETUP.md per attivarla (gratis)."}
       allowAttachments
+      initialConversation={recent}
     />
   );
 }
